@@ -111,10 +111,10 @@ export default function FAQSection() {
                 {/* Gradient Background Overlay */}
                 <div className="absolute inset-0 gradient-primary opacity-5 group-hover:opacity-10 transition-opacity duration-300"></div>
                 
-                <CardHeader className="pb-0 relative z-10">
+                <CardHeader className="py-2 relative z-10">
                   <button
                     onClick={() => toggleFAQ(index)}
-                    className="w-full text-left flex items-center justify-between hover:bg-muted/50 transition-all duration-300 cursor-pointer p-0 group"
+                    className="w-full text-left flex items-center  justify-between hover:bg-muted/50 transition-all duration-300 cursor-pointer p-0 group"
                   >
                     <div className="flex items-center gap-4">
                       <motion.div

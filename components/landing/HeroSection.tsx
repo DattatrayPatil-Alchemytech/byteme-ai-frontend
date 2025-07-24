@@ -138,7 +138,7 @@ export default function HeroSection() {
             >
               <Card className="hover-lift gradient-ev-nature/10 border-secondary/20 backdrop-blur-sm">
                 <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-gradient-ev-nature mb-1">8.7K</div>
+                  <div className="text-2xl font-bold text-gradient-ev-light mb-1">8.7K</div>
                   <div className="text-xs text-muted-foreground">Users Joined</div>
                 </CardContent>
               </Card>
@@ -150,7 +150,7 @@ export default function HeroSection() {
             >
               <Card className="hover-lift gradient-ev-fresh/10 border-danger/20 backdrop-blur-sm">
                 <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-gradient-ev-fresh mb-1">47</div>
+                  <div className="text-2xl font-bold text-gradient-ev-light mb-1">47</div>
                   <div className="text-xs text-muted-foreground">Blocked Users</div>
                 </CardContent>
               </Card>
@@ -162,7 +162,7 @@ export default function HeroSection() {
             >
               <Card className="hover-lift gradient-ev-eco/10 border-cyan-500/20 backdrop-blur-sm">
                 <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-gradient-ev-eco mb-1">45.3K</div>
+                  <div className="text-2xl font-bold text-gradient-ev-green mb-1">45.3K</div>
                   <div className="text-xs text-muted-foreground">Submissions</div>
                 </CardContent>
               </Card>

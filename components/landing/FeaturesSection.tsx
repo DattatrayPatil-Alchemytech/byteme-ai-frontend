@@ -43,8 +43,8 @@ export default function FeaturesSection() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-gradient-aurora mb-4">
-            Why Choose EV Rewards?
+          <h2 className="text-4xl md:text-5xl font-bold text-gradient-aurora pb-2 mb-2">
+            Why Choose ByteMe AI?
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Experience the future of sustainable driving with cutting-edge technology and instant rewards

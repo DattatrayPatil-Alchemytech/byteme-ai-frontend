@@ -97,7 +97,7 @@ export default function CTASection() {
             </motion.div>
             
             <motion.div
-              className="p-4 rounded-lg backdrop-blur-sm border border-success/10"
+              className="p-4 rounded-lg backdrop-blur-sm border border-primary/10"
               whileHover={{ scale: 1.05, y: -5 }}
               transition={{ duration: 0.3, delay: 0.1 }}
             >
@@ -107,7 +107,7 @@ export default function CTASection() {
             </motion.div>
             
             <motion.div
-              className="p-4 rounded-lg backdrop-blur-sm border border-secondary/10"
+              className="p-4 rounded-lg backdrop-blur-sm border border-primary/10"
               whileHover={{ scale: 1.05, y: -5 }}
               transition={{ duration: 0.3, delay: 0.2 }}
             >

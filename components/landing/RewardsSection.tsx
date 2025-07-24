@@ -47,7 +47,7 @@ export default function RewardsSection() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-gradient-sunset mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold text-gradient-aurora mb-4">
             Reward Structure
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -139,22 +139,7 @@ export default function RewardsSection() {
           ))}
         </motion.div>
         
-        {/* Additional Info */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={tiersVisible ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
-          transition={{ duration: 0.8, delay: 0.8, ease: "easeOut" }}
-          className="mt-16 text-center"
-        >
-          <div className="inline-block p-6 gradient-cyber rounded-2xl backdrop-blur-sm">
-            <h3 className="text-2xl font-bold text-white mb-2">
-              💎 Upgrade Your Tier Anytime
-            </h3>
-            <p className="text-white/90">
-              Start with Basic and upgrade as you earn more rewards
-            </p>
-          </div>
-        </motion.div>
+       
       </div>
     </section>
   );

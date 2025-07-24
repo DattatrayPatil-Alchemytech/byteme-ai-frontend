@@ -13,11 +13,11 @@ export default function Footer() {
                 <span className="text-primary-foreground font-bold text-sm">⚡</span>
               </div>
               <span className="text-foreground font-bold text-lg">
-                EV Rewards
+                ByteMe AI
               </span>
             </div>
             <p className="text-muted-foreground text-sm">
-              Empowering electric vehicle owners to earn rewards while driving sustainably.
+              Empowering sustainable driving with AI-powered rewards and blockchain technology.
             </p>
           </div>
           
@@ -55,7 +55,7 @@ export default function Footer() {
         <Separator className="mb-8" />
         
         <div className="flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground">
-          <p>&copy; 2024 EV Rewards. All rights reserved.</p>
+          <p>&copy; 2024 byteme ai. All rights reserved.</p>
           <p>Built on VeChain blockchain for sustainable driving rewards.</p>
         </div>
       </div>

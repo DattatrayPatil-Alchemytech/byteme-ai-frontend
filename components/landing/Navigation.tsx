@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -15,46 +15,48 @@ export default function Navigation() {
       setIsScrolled(scrollTop > 10);
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const navItems = [
-    { href: '#features', label: 'Features' },
-    { href: '#how-it-works', label: 'How it Works' },
-    { href: '#rewards', label: 'Rewards' },
-    { href: '#faq', label: 'FAQ' }
+    { href: "#features", label: "Features" },
+    { href: "#how-it-works", label: "How it Works" },
+    { href: "#rewards", label: "Rewards" },
+    { href: "#faq", label: "FAQ" },
   ];
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-      isScrolled 
-        ? 'bg-background/95 backdrop-blur-xl border-b border-primary/20 shadow-2xl py-3' 
-        : 'bg-transparent py-6'
-    }`}>
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        isScrolled
+          ? "bg-background/95 backdrop-blur-xl border-b border-primary/20 shadow-2xl py-3"
+          : "bg-transparent py-6"
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex justify-between items-center">
           {/* Logo Section */}
-          <motion.div 
+          <motion.div
             className="flex items-center space-x-3"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <motion.div 
+            <motion.div
               className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-lg ${
-                isScrolled ? 'gradient-ev-green' : 'gradient-ev-light'
+                isScrolled ? "gradient-ev-green" : "gradient-ev-light"
               }`}
-              whileHover={{ 
-                scale: 1.05, 
-                transition: { duration: 0.2 }
+              whileHover={{
+                scale: 1.05,
+                transition: { duration: 0.2 },
               }}
             >
               <span className="text-white font-bold text-2xl">⚡</span>
             </motion.div>
             <div className="flex flex-col">
-              <span className="text-gradient-ev-green font-bold text-2xl leading-none">
-                EV Rewards
+              <span className="text-gradient-ev-green font-bold text-2xl pb-2 leading-none">
+                ByteMe AI
               </span>
               <span className="text-xs text-muted-foreground -mt-1">
                 Drive Green, Earn Rewards
@@ -86,27 +88,15 @@ export default function Navigation() {
           </div>
 
           {/* Desktop CTA Buttons */}
-          <motion.div 
+          <motion.div
             className="hidden lg:flex items-center space-x-4"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Link href="/auth/login">
-                <Button 
-                  variant="ghost" 
-                  size="lg"
-                  className="text-muted-foreground hover:text-foreground hover:bg-primary/10 transition-all duration-300 font-medium"
-                >
-                  Sign In
-                </Button>
-              </Link>
-            </motion.div>
-            
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Link href="/auth/register">
-                <Button 
+                <Button
                   size="lg"
                   className="gradient-ev-green hover-glow text-white font-semibold px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
                 >
@@ -129,25 +119,25 @@ export default function Navigation() {
             <div className="w-6 h-6 flex flex-col justify-center items-center space-y-1">
               <motion.span
                 className="w-5 h-0.5 bg-foreground rounded-full"
-                animate={{ 
+                animate={{
                   rotate: isMobileMenuOpen ? 45 : 0,
-                  y: isMobileMenuOpen ? 6 : 0
+                  y: isMobileMenuOpen ? 6 : 0,
                 }}
                 transition={{ duration: 0.2 }}
               />
               <motion.span
                 className="w-5 h-0.5 bg-foreground rounded-full"
-                animate={{ 
+                animate={{
                   opacity: isMobileMenuOpen ? 0 : 1,
-                  scale: isMobileMenuOpen ? 0 : 1
+                  scale: isMobileMenuOpen ? 0 : 1,
                 }}
                 transition={{ duration: 0.2 }}
               />
               <motion.span
                 className="w-5 h-0.5 bg-foreground rounded-full"
-                animate={{ 
+                animate={{
                   rotate: isMobileMenuOpen ? -45 : 0,
-                  y: isMobileMenuOpen ? -6 : 0
+                  y: isMobileMenuOpen ? -6 : 0,
                 }}
                 transition={{ duration: 0.2 }}
               />
@@ -160,7 +150,7 @@ export default function Navigation() {
           {isMobileMenuOpen && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
+              animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.2 }}
               className="lg:hidden mt-4 overflow-hidden"
@@ -181,8 +171,8 @@ export default function Navigation() {
                 ))}
                 <div className="pt-4 border-t border-primary/20 space-y-3">
                   <Link href="/auth/login">
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       className="w-full text-muted-foreground hover:text-foreground hover:bg-primary/10"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
@@ -190,7 +180,7 @@ export default function Navigation() {
                     </Button>
                   </Link>
                   <Link href="/auth/register">
-                    <Button 
+                    <Button
                       className="w-full gradient-ev-green hover-glow text-white font-semibold"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
@@ -205,4 +195,4 @@ export default function Navigation() {
       </div>
     </nav>
   );
-} 
+}
