@@ -119,4 +119,926 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Optimize scrolling performance */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Use transform3d for hardware acceleration */
+  .gpu-accelerated {
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+  }
+  
+  /* Cursor pointer for all interactive elements */
+  button,
+  [role="button"],
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"],
+  .cursor-pointer,
+  .interactive {
+    cursor: pointer !important;
+  }
+  
+  /* Ensure all buttons have pointer cursor */
+  .btn,
+  .button,
+  [class*="btn"],
+  [class*="button"] {
+    cursor: pointer !important;
+  }
+}
+
+@layer utilities {
+  /* EV-Themed Green Gradient Classes */
+  .gradient-primary {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  }
+  
+  .gradient-secondary {
+    background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  }
+  
+  .gradient-success {
+    background: linear-gradient(135deg, #6ee7b7 0%, #34d399 100%);
+  }
+  
+  .gradient-warning {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  }
+  
+  .gradient-danger {
+    background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+  }
+  
+  .gradient-dark {
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  }
+  
+  /* EV Green Theme Gradients */
+  .gradient-ev-green {
+    background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+  }
+  
+  .gradient-ev-light {
+    background: linear-gradient(135deg, #6ee7b7 0%, #34d399 50%, #10b981 100%);
+  }
+  
+  .gradient-ev-cream {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fbbf24 100%);
+  }
+  
+  .gradient-ev-nature {
+    background: linear-gradient(135deg, #a7f3d0 0%, #6ee7b7 50%, #34d399 100%);
+  }
+  
+  .gradient-ev-fresh {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 50%, #6ee7b7 100%);
+  }
+  
+  .gradient-ev-eco {
+    background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+  }
+  
+  /* Simplified animated gradients - EV themed */
+  .gradient-aurora {
+    background: linear-gradient(135deg, #10b981 0%, #059669 50%, #34d399 100%);
+    background-size: 200% 200%;
+    animation: auroraShift 6s ease infinite;
+  }
+  
+  .gradient-neon {
+    background: linear-gradient(135deg, #6ee7b7 0%, #34d399 50%, #10b981 100%);
+    background-size: 200% 200%;
+    animation: neonPulse 4s ease infinite;
+  }
+  
+  .gradient-cosmic {
+    background: linear-gradient(135deg, #a7f3d0 0%, #6ee7b7 50%, #34d399 100%);
+    background-size: 200% 200%;
+    animation: cosmicFlow 8s ease infinite;
+  }
+  
+  .gradient-ocean {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 50%, #6ee7b7 100%);
+    background-size: 200% 200%;
+    animation: oceanWave 6s ease infinite;
+  }
+  
+  .gradient-sunset {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fbbf24 100%);
+    background-size: 200% 200%;
+    animation: sunsetGlow 5s ease infinite;
+  }
+  
+  .gradient-cyber {
+    background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+    background-size: 200% 200%;
+    animation: cyberPulse 4s ease infinite;
+  }
+  
+  /* Text Gradient Classes - EV themed */
+  .text-gradient-primary {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .text-gradient-aurora {
+    background: linear-gradient(135deg, #10b981 0%, #059669 50%, #34d399 100%);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: auroraShift 6s ease infinite;
+  }
+  
+  .text-gradient-neon {
+    background: linear-gradient(135deg, #6ee7b7 0%, #34d399 50%, #10b981 100%);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: neonPulse 4s ease infinite;
+  }
+  
+  .text-gradient-ev-green {
+    background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .text-gradient-ev-light {
+    background: linear-gradient(135deg, #6ee7b7 0%, #34d399 50%, #10b981 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .text-gradient-ev-cream {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fbbf24 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  /* Optimized Animation Classes - Reduced complexity */
+  .animate-slide-in-up {
+    animation: slideInUp 0.6s ease-out;
+  }
+  
+  .animate-slide-in-down {
+    animation: slideInDown 0.6s ease-out;
+  }
+  
+  .animate-slide-in-left {
+    animation: slideInLeft 0.6s ease-out;
+  }
+  
+  .animate-slide-in-right {
+    animation: slideInRight 0.6s ease-out;
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+  }
+  
+  .animate-scale-in {
+    animation: scaleIn 0.6s ease-out;
+  }
+  
+  .animate-bounce-in {
+    animation: bounceIn 0.8s ease-out;
+  }
+  
+  .animate-rotate-in {
+    animation: rotateIn 0.8s ease-out;
+  }
+  
+  .animate-pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+  
+  /* Simplified floating animation */
+  .animate-float {
+    animation: float 4s ease-in-out infinite;
+  }
+  
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+  
+  .animate-shimmer {
+    animation: shimmer 2s linear infinite;
+  }
+  
+  /* Blinking Animation Classes */
+  .animate-blink {
+    animation: blink 3s ease-in-out infinite;
+  }
+  
+  .animate-blink-slow {
+    animation: blink-slow 4s ease-in-out infinite;
+  }
+  
+  /* Dashboard Animation Classes */
+  .animate-dashboard-pulse {
+    animation: dashboard-pulse 3s ease-in-out infinite;
+  }
+  
+  .animate-meter-fill {
+    animation: meter-fill 4s ease-in-out infinite;
+  }
+  
+  .animate-data-stream {
+    animation: data-stream 5s ease-in-out infinite;
+  }
+  
+  .animate-circuit-flow {
+    animation: circuit-flow 6s ease-in-out infinite;
+  }
+  
+  .animate-blink-fast {
+    animation: blink-fast 1.5s ease-in-out infinite;
+  }
+  
+  .animate-blink-medium {
+    animation: blink-medium 2.5s ease-in-out infinite;
+  }
+  
+  .animate-blink-alert {
+    animation: blink-alert 2s ease-in-out infinite;
+  }
+  
+  /* Dashboard Element Classes */
+  .dashboard-gauge {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    border: 3px solid rgba(16, 185, 129, 0.3);
+    border-radius: 50%;
+    background: rgba(16, 185, 129, 0.1);
+    backdrop-filter: blur(4px);
+  }
+  
+  .dashboard-gauge::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 2px;
+    height: 35px;
+    background: rgba(16, 185, 129, 0.8);
+    transform: translate(-50%, -50%) rotate(45deg);
+    transform-origin: bottom center;
+  }
+  
+  .dashboard-meter {
+    position: absolute;
+    width: 80px;
+    height: 8px;
+    background: rgba(16, 185, 129, 0.2);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  .dashboard-meter::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: linear-gradient(90deg, #10b981, #34d399);
+    border-radius: 4px;
+    width: 0%;
+  }
+  
+  .dashboard-data {
+    position: absolute;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    font-weight: bold;
+    color: #000000;
+    text-shadow: 0 0 2px rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.9);
+    padding: 4px 8px;
+    border-radius: 4px;
+    backdrop-filter: blur(2px);
+    border: 1px solid rgba(16, 185, 129, 0.5);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  .dashboard-circuit {
+    position: absolute;
+    width: 100px;
+    height: 60px;
+    background: linear-gradient(45deg, rgba(16, 185, 129, 0.1), rgba(52, 211, 153, 0.1));
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  .dashboard-circuit::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 20px;
+    height: 2px;
+    background: rgba(16, 185, 129, 0.6);
+    border-radius: 1px;
+  }
+  
+  .dashboard-circuit::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 15px;
+    width: 2px;
+    height: 15px;
+    background: rgba(16, 185, 129, 0.6);
+    border-radius: 1px;
+  }
+  
+  .dashboard-blink {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: rgba(16, 185, 129, 0.8);
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+  }
+  
+  .dashboard-blink-alert {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: rgba(245, 158, 11, 0.8);
+    border-radius: 2px;
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+  }
+  
+  .dashboard-blink-warning {
+    position: absolute;
+    width: 10px;
+    height: 4px;
+    background: rgba(239, 68, 68, 0.8);
+    border-radius: 2px;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+  }
+  
+  /* Stat Meter Classes for Hero Section */
+  .stat-meter {
+    width: 100%;
+    height: 6px;
+    background: rgba(16, 185, 129, 0.2);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .stat-meter-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #10b981, #34d399);
+    border-radius: 3px;
+    transition: width 0.8s ease-out;
+    position: relative;
+  }
+  
+  .stat-meter-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shimmer 2s linear infinite;
+  }
+  
+  /* Odometer Digit Styling */
+  .odometer-digit {
+    color: #00ffff !important;
+    text-shadow: 
+      0 0 2px rgba(0, 255, 255, 1),
+      0 0 5px rgba(0, 255, 255, 1),
+      0 0 10px rgba(0, 255, 255, 0.8),
+      0 0 15px rgba(0, 255, 255, 0.6),
+      0 0 20px rgba(0, 255, 255, 0.4);
+    filter: blur(0.3px);
+    animation: digitGlow 3s ease-in-out infinite;
+    font-weight: 500;
+    font-size: 1.5rem;
+  }
+  
+  @keyframes digitGlow {
+    0%, 100% {
+      text-shadow: 
+        0 0 2px rgba(0, 255, 255, 1),
+        0 0 5px rgba(0, 255, 255, 1),
+        0 0 10px rgba(0, 255, 255, 0.8),
+        0 0 15px rgba(0, 255, 255, 0.6),
+        0 0 20px rgba(0, 255, 255, 0.4);
+      filter: blur(0.3px);
+    }
+    50% {
+      text-shadow: 
+        0 0 3px rgba(0, 255, 255, 1),
+        0 0 8px rgba(0, 255, 255, 1),
+        0 0 15px rgba(0, 255, 255, 1),
+        0 0 25px rgba(0, 255, 255, 0.8),
+        0 0 35px rgba(0, 255, 255, 0.6);
+      filter: blur(0.4px);
+    }
+  }
+  
+  /* Odometer Title and Description Styling */
+  .odometer-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #00ffff;
+    text-shadow: 
+      0 0 5px rgba(0, 255, 255, 0.8),
+      0 0 10px rgba(0, 255, 255, 0.4);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-family: 'Courier New', monospace;
+    animation: titleGlow 4s ease-in-out infinite;
+  }
+  
+  .odometer-description {
+    font-size: 0.875rem;
+    color: rgba(0, 255, 255, 0.8);
+    text-shadow: 0 0 3px rgba(0, 255, 255, 0.3);
+    letter-spacing: 0.02em;
+    font-weight: 400;
+    font-family: 'Courier New', monospace;
+  }
+  
+  @keyframes titleGlow {
+    0%, 100% {
+      text-shadow: 
+        0 0 5px rgba(0, 255, 255, 0.8),
+        0 0 10px rgba(0, 255, 255, 0.4);
+    }
+    50% {
+      text-shadow: 
+        0 0 8px rgba(0, 255, 255, 1),
+        0 0 15px rgba(0, 255, 255, 0.6),
+        0 0 20px rgba(0, 255, 255, 0.3);
+    }
+  }
+  
+  /* Scroll-triggered animations - Optimized */
+  .scroll-animate {
+    opacity: 0;
+    transform: translate3d(0, 30px, 0);
+    transition: all 0.6s ease-out;
+    will-change: transform, opacity;
+  }
+  
+  .scroll-animate.animate {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  
+  /* Optimized Keyframe Animations - Reduced complexity */
+  @keyframes auroraShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  
+  @keyframes neonPulse {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  
+  @keyframes cosmicFlow {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  
+  @keyframes oceanWave {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  
+  @keyframes sunsetGlow {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  
+  @keyframes cyberPulse {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 30px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+  
+  @keyframes slideInDown {
+    from {
+      opacity: 0;
+      transform: translate3d(0, -30px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+  
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translate3d(-30px, 0, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+  
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translate3d(30px, 0, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  @keyframes bounceIn {
+    0% {
+      opacity: 0;
+      transform: scale(0.3);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+    70% {
+      transform: scale(0.9);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  @keyframes rotateIn {
+    from {
+      opacity: 0;
+      transform: rotate(-180deg);
+    }
+    to {
+      opacity: 1;
+      transform: rotate(0);
+    }
+  }
+  
+  @keyframes pulseGlow {
+    0%, 100% {
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.5);
+    }
+  }
+  
+  @keyframes float {
+    0%, 100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(0, -8px, 0);
+    }
+  }
+  
+  @keyframes glow {
+    from {
+      box-shadow: 0 0 5px rgba(16, 185, 129, 0.4);
+    }
+    to {
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.6);
+    }
+  }
+  
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+  
+  /* Blinking Animation Keyframes */
+  @keyframes blink {
+    0%, 50% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    25%, 75% {
+      opacity: 0.3;
+      transform: scale(0.8);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  @keyframes blink-slow {
+    0%, 60% {
+      opacity: 0.6;
+      transform: scale(1);
+    }
+    30%, 90% {
+      opacity: 0.1;
+      transform: scale(0.7);
+    }
+    100% {
+      opacity: 0.6;
+      transform: scale(1);
+    }
+  }
+  
+  /* Dashboard Animation Keyframes */
+  @keyframes dashboard-pulse {
+    0%, 100% {
+      opacity: 0.3;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.6;
+      transform: scale(1.05);
+    }
+  }
+  
+  @keyframes meter-fill {
+    0% {
+      width: 0%;
+    }
+    50% {
+      width: 75%;
+    }
+    100% {
+      width: 100%;
+    }
+  }
+  
+  @keyframes data-stream {
+    0% {
+      opacity: 0.3;
+      transform: translateX(-10px);
+    }
+    50% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    100% {
+      opacity: 0.3;
+      transform: translateX(10px);
+    }
+  }
+  
+  @keyframes circuit-flow {
+    0% {
+      opacity: 0.2;
+      transform: scale(0.95);
+    }
+    50% {
+      opacity: 0.6;
+      transform: scale(1.02);
+    }
+    100% {
+      opacity: 0.2;
+      transform: scale(0.95);
+    }
+  }
+  
+  @keyframes blink-fast {
+    0%, 50% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    25%, 75% {
+      opacity: 0.2;
+      transform: scale(0.8);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  @keyframes blink-medium {
+    0%, 60% {
+      opacity: 0.8;
+      transform: scale(1);
+    }
+    30%, 90% {
+      opacity: 0.3;
+      transform: scale(0.9);
+    }
+    100% {
+      opacity: 0.8;
+      transform: scale(1);
+    }
+  }
+  
+  @keyframes blink-alert {
+    0%, 40% {
+      opacity: 1;
+      transform: scale(1);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
+    }
+    20%, 60% {
+      opacity: 0.4;
+      transform: scale(0.7);
+      box-shadow: 0 0 5px rgba(16, 185, 129, 0.4);
+    }
+    80%, 100% {
+      opacity: 1;
+      transform: scale(1);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
+    }
+  }
+  
+  /* Optimized Hover Effects */
+  .hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    will-change: transform;
+  }
+  
+  .hover-lift:hover {
+    transform: translate3d(0, -3px, 0);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .hover-glow:hover {
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+  }
+  
+  .hover-scale:hover {
+    transform: scale(1.02);
+  }
+  
+  /* Performance optimizations */
+  .backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+  
+  .backdrop-blur-xl {
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+  }
+  
+  /* Button hover gradient transition */
+  .btn-gradient-hover {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    transition: all 0.3s ease;
+  }
+  
+  .btn-gradient-hover:hover {
+    background: linear-gradient(135deg, #6ee7b7 0%, #34d399 100%);
+  }
+  
+  /* Glassy Blurry Background Gradients */
+  .glass-bg-primary {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 50%, rgba(52, 211, 153, 0.08) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+  }
+  
+  .glass-bg-secondary {
+    background: linear-gradient(135deg, rgba(52, 211, 153, 0.08) 0%, rgba(16, 185, 129, 0.05) 50%, rgba(110, 231, 183, 0.1) 100%);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(52, 211, 153, 0.15);
+  }
+  
+  .glass-bg-success {
+    background: linear-gradient(135deg, rgba(110, 231, 183, 0.1) 0%, rgba(52, 211, 153, 0.08) 50%, rgba(167, 243, 208, 0.05) 100%);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(110, 231, 183, 0.2);
+  }
+  
+  .glass-bg-warning {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.08) 0%, rgba(245, 158, 11, 0.05) 50%, rgba(253, 230, 138, 0.1) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(251, 191, 36, 0.15);
+  }
+  
+  .glass-bg-aurora {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(5, 150, 105, 0.08) 25%, rgba(52, 211, 153, 0.05) 50%, rgba(110, 231, 183, 0.08) 75%, rgba(167, 243, 208, 0.05) 100%);
+    backdrop-filter: blur(35px);
+    -webkit-backdrop-filter: blur(35px);
+    border: 1px solid rgba(16, 185, 129, 0.1);
+  }
+  
+  .glass-bg-neon {
+    background: linear-gradient(135deg, rgba(110, 231, 183, 0.08) 0%, rgba(52, 211, 153, 0.05) 30%, rgba(16, 185, 129, 0.08) 60%, rgba(167, 243, 208, 0.05) 100%);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border: 1px solid rgba(110, 231, 183, 0.15);
+  }
+  
+  .glass-bg-cosmic {
+    background: linear-gradient(135deg, rgba(167, 243, 208, 0.05) 0%, rgba(110, 231, 183, 0.08) 25%, rgba(52, 211, 153, 0.05) 50%, rgba(16, 185, 129, 0.08) 75%, rgba(209, 250, 229, 0.05) 100%);
+    backdrop-filter: blur(45px);
+    -webkit-backdrop-filter: blur(45px);
+    border: 1px solid rgba(167, 243, 208, 0.1);
+  }
+  
+  .glass-bg-ocean {
+    background: linear-gradient(135deg, rgba(209, 250, 229, 0.08) 0%, rgba(167, 243, 208, 0.05) 30%, rgba(110, 231, 183, 0.08) 60%, rgba(52, 211, 153, 0.05) 100%);
+    backdrop-filter: blur(50px);
+    -webkit-backdrop-filter: blur(50px);
+    border: 1px solid rgba(209, 250, 229, 0.15);
+  }
+  
+  .glass-bg-sunset {
+    background: linear-gradient(135deg, rgba(254, 243, 199, 0.08) 0%, rgba(253, 230, 138, 0.05) 30%, rgba(251, 191, 36, 0.08) 60%, rgba(245, 158, 11, 0.05) 100%);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(254, 243, 199, 0.15);
+  }
+  
+  .glass-bg-cyber {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 150, 105, 0.05) 25%, rgba(4, 120, 87, 0.08) 50%, rgba(6, 95, 70, 0.05) 75%, rgba(16, 185, 129, 0.08) 100%);
+    backdrop-filter: blur(55px);
+    -webkit-backdrop-filter: blur(55px);
+    border: 1px solid rgba(16, 185, 129, 0.1);
+  }
+  
+  /* Animated Glassy Backgrounds */
+  .glass-bg-animated {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(5, 150, 105, 0.08) 25%, rgba(52, 211, 153, 0.05) 50%, rgba(110, 231, 183, 0.08) 75%, rgba(167, 243, 208, 0.05) 100%);
+    background-size: 400% 400%;
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(16, 185, 129, 0.15);
+    animation: glassShift 8s ease infinite;
+  }
+  
+  @keyframes glassShift {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+  
+  /* Frosted Glass Effect */
+  .frosted-glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+  
+  .frosted-glass-green {
+    background: rgba(16, 185, 129, 0.1);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    box-shadow: 0 8px 32px rgba(16, 185, 129, 0.1);
+  }
 }
