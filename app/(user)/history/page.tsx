@@ -73,12 +73,14 @@ const VehicleHistoryPage = () => {
               key={vehicle.id}
               className="flex-shrink-0 bg-card border border-border rounded-xl shadow-md p-4 flex flex-col items-center min-w-[160px] max-w-[180px] w-full transition hover:shadow-lg hover:border-primary/60"
             >
-              <img
-                src={vehicle.image}
-                alt={vehicle.vehicle}
-                className="w-16 h-16 object-cover rounded-md mb-2 border border-muted"
-                loading="lazy"
-              />
+              <div className="w-24 h-24 flex items-center justify-center bg-gray-100 rounded-md mb-2 border border-muted">
+                <img
+                  src={vehicle.image}
+                  alt={vehicle.vehicle}
+                  className="w-full h-full rounded-md"
+                  loading="lazy"
+                />
+              </div>
               <div className="font-semibold text-center text-base truncate w-full text-foreground">{vehicle.vehicle}</div>
               <div className="text-xs text-muted-foreground mt-1 text-center capitalize">{vehicle.type} EV</div>
             </div>
