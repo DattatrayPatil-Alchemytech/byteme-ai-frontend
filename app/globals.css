@@ -1051,3 +1051,20 @@
 .animate-float-slow {
   animation: float-slow 3s ease-in-out infinite;
 }
+
+.custom-scrollbar::-webkit-scrollbar {
+  height: 10px;
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #22c55e; /* Tailwind green-500 or your primary */
+  border-radius: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f3f4f6; /* Tailwind gray-100 */
+  border-radius: 8px;
+}
+.custom-scrollbar {
+  scrollbar-color: #22c55e #f3f4f6;
+  scrollbar-width: thin;
+}

@@ -62,11 +62,12 @@ const VehicleHistoryPage = () => {
 
   return (
     <main className="p-0 sm:p-8">
-      <h1 className="text-3xl font-extrabold mb-4 flex items-center gap-2 text-foreground animate-fade-in">
-        Vehicle Driving Records
-      </h1>
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold text-foreground mb-2 animate-fade-in">Your Vehicle History</h1>
+        <p className="text-muted-foreground text-lg">Track your vehicle driving records</p>
+      </div>
       {/* Vehicle Cards Section */}
-      <div className="w-full mb-6 overflow-x-auto">
+      <div className="w-full mb-6 overflow-x-auto overflow-y-hidden custom-scrollbar">
         <div className="flex gap-4 min-w-[600px] sm:min-w-0">
           {mockHistory.slice(0, 20).map(vehicle => (
             <div
