@@ -71,16 +71,16 @@ const VehicleHistoryPage = () => {
           {mockHistory.slice(0, 20).map(vehicle => (
             <div
               key={vehicle.id}
-              className="flex-shrink-0 bg-white rounded-lg shadow p-4 flex flex-col items-center min-w-[140px] max-w-[160px] w-full border border-gray-100"
+              className="flex-shrink-0 bg-card border border-border rounded-xl shadow-md p-4 flex flex-col items-center min-w-[160px] max-w-[180px] w-full transition hover:shadow-lg hover:border-primary/60"
             >
               <img
                 src={vehicle.image}
                 alt={vehicle.vehicle}
-                className="w-12 h-12 object-contain mb-2"
+                className="w-16 h-16 object-cover rounded-md mb-2 border border-muted"
                 loading="lazy"
               />
-              <div className="font-semibold text-center text-sm truncate w-full">{vehicle.vehicle}</div>
-              <div className="text-xs text-gray-500 mt-1 text-center">{vehicle.type} EV</div>
+              <div className="font-semibold text-center text-base truncate w-full text-foreground">{vehicle.vehicle}</div>
+              <div className="text-xs text-muted-foreground mt-1 text-center capitalize">{vehicle.type} EV</div>
             </div>
           ))}
         </div>
