@@ -5,6 +5,7 @@ import Badges from "@/components/dashboard/Badges";
 import Leaderboard from "@/components/dashboard/Leaderboard";
 import TokenStore from "@/components/dashboard/TokenStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import VehicleHistoryPage from "../history/page";
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -281,6 +282,17 @@ export default function DashboardPage() {
             <span>Leaderboard</span>
           </button>
           <button
+            onClick={() => setActiveTab("history")}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-all cursor-pointer ${
+              activeTab === "history"
+                ? "gradient-ev-green text-white shadow-lg"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+            }`}
+          >
+            <span>🕑</span>
+            <span>History</span>
+          </button>
+          <button
             onClick={() => setActiveTab("store")}
             className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-all cursor-pointer ${
               activeTab === "store"
@@ -510,6 +522,11 @@ export default function DashboardPage() {
             userRank={{ rank: user.currentRank, miles: user.weeklyMiles }}
             onJoinChallenge={handleJoinChallenge}
           />
+        )}
+
+        {/* History Tab */}
+        {activeTab === "history" && (
+          <VehicleHistoryPage />
         )}
 
         {/* Store Tab */}

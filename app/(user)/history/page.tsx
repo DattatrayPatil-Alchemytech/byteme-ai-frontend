@@ -61,8 +61,8 @@ const VehicleHistoryPage = () => {
   });
 
   return (
-    <main className="p-8">
-      <h1 className="text-3xl font-extrabold mb-4 flex items-center gap-2 animate-fade-in">
+    <main className="p-0 sm:p-8">
+      <h1 className="text-3xl font-extrabold mb-4 flex items-center gap-2 text-foreground animate-fade-in">
         Vehicle Driving Records
       </h1>
       {/* Vehicle Cards Section */}
@@ -71,7 +71,7 @@ const VehicleHistoryPage = () => {
           {mockHistory.slice(0, 20).map(vehicle => (
             <div
               key={vehicle.id}
-              className="flex-shrink-0 bg-card border border-border rounded-xl shadow-md p-4 flex flex-col items-center min-w-[160px] max-w-[180px] w-full transition hover:shadow-lg hover:border-primary/60"
+              className="flex-shrink-0 bg-white/90 border border-border rounded-2xl shadow-lg p-4 flex flex-col items-center min-w-[160px] max-w-[180px] w-full transition-transform transition-shadow duration-300 hover:scale-[1.03] hover:shadow-2xl"
             >
               <div className="w-24 h-24 flex items-center justify-center bg-gray-100 rounded-md mb-2 border border-muted">
                 <img
@@ -94,7 +94,7 @@ const VehicleHistoryPage = () => {
           placeholder="Search vehicle..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="border rounded pl-3 pr-10 py-2 w-full sm:w-64 focus:ring-2 focus:ring-primary/30 transition"
+          className="border rounded-full pl-3 pr-10 py-2 w-full sm:w-64 focus:ring-2 focus:ring-primary/30 transition shadow"
         />
         <Select
           value={vehicleFilter}
@@ -103,10 +103,12 @@ const VehicleHistoryPage = () => {
           placeholder="All Vehicles"
         />
       </div>
-      <DataTable
-        columns={columns}
-        data={filtered}
-      />
+      <div className="bg-white/90 rounded-2xl shadow-lg p-4 transition-transform transition-shadow duration-300 hover:scale-[1.01] hover:shadow-2xl">
+        <DataTable
+          columns={columns}
+          data={filtered}
+        />
+      </div>
     </main>
   );
 };
