@@ -181,27 +181,27 @@ export default function UserViewPage({ params }: { params: { id: string } }) {
           <div className="flex items-center gap-2"><Wallet className="text-primary" size={20} /><span className="font-mono text-xs">{userDetails.wallet || '—'}</span></div>
         </div>
       </div>
-      {/* User Overview Summary Cards */}
+      {/* User Overview Summary Cards with dashboard icons */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8 animate-fade-in">
         <div className="rounded-xl bg-white/90 shadow flex flex-col items-center p-6 border border-muted hover:shadow-lg transition-all">
           <div className="text-3xl font-extrabold text-gradient-ev-green animate-pulse">{summary.tokens.toLocaleString()}</div>
           <div className="text-muted-foreground text-sm">B3TR Tokens</div>
-          <div className="mt-2 text-emerald-500"><Search size={28} /></div>
+          <div className="mt-2 p-2 bg-primary/20 rounded-lg text-2xl">⚡</div>
         </div>
         <div className="rounded-xl bg-white/90 shadow flex flex-col items-center p-6 border border-muted hover:shadow-lg transition-all">
           <div className="text-3xl font-extrabold text-gradient-ev-green animate-pulse">{summary.miles.toLocaleString()}</div>
           <div className="text-muted-foreground text-sm">Sustainable Miles</div>
-          <div className="mt-2 text-emerald-500"><Eye size={28} /></div>
+          <div className="mt-2 p-2 bg-primary/20 rounded-lg text-2xl">🚗</div>
         </div>
         <div className="rounded-xl bg-white/90 shadow flex flex-col items-center p-6 border border-muted hover:shadow-lg transition-all">
           <div className="text-3xl font-extrabold text-gradient-ev-green animate-pulse">{summary.co2}</div>
           <div className="text-muted-foreground text-sm">CO₂ Saved (t)</div>
-          <div className="mt-2 text-green-600"><X size={28} /></div>
+          <div className="mt-2 p-2 bg-primary/20 rounded-lg text-2xl">🌱</div>
         </div>
         <div className="rounded-xl bg-white/90 shadow flex flex-col items-center p-6 border border-muted hover:shadow-lg transition-all">
           <div className="text-3xl font-extrabold text-gradient-ev-green animate-pulse">#{summary.rank}</div>
           <div className="text-muted-foreground text-sm">Current Rank</div>
-          <div className="mt-2 text-yellow-500"><Eye size={28} /></div>
+          <div className="mt-2 p-2 bg-primary/20 rounded-lg text-2xl">🏆</div>
         </div>
       </div>
       <div className="w-full mb-6 overflow-x-auto overflow-y-hidden custom-scrollbar">
