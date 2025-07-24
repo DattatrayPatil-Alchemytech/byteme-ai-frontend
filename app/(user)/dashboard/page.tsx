@@ -344,7 +344,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex space-x-1 bg-muted/50 rounded-lg p-1 mb-8">
+      <div className="flex gap-2 bg-muted/50 rounded-lg p-1 mb-8 overflow-x-auto custom-scrollbar sm:gap-2 gap-1 px-1 sm:px-0 w-full sm:w-auto justify-center sm:justify-start">
         <button
           onClick={() => setActiveTab("overview")}
           className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-all cursor-pointer ${
