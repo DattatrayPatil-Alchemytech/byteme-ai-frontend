@@ -5,7 +5,98 @@ import Badges from "@/components/dashboard/Badges";
 import Leaderboard from "@/components/dashboard/Leaderboard";
 import TokenStore from "@/components/dashboard/TokenStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import VehicleHistoryPage from "../history/page";
+// Inline VehicleHistoryPage logic here for the History tab
+import { DataTable } from "@/components/ui/DataTable";
+import { ColumnDef } from "@tanstack/react-table";
+import { mockHistory } from "./mockHistory";
+import { useMemo } from "react";
+import { Select } from "@/components/ui/DropdownMenu";
+
+function VehicleHistoryTab() {
+  const [search, setSearch] = useState("");
+  const [vehicleFilter, setVehicleFilter] = useState("");
+  const columns: ColumnDef<(typeof mockHistory)[number]>[] = [
+    {
+      accessorKey: "vehicle",
+      header: "Vehicle",
+      cell: (info) => (
+        <span className="font-medium">{info.getValue() as string}</span>
+      ),
+    },
+    { accessorKey: "submissionCount", header: "Submission Count" },
+    { accessorKey: "milesDriven", header: "Miles Driven" },
+    { accessorKey: "carbonImpact", header: "Carbon Impact (tCO₂)" },
+    { accessorKey: "rewards", header: "Rewards (B3TR)" },
+    {
+      accessorKey: "imageHash",
+      header: "Image Hash",
+      cell: (info) => (
+        <span className="font-mono text-xs">{info.getValue() as string}</span>
+      ),
+    },
+    { accessorKey: "date", header: "Date" },
+  ];
+  const vehicleOptions = useMemo(() => {
+    const names = mockHistory.map((row) => row.vehicle);
+    return Array.from(new Set(names)).map((v) => ({ value: v, label: v }));
+  }, []);
+  const filtered = mockHistory.filter((row) => {
+    const matchesSearch = row.vehicle.toLowerCase().includes(search.toLowerCase());
+    const matchesFilter = vehicleFilter ? row.vehicle === vehicleFilter : true;
+    return matchesSearch && matchesFilter;
+  });
+  return (
+    <div className="space-y-6">
+      <div className="text-center mb-8">
+        <h2 className="text-2xl font-bold text-foreground mb-2">Your Vehicle History</h2>
+        <p className="text-muted-foreground">Track your vehicle driving records</p>
+      </div>
+      <div className="w-full mb-6 overflow-x-auto overflow-y-hidden custom-scrollbar">
+        <div className="flex gap-4 min-w-[600px] sm:min-w-0">
+          {mockHistory.slice(0, 20).map((vehicle) => (
+            <div
+              key={vehicle.id}
+              className="flex-shrink-0 bg-white/90 border border-border rounded-2xl shadow-lg p-4 flex flex-col items-center min-w-[160px] max-w-[180px] w-full transition-transform transition-shadow duration-300 hover:scale-[1.03] hover:shadow-2xl"
+            >
+              <div className="w-24 h-24 flex items-center justify-center bg-gray-100 rounded-md mb-2 border border-muted">
+                <img
+                  src={vehicle.image}
+                  alt={vehicle.vehicle}
+                  className="w-full h-full rounded-md"
+                  loading="lazy"
+                />
+              </div>
+              <div className="font-semibold text-center text-base truncate w-full text-foreground">
+                {vehicle.vehicle}
+              </div>
+              <div className="text-xs text-muted-foreground mt-1 text-center capitalize">
+                {vehicle.type} EV
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+        <input
+          type="text"
+          placeholder="Search vehicle..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="border rounded-full pl-3 pr-10 py-2 w-full sm:w-64 focus:ring-2 focus:ring-primary/30 transition shadow"
+        />
+        <Select
+          value={vehicleFilter}
+          onChange={setVehicleFilter}
+          options={[{ value: "", label: "All Vehicles" }, ...vehicleOptions]}
+          placeholder="All Vehicles"
+        />
+      </div>
+      <div className="bg-white/90 rounded-2xl shadow-lg p-4 transition-transform transition-shadow duration-300 hover:scale-[1.01] hover:shadow-2xl">
+        <DataTable columns={columns} data={filtered} />
+      </div>
+    </div>
+  );
+}
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -526,7 +617,7 @@ export default function DashboardPage() {
 
         {/* History Tab */}
         {activeTab === "history" && (
-          <VehicleHistoryPage />
+          <VehicleHistoryTab />
         )}
 
         {/* Store Tab */}
