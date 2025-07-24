@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { DataTable } from "@/components/ui/DataTable";
 import { ColumnDef } from "@tanstack/react-table";
 import { mockVehicles } from "./mockVehicles";
+import { Button } from "@/components/ui/button";
 
 // Mock data for profile, badges, tier, notifications, and vehicles
 const userProfile = {
@@ -54,7 +55,7 @@ export default function UserProfilePage() {
             autoFocus
           />
         ) : (
-          <span onClick={() => handleEdit(vehicle.id, vehicle.name)} className="cursor-pointer hover:underline">
+          <span onClick={() => handleEdit(vehicle.id, vehicle.name)} className="cursor-pointer hover:underline text-foreground">
             {vehicle.name}
           </span>
         );
@@ -63,19 +64,22 @@ export default function UserProfilePage() {
     {
       accessorKey: "type",
       header: "Type",
-      cell: (info) => <span className="capitalize">{info.getValue() as string}</span>,
+      cell: (info) => <span className="capitalize text-muted-foreground">{info.getValue() as string}</span>,
     },
     {
       accessorKey: "reg",
       header: "Registration",
-      cell: (info) => <span className="font-mono">{info.getValue() as string}</span>,
+      cell: (info) => {
+        const value = info.getValue() as string | undefined;
+        return value ? <span className="font-mono text-success">{value}</span> : <span className="text-muted-foreground">N/A</span>;
+      },
     },
     {
       accessorKey: "numberPlate",
       header: "Number Plate",
       cell: (info) => {
         const value = info.getValue() as string | undefined;
-        return value ? <span className="font-mono">{value}</span> : <span className="text-gray-400">N/A</span>;
+        return value ? <span className="font-mono text-success">{value}</span> : <span className="text-muted-foreground">N/A</span>;
       },
     },
     {
@@ -86,13 +90,13 @@ export default function UserProfilePage() {
         return (
           <div className="flex gap-2">
             {editId !== vehicle.id && (
-              <button className="text-xs text-primary underline" onClick={() => handleEdit(vehicle.id, vehicle.name)}>
+              <Button variant="link" size="sm" className="p-0 h-auto min-w-0" onClick={() => handleEdit(vehicle.id, vehicle.name)}>
                 Edit
-              </button>
+              </Button>
             )}
-            <button className="text-xs text-red-500 underline" onClick={() => handleRemove(vehicle.id)}>
+            <Button variant="destructive" size="sm" className="p-0 h-auto min-w-0" onClick={() => handleRemove(vehicle.id)}>
               Remove
-            </button>
+            </Button>
           </div>
         );
       },
@@ -100,36 +104,36 @@ export default function UserProfilePage() {
   ];
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8 mt-2">
-      {/* Profile Section */}
-      <section className="flex items-center gap-4 p-4 bg-white rounded shadow">
-        <img src={userProfile.avatar} alt="avatar" className="w-16 h-16 rounded-full object-cover border" />
-        <div>
-          <div className="font-bold text-lg">{userProfile.name}</div>
-          <div className="text-sm text-gray-500">{userProfile.email}</div>
+    <div className="max-w-3xl mx-auto space-y-10 mt-10">
+      {/* Profile Card */}
+      <section className="flex flex-col items-center bg-white/90 rounded-2xl shadow-lg p-10 mb-2">
+        <img src={userProfile.avatar} alt="avatar" className="w-28 h-28 rounded-full object-cover border-4 border-primary shadow mb-4" />
+        <div className="text-center">
+          <div className="text-3xl font-bold text-foreground mb-1">{userProfile.name}</div>
+          <div className="text-base text-muted-foreground mb-2">{userProfile.email}</div>
+          <div className="inline-block px-5 py-1 rounded-full bg-primary/10 text-primary font-semibold text-sm shadow-sm mt-2">{userProfile.tier} Tier</div>
         </div>
-        <div className="ml-auto px-4 py-1 rounded bg-primary text-primary-foreground font-semibold text-xs">{userProfile.tier} Tier</div>
       </section>
 
       {/* Badges/NFTs display */}
-      <section className="bg-white rounded shadow p-4">
-        <div className="font-semibold mb-2">Badges / NFTs</div>
-        <div className="flex gap-4">
+      <section className="bg-white/90 rounded-2xl shadow-lg p-8">
+        <div className="font-bold text-xl text-foreground mb-6 text-left">Badges / NFTs</div>
+        <div className="flex gap-8 justify-center">
           {userProfile.badges.map(badge => (
             <div key={badge.id} className="flex flex-col items-center">
-              <img src={badge.image} alt={badge.name} className="w-12 h-12 rounded-full border mb-1" />
-              <span className="text-xs text-center">{badge.name}</span>
+              <img src={badge.image} alt={badge.name} className="w-16 h-16 rounded-full border-2 border-primary mb-2 shadow" />
+              <span className="text-xs text-center text-muted-foreground font-medium">{badge.name}</span>
             </div>
           ))}
         </div>
       </section>
 
       {/* Notifications panel */}
-      <section className="bg-white rounded shadow p-4">
-        <div className="font-semibold mb-2">Notifications</div>
-        <ul className="space-y-1">
+      <section className="bg-white/90 rounded-2xl shadow-lg p-8">
+        <div className="font-bold text-xl text-foreground mb-6 text-left">Notifications</div>
+        <ul className="space-y-2">
           {userProfile.notifications.map(note => (
-            <li key={note.id} className={note.read ? "text-gray-400" : "font-medium text-gray-800"}>
+            <li key={note.id} className={note.read ? "text-gray-400" : "font-medium text-foreground"}>
               {note.message}
             </li>
           ))}
@@ -137,8 +141,8 @@ export default function UserProfilePage() {
       </section>
 
       {/* List of registered vehicles with details */}
-      <section className="bg-white rounded shadow p-4">
-        <div className="font-semibold mb-2">Registered Vehicles</div>
+      <section className="bg-white/90 rounded-2xl shadow-lg p-8">
+        <div className="font-bold text-xl text-foreground mb-6 text-left">Registered Vehicles</div>
         <DataTable columns={columns} data={vehicles} />
       </section>
     </div>

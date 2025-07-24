@@ -10,6 +10,7 @@ import {
   SortingState,
   getSortedRowModel,
 } from "@tanstack/react-table";
+import { Button } from "@/components/ui/button";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -56,18 +57,18 @@ export function DataTable<TData, TValue>({
           value={search ?? globalFilter}
           onChange={e => onSearchChange(e.target.value)}
           placeholder={searchPlaceholder}
-          className="border rounded px-3 py-2 w-full sm:w-64"
+          className="border rounded-full px-4 py-2 w-full sm:w-64 shadow focus:ring-2 focus:ring-primary outline-none"
         />
       )}
-      <div className="overflow-x-auto rounded shadow bg-white">
+      <div className="overflow-x-auto rounded-2xl shadow-lg bg-white/90 p-2">
         <table className="min-w-full text-sm">
-          <thead className="bg-gray-100">
+          <thead className="bg-muted text-foreground">
             {table.getHeaderGroups().map(headerGroup => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map(header => (
                   <th
                     key={header.id}
-                    className="px-4 py-2 text-left font-semibold cursor-pointer select-none"
+                    className="px-5 py-3 text-left font-semibold text-base cursor-pointer select-none"
                     onClick={header.column.getToggleSortingHandler()}
                   >
                     {flexRender(header.column.columnDef.header, header.getContext())}
@@ -81,9 +82,9 @@ export function DataTable<TData, TValue>({
           </thead>
           <tbody>
             {table.getRowModel().rows.map(row => (
-              <tr key={row.id} className="border-b hover:bg-gray-50">
+              <tr key={row.id} className="border-b last:border-0 hover:bg-muted/50 rounded-lg transition-all">
                 {row.getVisibleCells().map(cell => (
-                  <td key={cell.id} className="px-4 py-2">
+                  <td key={cell.id} className="px-5 py-3 align-middle">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
@@ -92,35 +93,38 @@ export function DataTable<TData, TValue>({
           </tbody>
         </table>
       </div>
-      <div className="flex items-center justify-between gap-2 pt-2">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mt-2">
         <div className="flex-1 text-xs text-muted-foreground">
           {table.getFilteredRowModel().rows.length} row(s)
         </div>
         <div className="space-x-2 flex items-center">
-          <button
-            className="px-2 py-1 border rounded disabled:opacity-50"
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
             Previous
-          </button>
+          </Button>
           {Array.from({ length: table.getPageCount() }, (_, i) => (
-            <button
+            <Button
               key={i}
-              className={`px-2 py-1 border rounded ${table.getState().pagination.pageIndex === i ? 'bg-primary text-white' : ''}`}
+              variant={table.getState().pagination.pageIndex === i ? "default" : "outline"}
+              size="sm"
               onClick={() => table.setPageIndex(i)}
               disabled={table.getState().pagination.pageIndex === i}
             >
               {i + 1}
-            </button>
+            </Button>
           ))}
-          <button
-            className="px-2 py-1 border rounded disabled:opacity-50"
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
             Next
-          </button>
+          </Button>
         </div>
       </div>
     </div>
