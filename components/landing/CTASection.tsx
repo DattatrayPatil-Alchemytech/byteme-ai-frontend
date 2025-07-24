@@ -52,7 +52,7 @@ export default function CTASection() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Link href="/auth/register">
+              <Link href="/login">
                 <Button 
                   variant="default" 
                   size="xl" 
