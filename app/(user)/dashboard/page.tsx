@@ -82,7 +82,7 @@ function VehicleHistoryTab() {
           placeholder="Search vehicle..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="border rounded-full pl-3 pr-10 py-2 w-full sm:w-64 focus:ring-2 focus:ring-primary/30 transition shadow"
+          className="border border-primary/30 rounded-full px-5 py-3 w-full sm:w-64 text-base font-medium shadow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary hover:ring-2 hover:ring-primary/30 hover:bg-primary/5 placeholder:text-muted-foreground"
         />
         <Select
           value={vehicleFilter}
