@@ -4,7 +4,7 @@ import { DataTable } from "@/components/ui/DataTable";
 import { ColumnDef } from "@tanstack/react-table";
 import { mockHistory } from "./mockHistory";
 
-const columns: ColumnDef<(typeof mockHistory)[0]>[] = [
+const columns: ColumnDef<(typeof mockHistory)[number]>[] = [
   {
     accessorKey: "user",
     header: "User",
@@ -44,14 +44,15 @@ const columns: ColumnDef<(typeof mockHistory)[0]>[] = [
 const UserHistoryPage = () => {
   const [search, setSearch] = useState("");
 
-  // Filter logic (simple search by user)
   const filtered = mockHistory.filter((row) =>
     row.user.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
     <main className="p-8 max-w-5xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">User History</h1>
+      <h1 className="text-3xl font-extrabold mb-4 flex items-center gap-2 animate-fade-in">
+        User Driving Records
+      </h1>
       <DataTable
         columns={columns}
         data={filtered}
