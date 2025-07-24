@@ -95,12 +95,12 @@ export function DataTable<TData, TValue>({
       </div>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mt-2">
         <div className="flex-1 text-xs text-muted-foreground">
-          {table.getFilteredRowModel().rows.length} row(s)
         </div>
-        <div className="space-x-2 flex items-center">
+        <div className="flex items-center gap-2">
           <Button
             variant="outline"
             size="sm"
+            className="rounded-full px-4 py-2 shadow text-base font-medium disabled:text-muted-foreground disabled:bg-muted disabled:cursor-not-allowed hover:bg-primary/10"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
@@ -111,6 +111,7 @@ export function DataTable<TData, TValue>({
               key={i}
               variant={table.getState().pagination.pageIndex === i ? "default" : "outline"}
               size="sm"
+              className={`rounded-full px-4 py-2 shadow text-base font-medium ${table.getState().pagination.pageIndex === i ? '' : 'hover:bg-primary/10'} ${table.getState().pagination.pageIndex === i ? '' : 'text-foreground'}`}
               onClick={() => table.setPageIndex(i)}
               disabled={table.getState().pagination.pageIndex === i}
             >
@@ -120,6 +121,7 @@ export function DataTable<TData, TValue>({
           <Button
             variant="outline"
             size="sm"
+            className="rounded-full px-4 py-2 shadow text-base font-medium disabled:text-muted-foreground disabled:bg-muted disabled:cursor-not-allowed hover:bg-primary/10"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
