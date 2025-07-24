@@ -55,21 +55,27 @@ const VehicleHistoryPage = () => {
 
   // Filter logic
   const filtered = mockHistory.filter((row) => {
-    const matchesSearch = row.vehicle.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch = row.vehicle
+      .toLowerCase()
+      .includes(search.toLowerCase());
     const matchesFilter = vehicleFilter ? row.vehicle === vehicleFilter : true;
     return matchesSearch && matchesFilter;
   });
 
   return (
-    <main className="p-0 sm:p-8">
+    <div className="space-y-6">
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-foreground mb-2 animate-fade-in">Your Vehicle History</h1>
-        <p className="text-muted-foreground text-lg">Track your vehicle driving records</p>
+        <h2 className="text-2xl font-bold text-foreground mb-2">
+          Your Vehicle History
+        </h2>
+        <p className="text-muted-foreground">
+          Track your vehicle driving records
+        </p>
       </div>
       {/* Vehicle Cards Section */}
       <div className="w-full mb-6 overflow-x-auto overflow-y-hidden custom-scrollbar">
         <div className="flex gap-4 min-w-[600px] sm:min-w-0">
-          {mockHistory.slice(0, 20).map(vehicle => (
+          {mockHistory.slice(0, 20).map((vehicle) => (
             <div
               key={vehicle.id}
               className="flex-shrink-0 bg-white/90 border border-border rounded-2xl shadow-lg p-4 flex flex-col items-center min-w-[160px] max-w-[180px] w-full transition-transform transition-shadow duration-300 hover:scale-[1.03] hover:shadow-2xl"
@@ -82,8 +88,12 @@ const VehicleHistoryPage = () => {
                   loading="lazy"
                 />
               </div>
-              <div className="font-semibold text-center text-base truncate w-full text-foreground">{vehicle.vehicle}</div>
-              <div className="text-xs text-muted-foreground mt-1 text-center capitalize">{vehicle.type} EV</div>
+              <div className="font-semibold text-center text-base truncate w-full text-foreground">
+                {vehicle.vehicle}
+              </div>
+              <div className="text-xs text-muted-foreground mt-1 text-center capitalize">
+                {vehicle.type} EV
+              </div>
             </div>
           ))}
         </div>
@@ -94,7 +104,7 @@ const VehicleHistoryPage = () => {
           type="text"
           placeholder="Search vehicle..."
           value={search}
-          onChange={e => setSearch(e.target.value)}
+          onChange={(e) => setSearch(e.target.value)}
           className="border rounded-full pl-3 pr-10 py-2 w-full sm:w-64 focus:ring-2 focus:ring-primary/30 transition shadow"
         />
         <Select
@@ -105,12 +115,9 @@ const VehicleHistoryPage = () => {
         />
       </div>
       <div className="bg-white/90 rounded-2xl shadow-lg p-4 transition-transform transition-shadow duration-300 hover:scale-[1.01] hover:shadow-2xl">
-        <DataTable
-          columns={columns}
-          data={filtered}
-        />
+        <DataTable columns={columns} data={filtered} />
       </div>
-    </main>
+    </div>
   );
 };
 
