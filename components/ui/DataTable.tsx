@@ -96,11 +96,11 @@ export function DataTable<TData, TValue>({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mt-2">
         <div className="flex-1 text-xs text-muted-foreground">
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar sm:gap-2 gap-1 px-1 sm:px-0 w-full sm:w-auto">
           <Button
             variant="outline"
             size="sm"
-            className="rounded-full px-4 py-2 shadow text-base font-medium disabled:text-muted-foreground disabled:bg-muted disabled:cursor-not-allowed hover:bg-primary/10"
+            className="rounded-full px-2 py-1 sm:px-4 sm:py-2 shadow text-sm sm:text-base font-medium disabled:text-muted-foreground disabled:bg-muted disabled:cursor-not-allowed hover:bg-primary/10 min-w-[40px]"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
@@ -111,7 +111,7 @@ export function DataTable<TData, TValue>({
               key={i}
               variant={table.getState().pagination.pageIndex === i ? "default" : "outline"}
               size="sm"
-              className={`rounded-full px-4 py-2 shadow text-base font-medium ${table.getState().pagination.pageIndex === i ? '' : 'hover:bg-primary/10'} ${table.getState().pagination.pageIndex === i ? '' : 'text-foreground'}`}
+              className={`rounded-full px-2 py-1 sm:px-4 sm:py-2 shadow text-sm sm:text-base font-medium min-w-[40px] ${table.getState().pagination.pageIndex === i ? '' : 'hover:bg-primary/10'} ${table.getState().pagination.pageIndex === i ? '' : 'text-foreground'}`}
               onClick={() => table.setPageIndex(i)}
               disabled={table.getState().pagination.pageIndex === i}
             >
@@ -121,7 +121,7 @@ export function DataTable<TData, TValue>({
           <Button
             variant="outline"
             size="sm"
-            className="rounded-full px-4 py-2 shadow text-base font-medium disabled:text-muted-foreground disabled:bg-muted disabled:cursor-not-allowed hover:bg-primary/10"
+            className="rounded-full px-2 py-1 sm:px-4 sm:py-2 shadow text-sm sm:text-base font-medium disabled:text-muted-foreground disabled:bg-muted disabled:cursor-not-allowed hover:bg-primary/10 min-w-[40px]"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
