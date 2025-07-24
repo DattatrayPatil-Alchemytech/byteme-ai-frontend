@@ -2,6 +2,8 @@ export const mockHistory = [
   {
     id: 1,
     vehicle: "Car A",
+    image: "/file.svg",
+    type: "4-wheel",
     submissionCount: 12,
     milesDriven: 3200,
     carbonImpact: 0.8,
@@ -12,6 +14,8 @@ export const mockHistory = [
   {
     id: 2,
     vehicle: "Car B",
+    image: "/window.svg",
+    type: "2-wheel",
     submissionCount: 8,
     milesDriven: 2100,
     carbonImpact: 0.5,
@@ -22,6 +26,8 @@ export const mockHistory = [
   {
     id: 3,
     vehicle: "Car C",
+    image: "/globe.svg",
+    type: "3-wheel",
     submissionCount: 15,
     milesDriven: 4100,
     carbonImpact: 1.1,
@@ -32,6 +38,8 @@ export const mockHistory = [
   {
     id: 4,
     vehicle: "Car D",
+    image: "/file.svg",
+    type: "4-wheel",
     submissionCount: 10,
     milesDriven: 1800,
     carbonImpact: 0.6,
@@ -42,6 +50,8 @@ export const mockHistory = [
   {
     id: 5,
     vehicle: "Car E",
+    image: "/window.svg",
+    type: "2-wheel",
     submissionCount: 7,
     milesDriven: 1500,
     carbonImpact: 0.4,
@@ -52,6 +62,8 @@ export const mockHistory = [
   {
     id: 6,
     vehicle: "Car F",
+    image: "/globe.svg",
+    type: "3-wheel",
     submissionCount: 13,
     milesDriven: 3500,
     carbonImpact: 0.9,
@@ -62,6 +74,8 @@ export const mockHistory = [
   {
     id: 7,
     vehicle: "Car G",
+    image: "/file.svg",
+    type: "4-wheel",
     submissionCount: 9,
     milesDriven: 2200,
     carbonImpact: 0.7,
@@ -72,6 +86,8 @@ export const mockHistory = [
   {
     id: 8,
     vehicle: "Car H",
+    image: "/window.svg",
+    type: "2-wheel",
     submissionCount: 11,
     milesDriven: 2900,
     carbonImpact: 0.85,
@@ -82,6 +98,8 @@ export const mockHistory = [
   {
     id: 9,
     vehicle: "Car I",
+    image: "/globe.svg",
+    type: "3-wheel",
     submissionCount: 6,
     milesDriven: 1200,
     carbonImpact: 0.3,
@@ -92,6 +110,8 @@ export const mockHistory = [
   {
     id: 10,
     vehicle: "Car J",
+    image: "/file.svg",
+    type: "4-wheel",
     submissionCount: 14,
     milesDriven: 3700,
     carbonImpact: 1.0,
@@ -102,6 +122,8 @@ export const mockHistory = [
   {
     id: 11,
     vehicle: "Car K",
+    image: "/window.svg",
+    type: "2-wheel",
     submissionCount: 5,
     milesDriven: 1000,
     carbonImpact: 0.2,
@@ -112,6 +134,8 @@ export const mockHistory = [
   {
     id: 12,
     vehicle: "Car L",
+    image: "/globe.svg",
+    type: "3-wheel",
     submissionCount: 16,
     milesDriven: 4300,
     carbonImpact: 1.2,
@@ -122,6 +146,8 @@ export const mockHistory = [
   {
     id: 13,
     vehicle: "Car M",
+    image: "/file.svg",
+    type: "4-wheel",
     submissionCount: 8,
     milesDriven: 2000,
     carbonImpact: 0.5,
@@ -132,6 +158,8 @@ export const mockHistory = [
   {
     id: 14,
     vehicle: "Car N",
+    image: "/window.svg",
+    type: "2-wheel",
     submissionCount: 12,
     milesDriven: 3200,
     carbonImpact: 0.8,
@@ -142,6 +170,8 @@ export const mockHistory = [
   {
     id: 15,
     vehicle: "Car O",
+    image: "/globe.svg",
+    type: "3-wheel",
     submissionCount: 10,
     milesDriven: 1800,
     carbonImpact: 0.6,
@@ -152,6 +182,8 @@ export const mockHistory = [
   {
     id: 16,
     vehicle: "Car P",
+    image: "/file.svg",
+    type: "4-wheel",
     submissionCount: 7,
     milesDriven: 1500,
     carbonImpact: 0.4,
@@ -162,6 +194,8 @@ export const mockHistory = [
   {
     id: 17,
     vehicle: "Car Q",
+    image: "/window.svg",
+    type: "2-wheel",
     submissionCount: 13,
     milesDriven: 3500,
     carbonImpact: 0.9,
@@ -172,6 +206,8 @@ export const mockHistory = [
   {
     id: 18,
     vehicle: "Car R",
+    image: "/globe.svg",
+    type: "3-wheel",
     submissionCount: 9,
     milesDriven: 2200,
     carbonImpact: 0.7,
@@ -182,6 +218,8 @@ export const mockHistory = [
   {
     id: 19,
     vehicle: "Car S",
+    image: "/file.svg",
+    type: "4-wheel",
     submissionCount: 11,
     milesDriven: 2900,
     carbonImpact: 0.85,
@@ -192,6 +230,8 @@ export const mockHistory = [
   {
     id: 20,
     vehicle: "Car T",
+    image: "/window.svg",
+    type: "2-wheel",
     submissionCount: 6,
     milesDriven: 1200,
     carbonImpact: 0.3,
@@ -202,6 +242,8 @@ export const mockHistory = [
   {
     id: 21,
     vehicle: "Car U",
+    image: "/globe.svg",
+    type: "3-wheel",
     submissionCount: 8,
     milesDriven: 2100,
     carbonImpact: 0.5,
@@ -212,6 +254,8 @@ export const mockHistory = [
   {
     id: 22,
     vehicle: "Car V",
+    image: "/file.svg",
+    type: "4-wheel",
     submissionCount: 12,
     milesDriven: 3200,
     carbonImpact: 0.8,
@@ -222,6 +266,8 @@ export const mockHistory = [
   {
     id: 23,
     vehicle: "Car W",
+    image: "/window.svg",
+    type: "2-wheel",
     submissionCount: 15,
     milesDriven: 4100,
     carbonImpact: 1.1,
@@ -232,6 +278,8 @@ export const mockHistory = [
   {
     id: 24,
     vehicle: "Car X",
+    image: "/globe.svg",
+    type: "3-wheel",
     submissionCount: 10,
     milesDriven: 1800,
     carbonImpact: 0.6,
@@ -242,6 +290,8 @@ export const mockHistory = [
   {
     id: 25,
     vehicle: "Car Y",
+    image: "/file.svg",
+    type: "4-wheel",
     submissionCount: 7,
     milesDriven: 1500,
     carbonImpact: 0.4,
@@ -252,6 +302,8 @@ export const mockHistory = [
   {
     id: 26,
     vehicle: "Car Z",
+    image: "/window.svg",
+    type: "2-wheel",
     submissionCount: 13,
     milesDriven: 3500,
     carbonImpact: 0.9,
@@ -262,6 +314,8 @@ export const mockHistory = [
   {
     id: 27,
     vehicle: "Car AA",
+    image: "/globe.svg",
+    type: "3-wheel",
     submissionCount: 8,
     milesDriven: 2000,
     carbonImpact: 0.5,
@@ -272,6 +326,8 @@ export const mockHistory = [
   {
     id: 28,
     vehicle: "Car BB",
+    image: "/file.svg",
+    type: "4-wheel",
     submissionCount: 12,
     milesDriven: 3200,
     carbonImpact: 0.8,
@@ -282,6 +338,8 @@ export const mockHistory = [
   {
     id: 29,
     vehicle: "Car CC",
+    image: "/window.svg",
+    type: "2-wheel",
     submissionCount: 15,
     milesDriven: 4100,
     carbonImpact: 1.1,
@@ -292,6 +350,8 @@ export const mockHistory = [
   {
     id: 30,
     vehicle: "Car DD",
+    image: "/globe.svg",
+    type: "3-wheel",
     submissionCount: 10,
     milesDriven: 1800,
     carbonImpact: 0.6,
@@ -302,6 +362,8 @@ export const mockHistory = [
   {
     id: 31,
     vehicle: "Car EE",
+    image: "/file.svg",
+    type: "4-wheel",
     submissionCount: 7,
     milesDriven: 1500,
     carbonImpact: 0.4,
@@ -312,6 +374,8 @@ export const mockHistory = [
   {
     id: 32,
     vehicle: "Car FF",
+    image: "/window.svg",
+    type: "2-wheel",
     submissionCount: 13,
     milesDriven: 3500,
     carbonImpact: 0.9,
@@ -322,6 +386,8 @@ export const mockHistory = [
   {
     id: 33,
     vehicle: "Car GG",
+    image: "/globe.svg",
+    type: "3-wheel",
     submissionCount: 9,
     milesDriven: 2200,
     carbonImpact: 0.7,
@@ -332,6 +398,8 @@ export const mockHistory = [
   {
     id: 34,
     vehicle: "Car HH",
+    image: "/file.svg",
+    type: "4-wheel",
     submissionCount: 11,
     milesDriven: 2900,
     carbonImpact: 0.85,
@@ -342,6 +410,8 @@ export const mockHistory = [
   {
     id: 35,
     vehicle: "Car II",
+    image: "/window.svg",
+    type: "2-wheel",
     submissionCount: 6,
     milesDriven: 1200,
     carbonImpact: 0.3,
@@ -352,6 +422,8 @@ export const mockHistory = [
   {
     id: 36,
     vehicle: "Car JJ",
+    image: "/globe.svg",
+    type: "3-wheel",
     submissionCount: 14,
     milesDriven: 3700,
     carbonImpact: 1.0,
@@ -362,6 +434,8 @@ export const mockHistory = [
   {
     id: 37,
     vehicle: "Car KK",
+    image: "/file.svg",
+    type: "4-wheel",
     submissionCount: 5,
     milesDriven: 1000,
     carbonImpact: 0.2,
@@ -372,6 +446,8 @@ export const mockHistory = [
   {
     id: 38,
     vehicle: "Car LL",
+    image: "/window.svg",
+    type: "2-wheel",
     submissionCount: 16,
     milesDriven: 4300,
     carbonImpact: 1.2,
@@ -382,6 +458,8 @@ export const mockHistory = [
   {
     id: 39,
     vehicle: "Car MM",
+    image: "/globe.svg",
+    type: "3-wheel",
     submissionCount: 8,
     milesDriven: 2000,
     carbonImpact: 0.5,
@@ -392,6 +470,8 @@ export const mockHistory = [
   {
     id: 40,
     vehicle: "Car NN",
+    image: "/file.svg",
+    type: "4-wheel",
     submissionCount: 12,
     milesDriven: 3200,
     carbonImpact: 0.8,
@@ -402,6 +482,8 @@ export const mockHistory = [
   {
     id: 41,
     vehicle: "Car OO",
+    image: "/window.svg",
+    type: "2-wheel",
     submissionCount: 10,
     milesDriven: 1800,
     carbonImpact: 0.6,
@@ -412,6 +494,8 @@ export const mockHistory = [
   {
     id: 42,
     vehicle: "Car PP",
+    image: "/globe.svg",
+    type: "3-wheel",
     submissionCount: 7,
     milesDriven: 1500,
     carbonImpact: 0.4,
@@ -422,6 +506,8 @@ export const mockHistory = [
   {
     id: 43,
     vehicle: "Car QQ",
+    image: "/file.svg",
+    type: "4-wheel",
     submissionCount: 13,
     milesDriven: 3500,
     carbonImpact: 0.9,
@@ -432,6 +518,8 @@ export const mockHistory = [
   {
     id: 44,
     vehicle: "Car RR",
+    image: "/window.svg",
+    type: "2-wheel",
     submissionCount: 9,
     milesDriven: 2200,
     carbonImpact: 0.7,
@@ -442,6 +530,8 @@ export const mockHistory = [
   {
     id: 45,
     vehicle: "Car SS",
+    image: "/globe.svg",
+    type: "3-wheel",
     submissionCount: 11,
     milesDriven: 2900,
     carbonImpact: 0.85,
@@ -452,6 +542,8 @@ export const mockHistory = [
   {
     id: 46,
     vehicle: "Car TT",
+    image: "/file.svg",
+    type: "4-wheel",
     submissionCount: 6,
     milesDriven: 1200,
     carbonImpact: 0.3,
@@ -462,6 +554,8 @@ export const mockHistory = [
   {
     id: 47,
     vehicle: "Car UU",
+    image: "/window.svg",
+    type: "2-wheel",
     submissionCount: 14,
     milesDriven: 3700,
     carbonImpact: 1.0,
@@ -472,6 +566,8 @@ export const mockHistory = [
   {
     id: 48,
     vehicle: "Car VV",
+    image: "/globe.svg",
+    type: "3-wheel",
     submissionCount: 5,
     milesDriven: 1000,
     carbonImpact: 0.2,
@@ -482,6 +578,8 @@ export const mockHistory = [
   {
     id: 49,
     vehicle: "Car WW",
+    image: "/file.svg",
+    type: "4-wheel",
     submissionCount: 16,
     milesDriven: 4300,
     carbonImpact: 1.2,
@@ -492,6 +590,8 @@ export const mockHistory = [
   {
     id: 50,
     vehicle: "Car XX",
+    image: "/window.svg",
+    type: "2-wheel",
     submissionCount: 8,
     milesDriven: 2000,
     carbonImpact: 0.5,
@@ -502,6 +602,8 @@ export const mockHistory = [
   {
     id: 51,
     vehicle: "Car YY",
+    image: "/globe.svg",
+    type: "3-wheel",
     submissionCount: 12,
     milesDriven: 3200,
     carbonImpact: 0.8,
@@ -512,6 +614,8 @@ export const mockHistory = [
   {
     id: 52,
     vehicle: "Car ZZ",
+    image: "/file.svg",
+    type: "4-wheel",
     submissionCount: 10,
     milesDriven: 1800,
     carbonImpact: 0.6,
@@ -522,6 +626,8 @@ export const mockHistory = [
   {
     id: 53,
     vehicle: "Car AAA",
+    image: "/window.svg",
+    type: "2-wheel",
     submissionCount: 7,
     milesDriven: 1500,
     carbonImpact: 0.4,
@@ -532,6 +638,8 @@ export const mockHistory = [
   {
     id: 54,
     vehicle: "Car BBB",
+    image: "/globe.svg",
+    type: "3-wheel",
     submissionCount: 13,
     milesDriven: 3500,
     carbonImpact: 0.9,
@@ -542,6 +650,8 @@ export const mockHistory = [
   {
     id: 55,
     vehicle: "Car CCC",
+    image: "/file.svg",
+    type: "4-wheel",
     submissionCount: 9,
     milesDriven: 2200,
     carbonImpact: 0.7,
@@ -552,6 +662,8 @@ export const mockHistory = [
   {
     id: 56,
     vehicle: "Car DDD",
+    image: "/window.svg",
+    type: "2-wheel",
     submissionCount: 11,
     milesDriven: 2900,
     carbonImpact: 0.85,
@@ -562,6 +674,8 @@ export const mockHistory = [
   {
     id: 57,
     vehicle: "Car EEE",
+    image: "/globe.svg",
+    type: "3-wheel",
     submissionCount: 6,
     milesDriven: 1200,
     carbonImpact: 0.3,
@@ -572,6 +686,8 @@ export const mockHistory = [
   {
     id: 58,
     vehicle: "Car FFF",
+    image: "/file.svg",
+    type: "4-wheel",
     submissionCount: 14,
     milesDriven: 3700,
     carbonImpact: 1.0,
@@ -582,6 +698,8 @@ export const mockHistory = [
   {
     id: 59,
     vehicle: "Car GGG",
+    image: "/window.svg",
+    type: "2-wheel",
     submissionCount: 5,
     milesDriven: 1000,
     carbonImpact: 0.2,
@@ -592,6 +710,8 @@ export const mockHistory = [
   {
     id: 60,
     vehicle: "Car AX",
+    image: "/globe.svg",
+    type: "3-wheel",
     submissionCount: 11,
     milesDriven: 2900,
     carbonImpact: 0.85,

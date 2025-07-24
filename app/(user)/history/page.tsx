@@ -61,10 +61,31 @@ const VehicleHistoryPage = () => {
   });
 
   return (
-    <main className="p-8 max-w-5xl mx-auto">
+    <main className="p-8">
       <h1 className="text-3xl font-extrabold mb-4 flex items-center gap-2 animate-fade-in">
         Vehicle Driving Records
       </h1>
+      {/* Vehicle Cards Section */}
+      <div className="w-full mb-6 overflow-x-auto">
+        <div className="flex gap-4 min-w-[600px] sm:min-w-0">
+          {mockHistory.slice(0, 20).map(vehicle => (
+            <div
+              key={vehicle.id}
+              className="flex-shrink-0 bg-white rounded-lg shadow p-4 flex flex-col items-center min-w-[140px] max-w-[160px] w-full border border-gray-100"
+            >
+              <img
+                src={vehicle.image}
+                alt={vehicle.vehicle}
+                className="w-12 h-12 object-contain mb-2"
+                loading="lazy"
+              />
+              <div className="font-semibold text-center text-sm truncate w-full">{vehicle.vehicle}</div>
+              <div className="text-xs text-gray-500 mt-1 text-center">{vehicle.type} EV</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      {/* End Vehicle Cards Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
         <input
           type="text"
