@@ -96,7 +96,7 @@ export function DataTable<TData, TValue>({
         <div className="flex-1 text-xs text-muted-foreground">
           {table.getFilteredRowModel().rows.length} row(s)
         </div>
-        <div className="space-x-2">
+        <div className="space-x-2 flex items-center">
           <button
             className="px-2 py-1 border rounded disabled:opacity-50"
             onClick={() => table.previousPage()}
@@ -104,6 +104,16 @@ export function DataTable<TData, TValue>({
           >
             Previous
           </button>
+          {Array.from({ length: table.getPageCount() }, (_, i) => (
+            <button
+              key={i}
+              className={`px-2 py-1 border rounded ${table.getState().pagination.pageIndex === i ? 'bg-primary text-white' : ''}`}
+              onClick={() => table.setPageIndex(i)}
+              disabled={table.getState().pagination.pageIndex === i}
+            >
+              {i + 1}
+            </button>
+          ))}
           <button
             className="px-2 py-1 border rounded disabled:opacity-50"
             onClick={() => table.nextPage()}
