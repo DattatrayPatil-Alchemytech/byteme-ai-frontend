@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import { SearchFilter } from '../../../components/ui/SearchFilter';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { Select } from '@/components/ui/DropdownMenu';
 
 const columns = [
   {
@@ -86,15 +87,22 @@ export default function UsersPage() {
       </div>
       <div className="relative z-10 p-6 space-y-6">
         <h1 className="text-3xl md:text-4xl font-extrabold text-gradient-ev-green animate-fade-in drop-shadow-lg tracking-tight font-sans">User Management</h1>
-        <Card className="p-4 bg-white/90 backdrop-blur-md shadow-xl">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-            <SearchFilter
-              search={search}
-              onSearchChange={setSearch}
-              filterLabel="Tier"
-              filterValue={tierFilter}
-              filterOptions={tierOptions}
-              onFilterChange={setTierFilter}
+        <Card className="p-6 bg-white/90 backdrop-blur-md shadow-xl">
+          {/* Consistent search/filter row */}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+            <input
+              type="text"
+              placeholder="Search..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="border border-primary/30 rounded-full px-5 py-3 w-full md:w-64 text-base font-medium shadow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary hover:ring-2 hover:ring-primary/30 hover:bg-primary/5 placeholder:text-muted-foreground"
+            />
+            <Select
+              value={tierFilter}
+              onChange={setTierFilter}
+              options={[...tierOptions.map(t => ({ value: t, label: t }))]}
+              placeholder="All Tiers"
+              className="min-w-[140px]"
             />
           </div>
           <DataTable columns={columns} data={filteredUsers} />
