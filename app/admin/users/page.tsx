@@ -10,6 +10,10 @@ import { Select } from '@/components/ui/DropdownMenu';
 
 const columns = [
   {
+    accessorKey: 'name',
+    header: 'Name',
+  },
+  {
     accessorKey: 'email',
     header: 'Email',
   },
