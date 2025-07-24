@@ -64,6 +64,27 @@ export default function Header() {
               </svg>
             </Link>
             
+            {/* Profile Icon Link */}
+            <Link
+              href="/profile"
+              className="text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center"
+              title="Profile"
+            >
+              <svg
+                className="w-7 h-7 rounded-full border border-muted bg-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5.121 17.804A9 9 0 1112 21a9 9 0 01-6.879-3.196zM15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+            </Link>
+            
             <button
               onClick={handleLogout}
               className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"

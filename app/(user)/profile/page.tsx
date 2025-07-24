@@ -25,14 +25,21 @@ export default function UserProfilePage() {
   const [vehicles, setVehicles] = useState(mockVehicles);
   const [editId, setEditId] = useState<number | null>(null);
   const [editName, setEditName] = useState("");
+  const [editError, setEditError] = useState("");
 
   const handleEdit = (id: number, name: string) => {
     setEditId(id);
     setEditName(name);
+    setEditError("");
   };
   const handleSave = (id: number) => {
+    if (!editName.trim()) {
+      setEditError("Name cannot be empty");
+      return;
+    }
     setVehicles(vehicles.map(v => v.id === id ? { ...v, name: editName } : v));
     setEditId(null);
+    setEditError("");
   };
   const handleRemove = (id: number) => {
     setVehicles(vehicles.filter(v => v.id !== id));
@@ -46,14 +53,19 @@ export default function UserProfilePage() {
       cell: (info) => {
         const vehicle = info.row.original;
         return editId === vehicle.id ? (
-          <input
-            className="border rounded px-2 py-1 text-sm"
-            value={editName}
-            onChange={e => setEditName(e.target.value)}
-            onBlur={() => handleSave(vehicle.id)}
-            onKeyDown={e => { if (e.key === 'Enter') handleSave(vehicle.id); }}
-            autoFocus
-          />
+          <>
+            <input
+              className="border rounded px-2 py-1 text-sm"
+              value={editName}
+              onChange={e => { setEditName(e.target.value); if (editError) setEditError(""); }}
+              onBlur={() => handleSave(vehicle.id)}
+              onKeyDown={e => { if (e.key === 'Enter') handleSave(vehicle.id); }}
+              autoFocus
+            />
+            {editError && (
+              <div className="text-xs text-red-500 mt-1">{editError}</div>
+            )}
+          </>
         ) : (
           <span onClick={() => handleEdit(vehicle.id, vehicle.name)} className="cursor-pointer hover:underline text-foreground">
             {vehicle.name}
