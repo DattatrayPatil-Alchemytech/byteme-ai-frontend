@@ -95,7 +95,7 @@ export default function Navigation() {
             transition={{ duration: 0.6, delay: 0.4 }}
           >
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Link href="/auth/register">
+              <Link href="/login">
                 <Button
                   size="lg"
                   className="gradient-ev-green hover-glow text-white font-semibold px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
@@ -179,7 +179,7 @@ export default function Navigation() {
                       Sign In
                     </Button>
                   </Link>
-                  <Link href="/auth/register">
+                  <Link href="/login">
                     <Button
                       className="w-full gradient-ev-green hover-glow text-white font-semibold"
                       onClick={() => setIsMobileMenuOpen(false)}

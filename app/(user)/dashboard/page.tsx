@@ -426,7 +426,7 @@ export default function DashboardPage() {
                         </div>
                       </div>
                       <div className="p-1 bg-primary/20 rounded-lg">
-                        <span className="text-2xl">📝</span>
+                        <span className="text-2xl">📅</span>
                       </div>
                     </div>
 
