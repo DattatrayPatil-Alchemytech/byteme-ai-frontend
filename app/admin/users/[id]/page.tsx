@@ -1,15 +1,13 @@
 "use client";
 import { notFound } from "next/navigation";
 import { mockUsers } from "../mockUsers";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { DataTable } from "@/components/ui/DataTable";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { useState, useMemo, useRef } from "react";
 import { Select } from "@/components/ui/DropdownMenu";
 import { mockHistory } from "@/app/(user)/dashboard/mockHistory";
 import { ColumnDef } from "@tanstack/react-table";
-import { Search, X, Eye } from "lucide-react";
+import { Search, X, Eye, Mail, Phone, MapPin, Calendar, BadgeCheck, Wallet, User } from "lucide-react";
+import { CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 // More mock user history data for a richer table and carousel
 const mockUserHistory = [
@@ -182,6 +180,21 @@ export default function UserViewPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="p-6 space-y-8">
+      {/* User Basic Details Card - Top of Page */}
+      <div className="w-full flex flex-col md:flex-row items-center justify-between gap-6 bg-white/90 rounded-xl shadow p-6 border border-muted mb-8 animate-fade-in">
+        <div className="flex items-center gap-4 w-full md:w-auto">
+          <User className="text-primary" size={32} />
+          <span className="text-2xl font-extrabold text-gradient-ev-green tracking-tight">{user.name}</span>
+        </div>
+        <div className="flex flex-wrap gap-x-8 gap-y-2 items-center w-full md:w-auto justify-between">
+          <div className="flex items-center gap-2"><Mail className="text-primary" size={20} /><span className="font-semibold">{user.email}</span></div>
+          <div className="flex items-center gap-2"><Phone className="text-primary" size={20} /><span>{userDetails.phone || '—'}</span></div>
+          <div className="flex items-center gap-2"><MapPin className="text-primary" size={20} /><span>{userDetails.address || '—'}</span></div>
+          <div className="flex items-center gap-2"><Calendar className="text-primary" size={20} /><span>{userDetails.registrationDate || '—'}</span></div>
+          <div className="flex items-center gap-2"><BadgeCheck className="text-primary" size={20} /><span className={userDetails.status === 'Active' ? 'text-green-600 font-bold' : 'text-red-600 font-bold'}>{userDetails.status || '—'}</span></div>
+          <div className="flex items-center gap-2"><Wallet className="text-primary" size={20} /><span className="font-mono text-xs">{userDetails.wallet || '—'}</span></div>
+        </div>
+      </div>
       {/* User Overview Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8 animate-fade-in">
         <div className="rounded-xl bg-white/90 shadow flex flex-col items-center p-6 border border-muted hover:shadow-lg transition-all">
@@ -248,6 +261,15 @@ export default function UserViewPage({ params }: { params: { id: string } }) {
       <div className="bg-white/90 rounded-2xl shadow-lg p-4 transition-transform transition-shadow duration-300 hover:scale-[1.01] hover:shadow-2xl">
         <DataTable columns={columns} data={filtered} />
       </div>
+      <CardContent className="space-y-4 p-0">
+        <div className="flex flex-wrap gap-x-8 gap-y-2 text-lg font-medium text-foreground/90 border-b border-muted pb-3 mb-3">
+          <div><span className="font-semibold text-primary">Tier:</span> {user.tier}</div>
+          <div><span className="font-semibold text-primary">Total Miles:</span> {user.totalMiles}</div>
+          <div><span className="font-semibold text-primary">Total Rewards:</span> {user.totalRewards}</div>
+          <div><span className="font-semibold text-primary">Submissions:</span> {user.submissionCount}</div>
+          <div><span className="font-semibold text-primary">Last Active:</span> {user.lastActive}</div>
+        </div>
+      </CardContent>
     </div>
   );
 }
