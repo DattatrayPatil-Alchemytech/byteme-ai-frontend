@@ -23,5 +23,74 @@ export const mockHistory = [
     imageHash: "0xdef456",
     date: "2024-07-02",
   },
-  
+  {
+    id: 3,
+    vehicle: "Three Wheeler C",
+    image: "/assets/threewheeler-ev.jpg",
+    type: "3-wheel",
+    submissionCount: 5,
+    milesDriven: 1500,
+    carbonImpact: 0.3,
+    rewards: 60,
+    imageHash: "0xghi789",
+    date: "2024-07-03",
+  },
+  {
+    id: 4,
+    vehicle: "Car D",
+    image: "/assets/car-ev.jpg",
+    type: "4-wheel",
+    submissionCount: 10,
+    milesDriven: 2800,
+    carbonImpact: 0.7,
+    rewards: 120,
+    imageHash: "0xjkl012",
+    date: "2024-07-04",
+  },
+  {
+    id: 5,
+    vehicle: "Bike E",
+    image: "/assets/bike-ev.jpg",
+    type: "2-wheel",
+    submissionCount: 7,
+    milesDriven: 1800,
+    carbonImpact: 0.4,
+    rewards: 80,
+    imageHash: "0xlmn345",
+    date: "2024-07-05",
+  },
+  {
+    id: 6,
+    vehicle: "Three Wheeler F",
+    image: "/assets/threewheeler-ev.jpg",
+    type: "3-wheel",
+    submissionCount: 6,
+    milesDriven: 1600,
+    carbonImpact: 0.35,
+    rewards: 70,
+    imageHash: "0xopq678",
+    date: "2024-07-06",
+  },
+  // Add 18 more entries
+  ...Array.from({ length: 18 }, (_, i) => {
+    const idx = i + 7;
+    const vehicles = [
+      { name: "Car", img: "/assets/car-ev.jpg", type: "4-wheel" },
+      { name: "Bike", img: "/assets/bike-ev.jpg", type: "2-wheel" },
+      { name: "Three Wheeler", img: "/assets/threewheeler-ev.jpg", type: "3-wheel" },
+    ];
+    const v = vehicles[idx % vehicles.length];
+    return {
+      id: idx,
+      vehicle: `${v.name} ${String.fromCharCode(65 + (idx % 6))}`,
+      image: v.img,
+      type: v.type,
+      submissionCount: 5 + (idx * 3) % 20,
+      milesDriven: 1000 + (idx * 123) % 3500,
+      carbonImpact: (0.2 + (idx % 5) * 0.1).toFixed(2),
+      rewards: 50 + (idx * 7) % 200,
+      imageHash: `0x${(Math.random() * 1e6).toString(16).slice(0, 6)}`,
+      date: `2024-07-${(idx % 28 + 1).toString().padStart(2, '0')}`,
+    };
+  })
 ]; 

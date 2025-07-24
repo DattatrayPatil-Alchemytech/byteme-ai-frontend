@@ -85,16 +85,6 @@ const mockUserHistory = [
   },
 ];
 
-const historyColumns = [
-  { accessorKey: "vehicle", header: "Vehicle" },
-  { accessorKey: "submissionCount", header: "Submission Count" },
-  { accessorKey: "milesDriven", header: "Miles Driven" },
-  { accessorKey: "carbonImpact", header: "Carbon Impact (tCO₂)" },
-  { accessorKey: "rewards", header: "Rewards (B3TR)" },
-  { accessorKey: "imageHash", header: "Image Hash" },
-  { accessorKey: "date", header: "Date" },
-];
-
 // Add more mock user details for demonstration
 const userDetailsMap: Record<string, any> = {
   '1': {
@@ -136,10 +126,6 @@ export default function UserViewPage({ params }: { params: { id: string } }) {
   // State for search and filter
   const [search, setSearch] = useState("");
   const [vehicleFilter, setVehicleFilter] = useState("");
-  const [selectedVehicle, setSelectedVehicle] = useState(
-    mockUserHistory[0]?.vehicle || ""
-  );
-  const carouselRef = useRef<HTMLDivElement>(null);
 
   // Vehicle options for dropdown
   const vehicleOptions = useMemo(() => {
@@ -254,7 +240,7 @@ export default function UserViewPage({ params }: { params: { id: string } }) {
         <Select
           value={vehicleFilter}
           onChange={setVehicleFilter}
-          options={[{ value: "", label: "All Vehicles" }, ...vehicleOptions]}
+          options={[...vehicleOptions]}
           placeholder="All Vehicles"
         />
       </div>
