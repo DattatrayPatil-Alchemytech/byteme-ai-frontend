@@ -2,12 +2,11 @@
 import { notFound } from "next/navigation";
 import { mockUsers } from "../mockUsers";
 import { DataTable } from "@/components/ui/DataTable";
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo } from "react";
 import { Select } from "@/components/ui/DropdownMenu";
 import { mockHistory } from "@/app/(user)/dashboard/mockHistory";
 import { ColumnDef } from "@tanstack/react-table";
-import { Search, X, Eye, Mail, Phone, MapPin, Calendar, BadgeCheck, Wallet, User } from "lucide-react";
-import { CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Mail, Phone, MapPin, Calendar, BadgeCheck, Wallet, User } from "lucide-react";
 
 // More mock user history data for a richer table and carousel
 const mockUserHistory = [

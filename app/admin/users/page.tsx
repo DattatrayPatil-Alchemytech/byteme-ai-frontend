@@ -48,10 +48,8 @@ const columns = [
       return (
         <div className="flex gap-2 items-center">
           <Link href={`/admin/users/${user.id}`} passHref legacyBehavior>
-            <Button size="sm" variant="outline">View</Button>
+            <span className="font-semibold text-foreground hover:underline cursor-pointer">View</span>
           </Link>
-          <Button size="sm" variant="ghost" onClick={() => {/* TODO: Edit logic */}}>Edit</Button>
-          <Button size="sm" variant="destructive" onClick={() => {/* TODO: Delete logic */}}>Delete</Button>
         </div>
       );
     },
