@@ -50,7 +50,7 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-white/80 backdrop-blur-lg border-b border-border shadow-sm sticky top-0 z-50">
+    <header className="bg-card/80 backdrop-blur-lg border-b border-border shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
@@ -104,14 +104,14 @@ export default function Header() {
               )}
             </button>
             {showNotifications && (
-              <div className="absolute right-0 top-12 w-80 bg-white rounded-xl shadow-xl border border-muted z-50 p-4 animate-fade-in">
+              <div className="absolute right-0 top-12 w-80 bg-card rounded-xl shadow-xl border border-border z-50 p-4 animate-fade-in">
                 <div className="font-bold text-lg mb-2 text-foreground">Notifications</div>
                 <ul className="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
                   {notifications.length === 0 ? (
                     <li className="text-muted-foreground">No notifications</li>
                   ) : (
                     notifications.map(note => (
-                      <li key={note.id} className={note.read ? "text-gray-400" : "font-medium text-foreground"}>
+                      <li key={note.id} className={note.read ? "text-muted-foreground" : "font-medium text-foreground"}>
                         {note.message}
                       </li>
                     ))
@@ -126,7 +126,7 @@ export default function Header() {
               title="Profile"
             >
               <svg
-                className="w-7 h-7 rounded-full border border-muted bg-white"
+                className="w-7 h-7 rounded-full border border-border bg-card"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
