@@ -3,6 +3,7 @@ import { useState, useMemo } from 'react';
 import { DataTable, Column } from '@/components/ui/DataTable';
 import { mockUsers } from './mockUsers';
 import Link from 'next/link';
+import { Eye } from 'lucide-react';
 import { Select } from '@/components/ui/DropdownMenu';
 
 const columns: Column[] = [
@@ -40,8 +41,10 @@ const columns: Column[] = [
     render: (value, row) => {
       const user = row as { id: string };
       return (
-        <div className="flex gap-2 items-center">
-          <Link href={`/admin/users/${user.id}`} className="font-semibold text-foreground hover:underline cursor-pointer">View</Link>
+        <div className="flex gap-2 items-center justify-center">
+          <Link href={`/admin/users/${user.id}`} className="flex items-center gap-1 font-semibold text-foreground hover:underline cursor-pointer">
+            <Eye className="w-4 h-4" />
+          </Link>
         </div>
       );
     },
