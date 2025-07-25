@@ -1068,3 +1068,21 @@
   scrollbar-color: #22c55e #f3f4f6;
   scrollbar-width: thin;
 }
+
+/* Dark theme override for custom scrollbar */
+.dark .custom-scrollbar::-webkit-scrollbar {
+  height: 10px;
+  background: #181f2a;
+}
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 8px;
+}
+.dark .custom-scrollbar::-webkit-scrollbar-track {
+  background: #0f172a;
+  border-radius: 8px;
+}
+.dark .custom-scrollbar {
+  scrollbar-color: #334155 #0f172a;
+  scrollbar-width: thin;
+}
