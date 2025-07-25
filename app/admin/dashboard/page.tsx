@@ -521,123 +521,123 @@ export default function AdminDashboardPage() {
     <div className="space-y-8">
       {/* Welcome */}
       <div>
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">
+        <h1 className="text-4xl font-bold text-foreground mb-2">
           Welcome back, {adminUsername}! 👋
         </h1>
-        <p className="text-gray-600 text-lg">
+        <p className="text-muted-foreground text-lg">
           Here&apos;s your comprehensive overview of ByteMe AI platform performance.
         </p>
       </div>
 
       {/* Global Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <CardContent className="p-6">
-            <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Users</p>
+                <p className="text-sm font-medium text-muted-foreground">Total Users</p>
                 <p className="text-3xl font-bold text-green-600">
                   {globalStats.totalUsers.toLocaleString()}
                 </p>
                 <p className="text-xs text-green-500">+{globalStats.monthlyGrowth}% this month</p>
               </div>
-              <div className="p-4 bg-green-100 rounded-xl">
+              <div className="p-4 bg-green-100 dark:bg-green-900/20 rounded-xl">
                 <span className="text-3xl">👥</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
 
-        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Miles</p>
+                <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                <p className="text-sm font-medium text-muted-foreground">Total Miles</p>
                 <p className="text-3xl font-bold text-blue-600">
                   {globalStats.totalMiles.toLocaleString()}
                 </p>
                 <p className="text-xs text-blue-500">Sustainable driving</p>
-              </div>
-              <div className="p-4 bg-blue-100 rounded-xl">
+                      </div>
+              <div className="p-4 bg-blue-100 dark:bg-blue-900/20 rounded-xl">
                 <span className="text-3xl">🚗</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
 
-        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Tokens</p>
+                <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                <p className="text-sm font-medium text-muted-foreground">Total Tokens</p>
                 <p className="text-3xl font-bold text-purple-600">
                   {globalStats.totalTokens.toLocaleString()}
                 </p>
                 <p className="text-xs text-purple-500">B3TR distributed</p>
-              </div>
-              <div className="p-4 bg-purple-100 rounded-xl">
+                      </div>
+              <div className="p-4 bg-purple-100 dark:bg-purple-900/20 rounded-xl">
                 <span className="text-3xl">⚡</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
 
-        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Carbon Offset</p>
+        <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                <p className="text-sm font-medium text-muted-foreground">Carbon Offset</p>
                 <p className="text-3xl font-bold text-emerald-600">
                   {globalStats.carbonOffset.toLocaleString()}
                 </p>
                 <p className="text-xs text-emerald-500">kg CO2 saved</p>
-              </div>
-              <div className="p-4 bg-emerald-100 rounded-xl">
+                      </div>
+              <div className="p-4 bg-emerald-100 dark:bg-emerald-900/20 rounded-xl">
                 <span className="text-3xl">🌱</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
       </div>
 
       {/* Additional Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+        <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-lg">
           <CardContent className="p-6">
             <div className="text-center">
-              <p className="text-sm font-medium text-gray-600">Active Users</p>
+              <p className="text-sm font-medium text-muted-foreground">Active Users</p>
               <p className="text-2xl font-bold text-green-600">{globalStats.activeUsers}</p>
-              <p className="text-xs text-gray-500">Daily: {globalStats.dailyActiveUsers}</p>
+              <p className="text-xs text-muted-foreground">Daily: {globalStats.dailyActiveUsers}</p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+        <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-lg">
           <CardContent className="p-6">
             <div className="text-center">
-              <p className="text-sm font-medium text-gray-600">Pending Submissions</p>
+              <p className="text-sm font-medium text-muted-foreground">Pending Submissions</p>
               <p className="text-2xl font-bold text-yellow-600">{globalStats.pendingSubmissions}</p>
-              <p className="text-xs text-gray-500">Awaiting review</p>
+              <p className="text-xs text-muted-foreground">Awaiting review</p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+        <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-lg">
           <CardContent className="p-6">
             <div className="text-center">
-              <p className="text-sm font-medium text-gray-600">Retention Rate</p>
+              <p className="text-sm font-medium text-muted-foreground">Retention Rate</p>
               <p className="text-2xl font-bold text-blue-600">{globalStats.userRetentionRate}%</p>
-              <p className="text-xs text-gray-500">Monthly average</p>
+              <p className="text-xs text-muted-foreground">Monthly average</p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+        <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-lg">
           <CardContent className="p-6">
             <div className="text-center">
-              <p className="text-sm font-medium text-gray-600">Platform Revenue</p>
+              <p className="text-sm font-medium text-muted-foreground">Platform Revenue</p>
               <p className="text-2xl font-bold text-purple-600">${globalStats.platformRevenue.toLocaleString()}</p>
-              <p className="text-xs text-gray-500">Total earnings</p>
+              <p className="text-xs text-muted-foreground">Total earnings</p>
             </div>
           </CardContent>
         </Card>
@@ -646,9 +646,9 @@ export default function AdminDashboardPage() {
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* User Growth Chart */}
-        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+        <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-lg">
           <CardHeader>
-            <CardTitle className="text-gray-900">User Growth Trend</CardTitle>
+            <CardTitle className="text-foreground">User Growth Trend</CardTitle>
           </CardHeader>
           <CardContent>
             <Chart
@@ -661,9 +661,9 @@ export default function AdminDashboardPage() {
         </Card>
 
         {/* Miles Chart */}
-        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+        <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-lg">
           <CardHeader>
-            <CardTitle className="text-gray-900">Monthly Miles Driven</CardTitle>
+            <CardTitle className="text-foreground">Monthly Miles Driven</CardTitle>
           </CardHeader>
           <CardContent>
             <Chart
@@ -679,9 +679,9 @@ export default function AdminDashboardPage() {
       {/* Additional Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Tokens Distribution */}
-        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+        <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-lg">
           <CardHeader>
-            <CardTitle className="text-gray-900">Token Distribution by User Type</CardTitle>
+            <CardTitle className="text-foreground">Token Distribution by User Type</CardTitle>
           </CardHeader>
           <CardContent>
             <Chart
@@ -694,9 +694,9 @@ export default function AdminDashboardPage() {
         </Card>
 
         {/* Weekly Activity */}
-        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+        <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-lg">
           <CardHeader>
-            <CardTitle className="text-gray-900">Weekly Activity</CardTitle>
+            <CardTitle className="text-foreground">Weekly Activity</CardTitle>
           </CardHeader>
           <CardContent>
             <Chart
@@ -709,41 +709,41 @@ export default function AdminDashboardPage() {
         </Card>
       </div>
 
-      {/* Top 10 Users */}
-      <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-gray-900">Top 10 Users</CardTitle>
-        </CardHeader>
-        <CardContent>
+            {/* Top 10 Users */}
+      <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-lg">
+                  <CardHeader>
+          <CardTitle className="text-foreground">Top 10 Users</CardTitle>
+                  </CardHeader>
+                  <CardContent>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4 font-medium text-gray-600">Rank</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-600">User</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-600">Vehicle</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-600">Miles</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-600">Tokens</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-600">Carbon Offset</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-600">Badges</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-600">Last Active</th>
+                <tr className="border-b border-border">
+                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">Rank</th>
+                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">User</th>
+                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">Vehicle</th>
+                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">Miles</th>
+                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">Tokens</th>
+                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">Carbon Offset</th>
+                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">Badges</th>
+                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">Last Active</th>
                 </tr>
               </thead>
               <tbody>
-                {topUsers.map((user) => (
-                  <tr key={user.id} className="border-b border-gray-100 hover:bg-gray-50">
+                      {topUsers.map((user) => (
+                  <tr key={user.id} className="border-b border-border/50 hover:bg-muted/50">
                     <td className="py-3 px-4">
                       <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">#{user.rank}</span>
-                      </div>
+                              <span className="text-white text-xs font-bold">#{user.rank}</span>
+                            </div>
                     </td>
                     <td className="py-3 px-4">
-                      <div>
-                        <p className="font-medium text-gray-900">{user.name}</p>
-                        <p className="text-sm text-gray-500">{user.email}</p>
-                      </div>
+                            <div>
+                        <p className="font-medium text-foreground">{user.name}</p>
+                        <p className="text-sm text-muted-foreground">{user.email}</p>
+                            </div>
                     </td>
-                    <td className="py-3 px-4 text-gray-700">{user.vehicleModel}</td>
+                    <td className="py-3 px-4 text-foreground">{user.vehicleModel}</td>
                     <td className="py-3 px-4">
                       <span className="font-semibold text-blue-600">{user.totalMiles.toLocaleString()}</span>
                     </td>
@@ -756,43 +756,43 @@ export default function AdminDashboardPage() {
                     <td className="py-3 px-4">
                       <div className="flex flex-wrap gap-1">
                         {user.badges.map((badge, index) => (
-                          <span key={index} className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                          <span key={index} className="px-2 py-1 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 text-xs rounded-full">
                             {badge}
                           </span>
                         ))}
                       </div>
                     </td>
-                    <td className="py-3 px-4 text-sm text-gray-500">{user.lastActive}</td>
+                    <td className="py-3 px-4 text-sm text-muted-foreground">{user.lastActive}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </div>
-        </CardContent>
-      </Card>
+                    </div>
+                  </CardContent>
+                </Card>
 
-      {/* Last Claims */}
-      <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-gray-900">Recent Claims & Submissions</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
+            {/* Last Claims */}
+      <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-lg">
+                  <CardHeader>
+          <CardTitle className="text-foreground">Recent Claims & Submissions</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
             {lastClaims.map((claim) => (
-              <div key={claim.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+              <div key={claim.id} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
                 <div className="flex items-center space-x-4">
                   <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
                     <span className="text-white text-sm font-bold">
                       {claim.user.charAt(0)}
                     </span>
                   </div>
-                  <div>
-                    <p className="font-medium text-gray-900">{claim.user}</p>
-                    <p className="text-sm text-gray-600">{claim.claimType}</p>
-                    <p className="text-xs text-gray-500">ID: {claim.submissionId}</p>
+                          <div>
+                    <p className="font-medium text-foreground">{claim.user}</p>
+                    <p className="text-sm text-muted-foreground">{claim.claimType}</p>
+                    <p className="text-xs text-muted-foreground">ID: {claim.submissionId}</p>
                   </div>
-                </div>
-                <div className="text-right">
+                          </div>
+                          <div className="text-right">
                   <div className="flex items-center space-x-2 mb-1">
                     {claim.miles && (
                       <span className="text-sm font-semibold text-blue-600">+{claim.miles} miles</span>
@@ -811,14 +811,14 @@ export default function AdminDashboardPage() {
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(claim.status)}`}>
                       {claim.status}
                     </span>
-                    <span className="text-xs text-gray-500">{claim.time}</span>
+                    <span className="text-xs text-muted-foreground">{claim.time}</span>
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
     </div>
   );
 } 

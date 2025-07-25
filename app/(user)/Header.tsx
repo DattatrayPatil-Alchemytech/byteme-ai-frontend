@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Bell } from 'lucide-react';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 // Mock notifications (replace with real data or context as needed)
 const notifications = [
@@ -67,6 +68,8 @@ export default function Header() {
                 Welcome, {userName}
               </span>
             )}
+            
+            <ThemeToggle />
             
             <Link
               href="/dashboard/upload"

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -94,6 +95,7 @@ export default function Navigation() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
+            <ThemeToggle />
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Link href="/login">
                 <Button
@@ -170,15 +172,9 @@ export default function Navigation() {
                   </motion.a>
                 ))}
                 <div className="pt-4 border-t border-primary/20 space-y-3">
-                  <Link href="/auth/login">
-                    <Button
-                      variant="ghost"
-                      className="w-full text-muted-foreground hover:text-foreground hover:bg-primary/10"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Sign In
-                    </Button>
-                  </Link>
+                  <div className="flex justify-center">
+                    <ThemeToggle />
+                  </div>
                   <Link href="/login">
                     <Button
                       className="w-full gradient-ev-green hover-glow text-white font-semibold"
