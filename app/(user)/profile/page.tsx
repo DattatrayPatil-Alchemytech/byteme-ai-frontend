@@ -8,9 +8,9 @@ import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { getRequest } from "@/lib/api/apiRequests";
 import { RootState } from "@/redux/store";
-import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
-import Modal from '@/components/modals/Modal';
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import Modal from "@/components/modals/Modal";
 
 // Mock data for profile, badges, tier, notifications, and vehicles
 const userProfile = {
@@ -35,8 +35,17 @@ export default function UserProfilePage() {
   const [editError, setEditError] = useState("");
   const [fakeData, setFakeData] = useState<unknown>(null); // New state for fake API data
   const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [newVehicle, setNewVehicle] = useState({ name: '', type: '', numberPlate: '' });
-  const [addError, setAddError] = useState('');
+  const [newVehicle, setNewVehicle] = useState({
+    name: "",
+    type: "",
+    numberPlate: "",
+  });
+  const [addError, setAddError] = useState("");
+  const [addFieldErrors, setAddFieldErrors] = useState<{
+    name?: string;
+    type?: string;
+    numberPlate?: string;
+  }>({});
   const router = useRouter();
 
   // Get user data from redux
@@ -49,7 +58,7 @@ export default function UserProfilePage() {
       .catch((err) => setFakeData({ error: err.message }));
   }, []);
 
-  console.log(fakeData)
+  console.log(fakeData);
 
   const handleEdit = (id: number, name: string) => {
     setEditId(id);
@@ -72,10 +81,11 @@ export default function UserProfilePage() {
   };
 
   const handleAddVehicle = () => {
-    if (!newVehicle.name.trim() || !newVehicle.type.trim() || !newVehicle.numberPlate.trim()) {
-      setAddError('All fields are required');
-      return;
-    }
+    const errors: { name?: string; type?: string; numberPlate?: string } = {};
+    if (!newVehicle.name.trim()) errors.name = "Name is required";
+    if (!newVehicle.type.trim()) errors.type = "Type is required";
+    setAddFieldErrors(errors);
+    if (Object.keys(errors).length > 0) return;
     setVehicles([
       ...vehicles,
       {
@@ -87,8 +97,9 @@ export default function UserProfilePage() {
       },
     ]);
     setAddDialogOpen(false);
-    setNewVehicle({ name: '', type: '', numberPlate: '' });
-    setAddError('');
+    setNewVehicle({ name: "", type: "", numberPlate: "" });
+    setAddError("");
+    setAddFieldErrors({});
   };
 
   // DataTable columns
@@ -269,31 +280,52 @@ export default function UserProfilePage() {
           data={vehicles as unknown as Record<string, unknown>[]}
         />
       </section>
-      <Modal show={addDialogOpen} handleClose={() => setAddDialogOpen(false)} title="Add Vehicle">
+      <Modal
+        show={addDialogOpen}
+        handleClose={() => setAddDialogOpen(false)}
+        title="Add Vehicle"
+      >
         <div className="space-y-4 bg-background text-foreground">
-          <Input
-            placeholder="Name"
-            value={newVehicle.name}
-            onChange={e => setNewVehicle({ ...newVehicle, name: e.target.value })}
-            className="bg-background text-foreground border-border"
-          />
-          <Select
-            value={newVehicle.type}
-            onChange={e => setNewVehicle({ ...newVehicle, type: e.target.value })}
-            className="bg-background text-foreground border-border"
-          >
-            <option value="">Select Type</option>
-            <option value="2-Wheel">2-Wheel</option>
-            <option value="3-Wheel">3-Wheel</option>
-            <option value="4-Wheel">4-Wheel</option>
-          </Select>
-          <Input
-            placeholder="Number Plate"
-            value={newVehicle.numberPlate}
-            onChange={e => setNewVehicle({ ...newVehicle, numberPlate: e.target.value })}
-            className="bg-background text-foreground border-border"
-          />
-          {addError && <div className="text-red-500 text-sm">{addError}</div>}
+          <div>
+            <Input
+              placeholder="Name"
+              value={newVehicle.name}
+              onChange={(e) =>
+                setNewVehicle({ ...newVehicle, name: e.target.value })
+              }
+              className="bg-background text-foreground border-border"
+            />
+            {addFieldErrors.name && (
+              <div className="text-red-500 text-sm">{addFieldErrors.name}</div>
+            )}
+          </div>
+          <div>
+            <Select
+              value={newVehicle.type}
+              onChange={(e) =>
+                setNewVehicle({ ...newVehicle, type: e.target.value })
+              }
+              className="bg-background text-foreground border-border"
+            >
+              <option value="">Select Type</option>
+              <option value="2-Wheel">2-Wheel</option>
+              <option value="3-Wheel">3-Wheel</option>
+              <option value="4-Wheel">4-Wheel</option>
+            </Select>
+            {addFieldErrors.type && (
+              <div className="text-red-500 text-sm">{addFieldErrors.type}</div>
+            )}
+          </div>
+          <div>
+            <Input
+              placeholder="Number Plate"
+              value={newVehicle.numberPlate}
+              onChange={(e) =>
+                setNewVehicle({ ...newVehicle, numberPlate: e.target.value })
+              }
+              className="bg-background text-foreground border-border"
+            />
+          </div>
           <div className="flex justify-end gap-2 mt-4">
             <Button variant="secondary" onClick={() => setAddDialogOpen(false)}>
               Cancel
