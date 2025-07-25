@@ -337,12 +337,10 @@ export default function UserViewPage({ params }: { params: { id: string } }) {
               className="bg-background text-foreground border border-border hover:bg-muted/60"
             />
           </div>
-          <div className="bg-card/80 rounded-2xl shadow-lg p-4 transition-transform duration-300 hover:scale-[1.01] hover:shadow-2xl">
-            <DataTable
-              columns={columns}
-              data={filtered as Record<string, unknown>[]}
-            />
-          </div>
+          <DataTable
+            columns={columns}
+            data={filtered as Record<string, unknown>[]}
+          />
         </CardContent>
       </Card>
     </div>
