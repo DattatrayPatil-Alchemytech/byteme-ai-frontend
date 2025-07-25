@@ -4,16 +4,13 @@ import { User, Award, Star, Pencil } from "lucide-react";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { mockVehicles } from "./mockVehicles";
 import { Button } from "@/components/ui/button";
-import { Bell } from "lucide-react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { useSelector } from "react-redux";
-import { apiGet } from "@/lib/apiHelpers/apiMiddleware";
 import { getRequest } from "@/lib/api/apiRequests";
 import { RootState } from "@/redux/store";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
+import Modal from '@/components/modals/Modal';
 
 // Mock data for profile, badges, tier, notifications, and vehicles
 const userProfile = {
@@ -272,46 +269,41 @@ export default function UserProfilePage() {
           data={vehicles as unknown as Record<string, unknown>[]}
         />
       </section>
-      <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
-        <DialogContent className="bg-background text-foreground">
-          <DialogHeader>
-            <DialogTitle>Add Vehicle</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <Input
-              placeholder="Name"
-              value={newVehicle.name}
-              onChange={e => setNewVehicle({ ...newVehicle, name: e.target.value })}
-              className="bg-background text-foreground border-border"
-            />
-            <Select
-              value={newVehicle.type}
-              onChange={e => setNewVehicle({ ...newVehicle, type: e.target.value })}
-              className="bg-background text-foreground border-border"
-            >
-              <option value="">Select Type</option>
-              <option value="2-Wheel">2-Wheel</option>
-              <option value="3-Wheel">3-Wheel</option>
-              <option value="4-Wheel">4-Wheel</option>
-            </Select>
-            <Input
-              placeholder="Number Plate"
-              value={newVehicle.numberPlate}
-              onChange={e => setNewVehicle({ ...newVehicle, numberPlate: e.target.value })}
-              className="bg-background text-foreground border-border"
-            />
-            {addError && <div className="text-red-500 text-sm">{addError}</div>}
-          </div>
-          <DialogFooter>
+      <Modal show={addDialogOpen} handleClose={() => setAddDialogOpen(false)} title="Add Vehicle">
+        <div className="space-y-4 bg-background text-foreground">
+          <Input
+            placeholder="Name"
+            value={newVehicle.name}
+            onChange={e => setNewVehicle({ ...newVehicle, name: e.target.value })}
+            className="bg-background text-foreground border-border"
+          />
+          <Select
+            value={newVehicle.type}
+            onChange={e => setNewVehicle({ ...newVehicle, type: e.target.value })}
+            className="bg-background text-foreground border-border"
+          >
+            <option value="">Select Type</option>
+            <option value="2-Wheel">2-Wheel</option>
+            <option value="3-Wheel">3-Wheel</option>
+            <option value="4-Wheel">4-Wheel</option>
+          </Select>
+          <Input
+            placeholder="Number Plate"
+            value={newVehicle.numberPlate}
+            onChange={e => setNewVehicle({ ...newVehicle, numberPlate: e.target.value })}
+            className="bg-background text-foreground border-border"
+          />
+          {addError && <div className="text-red-500 text-sm">{addError}</div>}
+          <div className="flex justify-end gap-2 mt-4">
             <Button variant="secondary" onClick={() => setAddDialogOpen(false)}>
               Cancel
             </Button>
             <Button variant="default" onClick={handleAddVehicle}>
               Add
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }
