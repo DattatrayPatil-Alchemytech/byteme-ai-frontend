@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import Image from 'next/image';
+import { User, Award, Star } from 'lucide-react';
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { mockVehicles } from "./mockVehicles";
 import { Button } from "@/components/ui/button";
@@ -11,11 +11,11 @@ import { useRouter } from "next/navigation";
 const userProfile = {
   name: "Jane Doe",
   email: "jane.doe@email.com",
-  avatar: "/assets/bike-ev.jpg",
+  avatar: "icon", // Use icon for avatar
   tier: "Gold",
   badges: [
-    { id: 1, name: "Eco Warrior", image: "/assets/bike-ev.jpg" },
-    { id: 2, name: "EV Pioneer", image: "/assets/car-ev.jpg" },
+    { id: 1, name: "Eco Warrior", icon: Award },
+    { id: 2, name: "EV Pioneer", icon: Star },
   ],
   notifications: [
     { id: 1, message: "Your vehicle registration is approved!", read: false },
@@ -125,17 +125,20 @@ export default function UserProfilePage() {
       <button
         type="button"
         onClick={() => router.back()}
-        className="flex items-center gap-2 mb-2 px-4 py-2 bg-muted text-foreground border border-border rounded-lg hover:bg-primary/10 transition-colors"
+        className="mb-4 ml-1 flex items-center justify-center w-9 h-9 rounded-full border border-border bg-muted text-foreground hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors shadow-sm"
+        aria-label="Go back"
+        title="Go back"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
         </svg>
-        <span>Back</span>
       </button>
       {/* Header with Bell Icon removed */}
       {/* Profile Card */}
       <section className="flex flex-col items-center bg-background border border-border rounded-2xl p-10">
-        <Image src={userProfile.avatar} alt="avatar" width={112} height={112} className="w-28 h-28 rounded-full object-cover border-4 border-primary mb-4" />
+        <div className="w-28 h-28 rounded-full border-4 border-primary mb-4 flex items-center justify-center bg-muted">
+          <User className="w-20 h-20 text-primary" />
+        </div>
         <div className="text-center">
           <div className="text-3xl font-bold text-foreground mb-1">{userProfile.name}</div>
           <div className="text-base text-muted-foreground mb-2">{userProfile.email}</div>
@@ -145,14 +148,19 @@ export default function UserProfilePage() {
 
       {/* Badges/NFTs display */}
       <section className="bg-background border border-border rounded-2xl p-8">
-        <div className="font-bold text-xl text-foreground mb-6 text-left">Badges / NFTs</div>
+        <div className="font-bold text-xl text-foreground mb-6 text-left">Badges</div>
         <div className="flex gap-8 justify-center">
-          {userProfile.badges.map(badge => (
-            <div key={badge.id} className="flex flex-col items-center">
-              <Image src={badge.image} alt={badge.name} width={64} height={64} className="w-16 h-16 rounded-full border-2 border-primary mb-2" />
-              <span className="text-xs text-center text-muted-foreground font-medium">{badge.name}</span>
-            </div>
-          ))}
+          {userProfile.badges.map(badge => {
+            const Icon = badge.icon;
+            return (
+              <div key={badge.id} className="flex flex-col items-center">
+                <div className="w-16 h-16 rounded-full border-2 border-primary mb-2 flex items-center justify-center bg-muted">
+                  <Icon className="w-10 h-10 text-primary" />
+                </div>
+                <span className="text-xs text-center text-muted-foreground font-medium">{badge.name}</span>
+              </div>
+            );
+          })}
         </div>
       </section>
 
