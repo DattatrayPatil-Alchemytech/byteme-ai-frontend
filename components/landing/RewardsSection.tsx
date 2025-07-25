@@ -91,7 +91,7 @@ export default function RewardsSection() {
                     <span className="text-3xl">{tier.icon}</span>
                   </motion.div>
                   
-                  <CardTitle className="text-2xl font-bold text-black group-hover:text-green-600 transition-colors duration-300 mb-2">
+                  <CardTitle className="text-2xl font-bold text-foreground group-hover:text-green-600 transition-colors duration-300 mb-2">
                     {tier.name}
                   </CardTitle>
                   
@@ -107,12 +107,12 @@ export default function RewardsSection() {
                       to={tier.tokens} 
                       duration={2} 
                       delay={index * 0.3}
-                      className="text-black group-hover:text-green-600 transition-colors duration-300"
+                      className="text-foreground group-hover:text-green-600 transition-colors duration-300"
                     />
-                    <span className="text-black group-hover:text-green-600 transition-colors duration-300"> B3TR</span>
+                                          <span className="text-foreground group-hover:text-green-600 transition-colors duration-300"> B3TR</span>
                   </motion.div>
                   
-                  <p className="text-black group-hover:text-green-600 transition-colors duration-300 text-lg">{tier.description}</p>
+                                      <p className="text-foreground group-hover:text-green-600 transition-colors duration-300 text-lg">{tier.description}</p>
                 </CardHeader>
                 
                 <CardContent className="relative z-10">

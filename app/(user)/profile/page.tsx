@@ -121,7 +121,7 @@ export default function UserProfilePage() {
     <div className="max-w-3xl mx-auto space-y-10 mt-10">
       {/* Header with Bell Icon removed */}
       {/* Profile Card */}
-      <section className="flex flex-col items-center bg-white/90 rounded-2xl shadow-lg p-10 mb-2 transition-transform duration-300 hover:scale-[1.015] hover:shadow-2xl">
+              <section className="flex flex-col items-center bg-card/90 rounded-2xl shadow-lg p-10 mb-2 transition-transform duration-300 hover:scale-[1.015] hover:shadow-2xl">
         <Image src={userProfile.avatar} alt="avatar" width={112} height={112} className="w-28 h-28 rounded-full object-cover border-4 border-primary shadow mb-4" />
         <div className="text-center">
           <div className="text-3xl font-bold text-foreground mb-1">{userProfile.name}</div>
@@ -131,7 +131,7 @@ export default function UserProfilePage() {
       </section>
 
       {/* Badges/NFTs display */}
-      <section className="bg-white/90 rounded-2xl shadow-lg p-8 transition-transform  duration-300 hover:scale-[1.015] hover:shadow-2xl">
+              <section className="bg-card/90 rounded-2xl shadow-lg p-8 transition-transform  duration-300 hover:scale-[1.015] hover:shadow-2xl">
         <div className="font-bold text-xl text-foreground mb-6 text-left">Badges / NFTs</div>
         <div className="flex gap-8 justify-center">
           {userProfile.badges.map(badge => (
@@ -146,7 +146,7 @@ export default function UserProfilePage() {
       {/* Notifications panel removed */}
 
       {/* List of registered vehicles with details */}
-      <section className="bg-white/90 rounded-2xl shadow-lg p-8 mb-12 transition-transform duration-300 hover:scale-[1.015] hover:shadow-2xl">
+              <section className="bg-card/90 rounded-2xl shadow-lg p-8 mb-12 transition-transform duration-300 hover:scale-[1.015] hover:shadow-2xl">
         <div className="font-bold text-xl text-foreground mb-6 text-left">Registered Vehicles</div>
         <DataTable columns={columns} data={vehicles} />
       </section>

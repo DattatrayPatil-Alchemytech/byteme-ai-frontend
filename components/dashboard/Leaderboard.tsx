@@ -100,7 +100,7 @@ export default function Leaderboard({ leaderboard, challenges, userRank, onJoinC
                   className={`flex items-center justify-between p-3 rounded-lg transition-all ${
                     entry.name === 'John Doe'
                       ? 'gradient-ev-green/20 border border-primary/30'
-                      : 'bg-white/50 hover:bg-white/70'
+                      : 'bg-card/50 hover:bg-card/70'
                   }`}
                 >
                   <div className="flex items-center space-x-3">
@@ -147,7 +147,7 @@ export default function Leaderboard({ leaderboard, challenges, userRank, onJoinC
           <CardContent>
             <div className="space-y-4">
               {challenges.map((challenge) => (
-                <div key={challenge.id} className="p-4 bg-white/50 rounded-lg border border-white/20">
+                <div key={challenge.id} className="p-4 bg-card/50 rounded-lg border border-border/20">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center space-x-3">
                       <span className="text-2xl">{challenge.icon}</span>

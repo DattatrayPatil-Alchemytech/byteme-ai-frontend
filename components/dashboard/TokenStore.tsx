@@ -122,7 +122,7 @@ export default function TokenStore({ products, userTokens, onPurchase, purchaseH
               <CardContent className="space-y-4">
                 <p className="text-muted-foreground">{selectedProduct.description}</p>
                 
-                <div className="bg-white/50 rounded-lg p-4">
+                <div className="bg-card/50 rounded-lg p-4">
                   <h5 className="text-foreground font-semibold mb-2">Features:</h5>
                   <ul className="space-y-1">
                     {selectedProduct.features.map((feature, index) => (
@@ -162,7 +162,7 @@ export default function TokenStore({ products, userTokens, onPurchase, purchaseH
               <CardContent>
                 <div className="space-y-3">
                   {purchaseHistory.map((purchase) => (
-                    <div key={purchase.id} className="flex items-center justify-between p-3 bg-white/50 rounded-lg">
+                    <div key={purchase.id} className="flex items-center justify-between p-3 bg-card/50 rounded-lg">
                       <div>
                         <p className="text-foreground font-medium">{purchase.product.name}</p>
                         <p className="text-sm text-muted-foreground">

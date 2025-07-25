@@ -95,7 +95,7 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-white/80 backdrop-blur-lg border-b border-border shadow-sm sticky top-0 z-50">
+    <header className="bg-card/80 backdrop-blur-lg border-b border-border shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
@@ -180,7 +180,7 @@ export default function Header() {
               title="Profile"
             >
               <svg
-                className="w-7 h-7 rounded-full border border-muted bg-white"
+                className="w-7 h-7 rounded-full border border-border bg-card"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
