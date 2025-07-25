@@ -98,7 +98,10 @@ function VehicleHistoryTab() {
         />
       </div>
       <div className="bg-card/90 rounded-2xl shadow-lg p-4 transition-transform transition-shadow duration-300 hover:scale-[1.01] hover:shadow-2xl">
-        <DataTable columns={columns} data={filtered} />
+        <DataTable
+          columns={columns}
+          data={filtered as unknown as Record<string, unknown>[]}
+        />
       </div>
     </div>
   );
@@ -106,7 +109,7 @@ function VehicleHistoryTab() {
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("overview");
-  const [user, setUser] = useState({
+  const [user] = useState({
     name: "John Doe",
     email: "user@byteme.in",
     b3trTokens: 1250,
