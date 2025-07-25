@@ -14,6 +14,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const sidebarItems = [
     { id: 'overview', label: 'Overview', icon: '📊', path: '/admin/dashboard' },
     { id: 'users', label: 'Users', icon: '👥', path: '/admin/users' },
+    { id: 'products', label: 'Products', icon: '🛍️', path: '/admin/products' },
     { id: 'rewards', label: 'Rewards', icon: '🏆', path: '/admin/rewards' },
     { id: 'settings', label: 'Settings', icon: '⚙️', path: '/admin/settings' }
   ];

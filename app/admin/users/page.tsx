@@ -1,6 +1,6 @@
 'use client';
 import { useState, useMemo } from 'react';
-import { DataTable } from '@/components/ui/DataTable';
+import { DataTable, Column } from '@/components/ui/DataTable';
 import { mockUsers } from './mockUsers';
 import { Card } from '@/components/ui/card';
 import { SearchFilter } from '../../../components/ui/SearchFilter';
@@ -8,48 +8,48 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/DropdownMenu';
 
-const columns = [
+const columns: Column[] = [
   {
-    accessorKey: 'name',
-    header: 'Name',
+    key: 'name',
+    label: 'Name',
   },
   {
-    accessorKey: 'email',
-    header: 'Email',
+    key: 'email',
+    label: 'Email',
   },
   {
-    accessorKey: 'twitter',
-    header: 'Twitter/X',
+    key: 'twitter',
+    label: 'Twitter/X',
   },
   {
-    accessorKey: 'linkedin',
-    header: 'LinkedIn',
+    key: 'linkedin',
+    label: 'LinkedIn',
   },
   {
-    accessorKey: 'submissionCount',
-    header: 'Submissions',
+    key: 'submissionCount',
+    label: 'Submissions',
   },
   {
-    accessorKey: 'totalMiles',
-    header: 'Miles Driven',
+    key: 'totalMiles',
+    label: 'Miles Driven',
   },
   {
-    accessorKey: 'totalRewards',
-    header: 'Rewards',
+    key: 'totalRewards',
+    label: 'Rewards',
   },
   {
-    accessorKey: 'tier',
-    header: 'Tier',
+    key: 'tier',
+    label: 'Tier',
   },
   {
-    accessorKey: 'lastActive',
-    header: 'Last Active',
+    key: 'lastActive',
+    label: 'Last Active',
   },
   {
-    id: 'actions',
-    header: 'Actions',
-    cell: ({ row }: { row: any }) => {
-      const user = row.original;
+    key: 'actions',
+    label: 'Actions',
+    render: (value, row) => {
+      const user = row as { id: string };
       return (
         <div className="flex gap-2 items-center">
           <Link href={`/admin/users/${user.id}`} passHref legacyBehavior>
@@ -109,7 +109,7 @@ export default function UsersPage() {
               className="min-w-[140px]"
             />
           </div>
-          <DataTable columns={columns} data={filteredUsers} />
+          <DataTable columns={columns} data={filteredUsers as unknown as Record<string, unknown>[]} />
         </Card>
       </div>
     </div>

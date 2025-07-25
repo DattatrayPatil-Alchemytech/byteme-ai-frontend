@@ -1,134 +1,293 @@
-"use client";
-import * as React from "react";
+import React, { useState } from 'react';
 import {
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-  ColumnDef,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  SortingState,
-  getSortedRowModel,
-} from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-  search?: string;
-  onSearchChange?: (value: string) => void;
-  searchPlaceholder?: string;
+export interface Column {
+  key: string;
+  label: string;
+  render?: (value: unknown, row: Record<string, unknown>) => React.ReactNode;
+  sortable?: boolean;
+  width?: string;
 }
 
-export function DataTable<TData, TValue>({
-  columns,
+export interface Action {
+  label: string;
+  icon?: React.ReactNode;
+  onClick: (row: Record<string, unknown>) => void;
+  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+  className?: string;
+}
+
+export interface DataTableProps {
+  data: Record<string, unknown>[];
+  columns: Column[];
+  actions?: Action[];
+  title?: string;
+  searchable?: boolean;
+  searchPlaceholder?: string;
+  searchKeys?: string[];
+  pagination?: boolean;
+  itemsPerPageOptions?: number[];
+  defaultItemsPerPage?: number;
+  className?: string;
+  onRowClick?: (row: Record<string, unknown>) => void;
+  loading?: boolean;
+  emptyMessage?: string;
+}
+
+export function DataTable({
   data,
-  search,
-  onSearchChange,
+  columns,
+  actions = [],
+  title,
+  searchable = false,
   searchPlaceholder = "Search...",
-}: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [globalFilter, setGlobalFilter] = React.useState("");
+  searchKeys = [],
+  pagination = true,
+  itemsPerPageOptions = [5, 10, 20, 50],
+  defaultItemsPerPage = 10,
+  className = "",
+  onRowClick,
+  loading = false,
+  emptyMessage = "No data available"
+}: DataTableProps) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(defaultItemsPerPage);
+  const [searchTerm, setSearchTerm] = useState('');
 
-  React.useEffect(() => {
-    if (typeof search === "string") setGlobalFilter(search);
-  }, [search]);
+  // Filter data based on search term
+  const filteredData = searchable && searchTerm
+    ? data.filter(item =>
+        searchKeys.some(key => {
+          const value = item[key];
+          return value && String(value).toLowerCase().includes(searchTerm.toLowerCase());
+        })
+      )
+    : data;
 
-  const table = useReactTable({
-    data,
-    columns,
-    state: {
-      sorting,
-      globalFilter,
-    },
-    onSortingChange: setSorting,
-    onGlobalFilterChange: onSearchChange || setGlobalFilter,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    globalFilterFn: "auto",
-  });
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentData = pagination ? filteredData.slice(startIndex, endIndex) : filteredData;
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset to first page when searching
+  };
+
+  const handleItemsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setItemsPerPage(Number(e.target.value));
+    setCurrentPage(1); // Reset to first page when changing items per page
+  };
+
+  const renderCell = (column: Column, row: Record<string, unknown>) => {
+    const value = row[column.key];
+    
+    if (column.render) {
+      return column.render(value, row);
+    }
+
+    // Default rendering based on data type
+    if (typeof value === 'boolean') {
+      return (
+        <Badge variant={value ? 'default' : 'secondary'}>
+          {value ? 'Yes' : 'No'}
+        </Badge>
+      );
+    }
+
+    if (typeof value === 'number') {
+      return value.toLocaleString();
+    }
+
+    if (value instanceof Date) {
+      return value.toLocaleDateString();
+    }
+
+    return (value as string) || '-';
+  };
+
+  if (loading) {
+    return (
+      <Card className={`bg-card/80 backdrop-blur-sm border-0 shadow-lg ${className}`}>
+        <CardContent className="p-6">
+          <div className="flex items-center justify-center h-32">
+            <div className="text-center">
+              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+              <p className="text-muted-foreground">Loading...</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
-    <div className="space-y-4">
-      {onSearchChange && (
-        <input
-          value={search ?? globalFilter}
-          onChange={e => onSearchChange(e.target.value)}
-          placeholder={searchPlaceholder}
-          className="border rounded-full px-4 py-2 w-full sm:w-64 shadow focus:ring-2 focus:ring-primary outline-none"
-        />
+    <div className={`space-y-6 ${className}`}>
+      {/* Header */}
+      {(title || searchable) && (
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          {title && (
+            <div>
+              <h2 className="text-2xl font-bold text-foreground">{title}</h2>
+              <p className="text-muted-foreground">
+                {filteredData.length} {filteredData.length === 1 ? 'item' : 'items'}
+              </p>
+            </div>
+          )}
+          {searchable && (
+            <div className="w-full sm:w-auto">
+              <Input
+                placeholder={searchPlaceholder}
+                value={searchTerm}
+                onChange={handleSearch}
+                className="w-full sm:w-64"
+              />
+            </div>
+          )}
+        </div>
       )}
-      <div className="overflow-x-auto rounded-2xl shadow-lg bg-white/90 p-2">
-        <table className="min-w-full text-sm">
-          <thead className="bg-muted text-foreground">
-            {table.getHeaderGroups().map(headerGroup => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map(header => (
-                  <th
-                    key={header.id}
-                    className="px-5 py-3 text-left font-semibold text-base cursor-pointer select-none"
-                    onClick={header.column.getToggleSortingHandler()}
+
+      {/* Table */}
+      <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-lg">
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  {columns.map((column) => (
+                    <TableHead 
+                      key={column.key}
+                      style={{ width: column.width }}
+                      className={column.sortable ? 'cursor-pointer hover:bg-muted/50' : ''}
+                    >
+                      {column.label}
+                    </TableHead>
+                  ))}
+                  {actions.length > 0 && (
+                    <TableHead className="w-[100px]">Actions</TableHead>
+                  )}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {currentData.length === 0 ? (
+                  <TableRow>
+                    <TableCell 
+                      colSpan={columns.length + (actions.length > 0 ? 1 : 0)}
+                      className="text-center py-8"
+                    >
+                      <div className="text-muted-foreground">
+                        {emptyMessage}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  currentData.map((row, index) => (
+                    <TableRow 
+                      key={(row.id as string) || index}
+                      className={onRowClick ? 'cursor-pointer hover:bg-muted/50' : ''}
+                      onClick={() => onRowClick?.(row)}
+                    >
+                      {columns.map((column) => (
+                        <TableCell key={column.key}>
+                          {renderCell(column, row)}
+                        </TableCell>
+                      ))}
+                      {actions.length > 0 && (
+                        <TableCell>
+                          <div className="flex items-center space-x-2">
+                            {actions.map((action, actionIndex) => (
+                              <Button
+                                key={actionIndex}
+                                variant={action.variant || 'ghost'}
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  action.onClick(row);
+                                }}
+                                className={`h-8 w-8 p-0 ${action.className || ''}`}
+                              >
+                                {action.icon}
+                              </Button>
+                            ))}
+                          </div>
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Pagination */}
+          {pagination && filteredData.length > 0 && (
+            <div className="flex items-center justify-between p-6 border-t">
+              <div className="text-sm text-muted-foreground">
+                Showing {startIndex + 1} to {Math.min(endIndex, filteredData.length)} of {filteredData.length} items
+              </div>
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <label className="text-sm text-muted-foreground">Show:</label>
+                  <select
+                    value={itemsPerPage}
+                    onChange={handleItemsPerPageChange}
+                    className="px-3 py-2 border border-border rounded-md bg-background text-foreground text-sm"
                   >
-                    {flexRender(header.column.columnDef.header, header.getContext())}
-                    {header.column.getIsSorted() ? (
-                      header.column.getIsSorted() === "asc" ? " ▲" : " ▼"
-                    ) : null}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody>
-            {table.getRowModel().rows.map(row => (
-              <tr key={row.id} className="border-b last:border-0 hover:bg-muted/50 rounded-lg transition-all">
-                {row.getVisibleCells().map(cell => (
-                  <td key={cell.id} className="px-5 py-3 align-middle">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mt-2">
-        <div className="flex-1 text-xs text-muted-foreground">
-        </div>
-        <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar sm:gap-2 gap-1 px-1 sm:px-0 w-full sm:w-auto">
-          <Button
-            variant="outline"
-            size="sm"
-            className="rounded-full px-2 py-1 sm:px-4 sm:py-2 shadow text-sm sm:text-base font-medium disabled:text-muted-foreground disabled:bg-muted disabled:cursor-not-allowed hover:bg-primary/10 min-w-[40px]"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          {Array.from({ length: table.getPageCount() }, (_, i) => (
-            <Button
-              key={i}
-              variant={table.getState().pagination.pageIndex === i ? "default" : "outline"}
-              size="sm"
-              className={`rounded-full px-2 py-1 sm:px-4 sm:py-2 shadow text-sm sm:text-base font-medium min-w-[40px] ${table.getState().pagination.pageIndex === i ? '' : 'hover:bg-primary/10'} ${table.getState().pagination.pageIndex === i ? '' : 'text-foreground'}`}
-              onClick={() => table.setPageIndex(i)}
-              disabled={table.getState().pagination.pageIndex === i}
-            >
-              {i + 1}
-            </Button>
-          ))}
-          <Button
-            variant="outline"
-            size="sm"
-            className="rounded-full px-2 py-1 sm:px-4 sm:py-2 shadow text-sm sm:text-base font-medium disabled:text-muted-foreground disabled:bg-muted disabled:cursor-not-allowed hover:bg-primary/10 min-w-[40px]"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
+                    {itemsPerPageOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </Button>
+                  <div className="flex items-center space-x-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <Button
+                        key={page}
+                        variant={currentPage === page ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setCurrentPage(page)}
+                        className="w-8 h-8 p-0"
+                      >
+                        {page}
+                      </Button>
+                    ))}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 } 
