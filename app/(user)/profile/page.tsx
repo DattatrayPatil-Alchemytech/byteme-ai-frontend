@@ -121,7 +121,7 @@ export default function UserProfilePage() {
     <div className="max-w-3xl mx-auto space-y-10 mt-10">
       {/* Header with Bell Icon removed */}
       {/* Profile Card */}
-      <section className="flex flex-col items-center bg-white/90 rounded-2xl shadow-lg p-10 mb-2 transition-transform transition-shadow duration-300 hover:scale-[1.015] hover:shadow-2xl">
+      <section className="flex flex-col items-center bg-white/90 rounded-2xl shadow-lg p-10 mb-2 transition-transform duration-300 hover:scale-[1.015] hover:shadow-2xl">
         <Image src={userProfile.avatar} alt="avatar" width={112} height={112} className="w-28 h-28 rounded-full object-cover border-4 border-primary shadow mb-4" />
         <div className="text-center">
           <div className="text-3xl font-bold text-foreground mb-1">{userProfile.name}</div>

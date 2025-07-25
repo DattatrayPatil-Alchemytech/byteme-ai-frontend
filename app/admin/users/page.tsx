@@ -7,6 +7,7 @@ import { SearchFilter } from '../../../components/ui/SearchFilter';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/DropdownMenu';
+import type { CellContext } from '@tanstack/react-table';
 
 const columns: Column[] = [
   {
@@ -52,9 +53,7 @@ const columns: Column[] = [
       const user = row as { id: string };
       return (
         <div className="flex gap-2 items-center">
-          <Link href={`/admin/users/${user.id}`} passHref legacyBehavior>
-            <span className="font-semibold text-foreground hover:underline cursor-pointer">View</span>
-          </Link>
+          <Link href={`/admin/users/${user.id}`} className="font-semibold text-foreground hover:underline cursor-pointer">View</Link>
         </div>
       );
     },
@@ -90,8 +89,13 @@ export default function UsersPage() {
         <div className="absolute w-20 h-20 border-2 border-emerald-400/30 rounded-full animate-spin" style={{ top: '65%', left: '15%', animationDuration: '15s' }} />
       </div>
       <div className="relative z-10 p-6 space-y-6">
-        <h1 className="text-3xl md:text-4xl font-extrabold text-gradient-ev-green animate-fade-in drop-shadow-lg tracking-tight font-sans">User Management</h1>
-        <Card className="p-6 bg-white/90 backdrop-blur-md shadow-xl">
+        <h1
+          className="text-3xl md:text-4xl font-extrabold text-gradient-ev-green animate-fade-in drop-shadow-lg tracking-tight font-sans"
+          style={{ lineHeight: '1.2', paddingTop: '0.25em', paddingBottom: '0.25em', overflow: 'visible' }}
+        >
+          User Management
+        </h1>
+        <Card className="p-6 bg-white/90 backdrop-blur-md shadow-xl overflow-x-auto">
           {/* Consistent search/filter row */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
             <input
