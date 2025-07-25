@@ -5,6 +5,7 @@ import { DataTable, Column } from "@/components/ui/DataTable";
 import { mockVehicles } from "./mockVehicles";
 import { Button } from "@/components/ui/button";
 import { Bell } from 'lucide-react';
+import { useRouter } from "next/navigation";
 
 // Mock data for profile, badges, tier, notifications, and vehicles
 const userProfile = {
@@ -28,6 +29,7 @@ export default function UserProfilePage() {
   const [editName, setEditName] = useState("");
   const [editError, setEditError] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
+  const router = useRouter();
 
   const handleEdit = (id: number, name: string) => {
     setEditId(id);
@@ -118,25 +120,36 @@ export default function UserProfilePage() {
   ];
 
   return (
-    <div className="max-w-3xl mx-auto space-y-10 mt-10">
+    <div className="max-w-3xl mx-auto space-y-4 mt-10 mb-10">
+      {/* Back Button */}
+      <button
+        type="button"
+        onClick={() => router.back()}
+        className="flex items-center gap-2 mb-2 px-4 py-2 bg-muted text-foreground border border-border rounded-lg hover:bg-primary/10 transition-colors"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+        <span>Back</span>
+      </button>
       {/* Header with Bell Icon removed */}
       {/* Profile Card */}
-      <section className="flex flex-col items-center bg-white/90 rounded-2xl shadow-lg p-10 mb-2 transition-transform duration-300 hover:scale-[1.015] hover:shadow-2xl">
-        <Image src={userProfile.avatar} alt="avatar" width={112} height={112} className="w-28 h-28 rounded-full object-cover border-4 border-primary shadow mb-4" />
+      <section className="flex flex-col items-center bg-background border border-border rounded-2xl p-10">
+        <Image src={userProfile.avatar} alt="avatar" width={112} height={112} className="w-28 h-28 rounded-full object-cover border-4 border-primary mb-4" />
         <div className="text-center">
           <div className="text-3xl font-bold text-foreground mb-1">{userProfile.name}</div>
           <div className="text-base text-muted-foreground mb-2">{userProfile.email}</div>
-          <div className="inline-block px-5 py-1 rounded-full bg-primary/10 text-primary font-semibold text-sm shadow-sm mt-2">{userProfile.tier} Tier</div>
+          <div className="inline-block px-5 py-1 rounded-full bg-primary/10 text-primary font-semibold text-sm mt-2">{userProfile.tier} Tier</div>
         </div>
       </section>
 
       {/* Badges/NFTs display */}
-      <section className="bg-white/90 rounded-2xl shadow-lg p-8 transition-transform  duration-300 hover:scale-[1.015] hover:shadow-2xl">
+      <section className="bg-background border border-border rounded-2xl p-8">
         <div className="font-bold text-xl text-foreground mb-6 text-left">Badges / NFTs</div>
         <div className="flex gap-8 justify-center">
           {userProfile.badges.map(badge => (
             <div key={badge.id} className="flex flex-col items-center">
-              <Image src={badge.image} alt={badge.name} width={64} height={64} className="w-16 h-16 rounded-full border-2 border-primary mb-2 shadow animate-float-slow" />
+              <Image src={badge.image} alt={badge.name} width={64} height={64} className="w-16 h-16 rounded-full border-2 border-primary mb-2" />
               <span className="text-xs text-center text-muted-foreground font-medium">{badge.name}</span>
             </div>
           ))}
@@ -146,7 +159,7 @@ export default function UserProfilePage() {
       {/* Notifications panel removed */}
 
       {/* List of registered vehicles with details */}
-      <section className="bg-white/90 rounded-2xl shadow-lg p-8 mb-12 transition-transform duration-300 hover:scale-[1.015] hover:shadow-2xl">
+      <section className="bg-background border border-border rounded-2xl p-8">
         <div className="font-bold text-xl text-foreground mb-6 text-left">Registered Vehicles</div>
         <DataTable columns={columns} data={vehicles} />
       </section>
