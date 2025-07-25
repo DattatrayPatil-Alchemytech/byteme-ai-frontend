@@ -14,14 +14,14 @@ type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 // API Request Options
 interface ApiOptions {
   method?: HttpMethod;
-  body?: any;
+  body?: unknown;
   headers?: Record<string, string>;
   requireAuth?: boolean;
   showToast?: boolean;
 }
 
 // API Response wrapper
-interface ApiResponse<T = any> {
+interface ApiResponse<T = unknown> {
   data: T;
   message?: string;
   success: boolean;
@@ -32,7 +32,7 @@ class ApiError extends Error {
   constructor(
     public status: number,
     public message: string,
-    public data?: any
+    public data?: unknown
   ) {
     super(message);
     this.name = "ApiError";
@@ -40,7 +40,7 @@ class ApiError extends Error {
 }
 
 // Main API middleware function
-export const apiRequest = async <T = any>(
+export const apiRequest = async <T = unknown>(
   endpoint: string,
   options: ApiOptions = {}
 ): Promise<T> => {
@@ -160,7 +160,7 @@ export const apiRequest = async <T = any>(
     }
 
     // Parse response data
-    let responseData: any;
+    let responseData: unknown;
     const contentType = response.headers.get("content-type");
 
     if (contentType && contentType.includes("application/json")) {
@@ -187,30 +187,30 @@ export const apiRequest = async <T = any>(
 };
 
 // Convenience methods for different HTTP verbs
-export const apiGet = <T = any>(
+export const apiGet = <T = unknown>(
   endpoint: string,
   options: Omit<ApiOptions, "method"> = {}
 ): Promise<T> => apiRequest<T>(endpoint, { ...options, method: "GET" });
 
-export const apiPost = <T = any>(
+export const apiPost = <T = unknown>(
   endpoint: string,
-  body?: any,
+  body?: unknown,
   options: Omit<ApiOptions, "method" | "body"> = {}
 ): Promise<T> => apiRequest<T>(endpoint, { ...options, method: "POST", body });
 
-export const apiPut = <T = any>(
+export const apiPut = <T = unknown>(
   endpoint: string,
-  body?: any,
+  body?: unknown,
   options: Omit<ApiOptions, "method" | "body"> = {}
 ): Promise<T> => apiRequest<T>(endpoint, { ...options, method: "PUT", body });
 
-export const apiPatch = <T = any>(
+export const apiPatch = <T = unknown>(
   endpoint: string,
-  body?: any,
+  body?: unknown,
   options: Omit<ApiOptions, "method" | "body"> = {}
 ): Promise<T> => apiRequest<T>(endpoint, { ...options, method: "PATCH", body });
 
-export const apiDelete = <T = any>(
+export const apiDelete = <T = unknown>(
   endpoint: string,
   options: Omit<ApiOptions, "method"> = {}
 ): Promise<T> => apiRequest<T>(endpoint, { ...options, method: "DELETE" });
