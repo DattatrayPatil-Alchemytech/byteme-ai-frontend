@@ -1,11 +1,10 @@
 "use client";
-import { notFound, useParams } from "next/navigation";
+import { notFound } from "next/navigation";
+import Image from 'next/image';
 import { mockUsers } from "../mockUsers";
-import { DataTable } from "@/components/ui/DataTable";
+import { DataTable, Column } from "@/components/ui/DataTable";
 import { useState, useMemo } from "react";
 import { Select } from "@/components/ui/DropdownMenu";
-import { mockHistory } from "@/app/(user)/dashboard/mockHistory";
-import { ColumnDef } from "@tanstack/react-table";
 import { Mail, Phone, MapPin, Calendar, BadgeCheck, Wallet, User } from "lucide-react";
 
 // More mock user history data for a richer table and carousel
@@ -84,8 +83,17 @@ const mockUserHistory = [
   },
 ];
 
+// Define user details interface
+interface UserDetails {
+  phone?: string;
+  address?: string;
+  registrationDate?: string;
+  status?: string;
+  wallet?: string;
+}
+
 // Add more mock user details for demonstration
-const userDetailsMap: Record<string, any> = {
+const userDetailsMap: Record<string, UserDetails> = {
   '1': {
     phone: '+1 555-123-4567',
     address: '123 Green Lane, Eco City, CA',
@@ -109,11 +117,21 @@ const userDetailsMap: Record<string, any> = {
   },
 };
 
-export default function UserViewPage() {
-  const params = useParams();
+export default function UserViewPage({ params }: { params: { id: string } }) {
+  // All hooks must be called before any early returns
+  const [search, setSearch] = useState("");
+  const [vehicleFilter, setVehicleFilter] = useState("");
+
+  // Vehicle options for dropdown - moved before early return
+  const vehicleOptions = useMemo(() => {
+    const names = mockUserHistory.map((row) => row.vehicle);
+    return Array.from(new Set(names)).map((v) => ({ value: v, label: v }));
+  }, []);
+
   const user = mockUsers.find((u) => u.id === params.id);
   if (!user) return notFound();
-  const userDetails = userDetailsMap[user.id] || {};
+  
+  const userDetails = userDetailsMap[user.id] || {} as UserDetails;
 
   // Mock dashboard summary data for this user
   const summary = {
@@ -123,18 +141,8 @@ export default function UserViewPage() {
     rank: user.tier === 'Platinum' ? 1 : user.tier === 'Gold' ? 2 : 3,
   };
 
-  // State for search and filter
-  const [search, setSearch] = useState("");
-  const [vehicleFilter, setVehicleFilter] = useState("");
-
-  // Vehicle options for dropdown
-  const vehicleOptions = useMemo(() => {
-    const names = mockUserHistory.map((row) => row.vehicle);
-    return Array.from(new Set(names)).map((v) => ({ value: v, label: v }));
-  }, []);
-
   // Filtered history
-  const filtered = mockHistory.filter((row) => {
+  const filtered = mockUserHistory.filter((row) => {
     const matchesSearch = row.vehicle
       .toLowerCase()
       .includes(search.toLowerCase());
@@ -142,26 +150,26 @@ export default function UserViewPage() {
     return matchesSearch && matchesFilter;
   });
 
-  const columns: ColumnDef<(typeof mockHistory)[number]>[] = [
+  const columns: Column[] = [
     {
-      accessorKey: "vehicle",
-      header: "Vehicle",
-      cell: (info) => (
-        <span className="font-medium">{info.getValue() as string}</span>
+      key: "vehicle",
+      label: "Vehicle",
+      render: (value) => (
+        <span className="font-medium">{value as string}</span>
       ),
     },
-    { accessorKey: "submissionCount", header: "Submission Count" },
-    { accessorKey: "milesDriven", header: "Miles Driven" },
-    { accessorKey: "carbonImpact", header: "Carbon Impact (tCO₂)" },
-    { accessorKey: "rewards", header: "Rewards (B3TR)" },
+    { key: "submissionCount", label: "Submission Count" },
+    { key: "milesDriven", label: "Miles Driven" },
+    { key: "carbonImpact", label: "Carbon Impact (tCO₂)" },
+    { key: "rewards", label: "Rewards (B3TR)" },
     {
-      accessorKey: "imageHash",
-      header: "Image Hash",
-      cell: (info) => (
-        <span className="font-mono text-xs">{info.getValue() as string}</span>
+      key: "imageHash",
+      label: "Image Hash",
+      render: (value) => (
+        <span className="font-mono text-xs">{value as string}</span>
       ),
     },
-    { accessorKey: "date", header: "Date" },
+    { key: "date", label: "Date" },
   ];
 
   return (
@@ -206,17 +214,18 @@ export default function UserViewPage() {
       </div>
       <div className="w-full mb-6 overflow-x-auto overflow-y-hidden custom-scrollbar">
         <div className="flex gap-4 min-w-[600px] sm:min-w-0">
-          {mockHistory.slice(0, 20).map((vehicle) => (
+          {mockUserHistory.slice(0, 20).map((vehicle) => (
             <div
               key={vehicle.id}
               className="flex-shrink-0 bg-white/90 border border-border rounded-2xl shadow-lg p-4 flex flex-col items-center min-w-[160px] max-w-[180px] w-full transition-transform transition-shadow duration-300 hover:scale-[1.03] hover:shadow-2xl"
             >
               <div className="w-24 h-24 flex items-center justify-center bg-gray-100 rounded-md mb-2 border border-muted">
-                <img
+                <Image
                   src={vehicle.image}
                   alt={vehicle.vehicle}
+                  width={96}
+                  height={96}
                   className="w-full h-full rounded-md"
-                  loading="lazy"
                 />
               </div>
               <div className="font-semibold text-center text-base truncate w-full text-foreground">
@@ -244,8 +253,8 @@ export default function UserViewPage() {
           placeholder="All Vehicles"
         />
       </div>
-      <div className="bg-white/90 rounded-2xl shadow-lg p-4 transition-transform transition-shadow duration-300 hover:scale-[1.01] hover:shadow-2xl">
-        <DataTable columns={columns} data={filtered} />
+      <div className="bg-white/90 rounded-2xl shadow-lg p-4 transition-transform duration-300 hover:scale-[1.01] hover:shadow-2xl">
+        <DataTable columns={columns} data={filtered as Record<string, unknown>[]} />
       </div>
     </div>
   );

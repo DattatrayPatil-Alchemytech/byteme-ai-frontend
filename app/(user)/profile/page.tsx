@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import { DataTable } from "@/components/ui/DataTable";
-import { ColumnDef } from "@tanstack/react-table";
+import Image from 'next/image';
+import { DataTable, Column } from "@/components/ui/DataTable";
 import { mockVehicles } from "./mockVehicles";
 import { Button } from "@/components/ui/button";
 import { Bell } from 'lucide-react';
@@ -48,12 +48,12 @@ export default function UserProfilePage() {
   };
 
   // DataTable columns
-  const columns: ColumnDef<(typeof vehicles)[number]>[] = [
+  const columns: Column[] = [
     {
-      accessorKey: "name",
-      header: "Name",
-      cell: (info) => {
-        const vehicle = info.row.original;
+      key: "name",
+      label: "Name",
+      render: (value, row) => {
+        const vehicle = row as { id: number; name: string };
         return editId === vehicle.id ? (
           <>
             <input
@@ -76,31 +76,31 @@ export default function UserProfilePage() {
       },
     },
     {
-      accessorKey: "type",
-      header: "Type",
-      cell: (info) => <span className="capitalize text-muted-foreground">{info.getValue() as string}</span>,
+      key: "type",
+      label: "Type",
+      render: (value) => <span className="capitalize text-muted-foreground">{value as string}</span>,
     },
     {
-      accessorKey: "reg",
-      header: "Registration",
-      cell: (info) => {
-        const value = info.getValue() as string | undefined;
-        return value ? <span className="font-mono text-success">{value}</span> : <span className="text-muted-foreground">N/A</span>;
+      key: "reg",
+      label: "Registration",
+      render: (value) => {
+        const stringValue = value as string | undefined;
+        return stringValue ? <span className="font-mono text-success">{stringValue}</span> : <span className="text-muted-foreground">N/A</span>;
       },
     },
     {
-      accessorKey: "numberPlate",
-      header: "Number Plate",
-      cell: (info) => {
-        const value = info.getValue() as string | undefined;
-        return value ? <span className="font-mono text-success">{value}</span> : <span className="text-muted-foreground">N/A</span>;
+      key: "numberPlate",
+      label: "Number Plate",
+      render: (value) => {
+        const stringValue = value as string | undefined;
+        return stringValue ? <span className="font-mono text-success">{stringValue}</span> : <span className="text-muted-foreground">N/A</span>;
       },
     },
     {
-      id: "edit",
-      header: "",
-      cell: (info) => {
-        const vehicle = info.row.original;
+      key: "edit",
+      label: "",
+      render: (value, row) => {
+        const vehicle = row as { id: number; name: string };
         return (
           <div className="flex gap-2">
             {editId !== vehicle.id && (
@@ -121,8 +121,8 @@ export default function UserProfilePage() {
     <div className="max-w-3xl mx-auto space-y-10 mt-10">
       {/* Header with Bell Icon removed */}
       {/* Profile Card */}
-      <section className="flex flex-col items-center bg-white/90 rounded-2xl shadow-lg p-10 mb-2 transition-transform transition-shadow duration-300 hover:scale-[1.015] hover:shadow-2xl">
-        <img src={userProfile.avatar} alt="avatar" className="w-28 h-28 rounded-full object-cover border-4 border-primary shadow mb-4" />
+      <section className="flex flex-col items-center bg-white/90 rounded-2xl shadow-lg p-10 mb-2 transition-transform duration-300 hover:scale-[1.015] hover:shadow-2xl">
+        <Image src={userProfile.avatar} alt="avatar" width={112} height={112} className="w-28 h-28 rounded-full object-cover border-4 border-primary shadow mb-4" />
         <div className="text-center">
           <div className="text-3xl font-bold text-foreground mb-1">{userProfile.name}</div>
           <div className="text-base text-muted-foreground mb-2">{userProfile.email}</div>
@@ -131,12 +131,12 @@ export default function UserProfilePage() {
       </section>
 
       {/* Badges/NFTs display */}
-      <section className="bg-white/90 rounded-2xl shadow-lg p-8 transition-transform transition-shadow duration-300 hover:scale-[1.015] hover:shadow-2xl">
-        <div className="font-bold text-xl text-foreground mb-6 text-left">Badges</div>
+      <section className="bg-white/90 rounded-2xl shadow-lg p-8 transition-transform  duration-300 hover:scale-[1.015] hover:shadow-2xl">
+        <div className="font-bold text-xl text-foreground mb-6 text-left">Badges / NFTs</div>
         <div className="flex gap-8 justify-center">
           {userProfile.badges.map(badge => (
             <div key={badge.id} className="flex flex-col items-center">
-              <img src={badge.image} alt={badge.name} className="w-16 h-16 rounded-full border-2 border-primary mb-2 shadow animate-float-slow" />
+              <Image src={badge.image} alt={badge.name} width={64} height={64} className="w-16 h-16 rounded-full border-2 border-primary mb-2 shadow animate-float-slow" />
               <span className="text-xs text-center text-muted-foreground font-medium">{badge.name}</span>
             </div>
           ))}
