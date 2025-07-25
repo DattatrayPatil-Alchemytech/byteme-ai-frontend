@@ -16,10 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="bg-background text-foreground transition-colors duration-300">
-        <Providers>
-          {children}
-          <Toaster position="top-right" />
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

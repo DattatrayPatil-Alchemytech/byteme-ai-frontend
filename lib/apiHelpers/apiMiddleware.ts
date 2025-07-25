@@ -1,0 +1,222 @@
+"use client";
+
+import toast from "react-hot-toast";
+import { store } from "@/redux/store";
+import { logout } from "@/redux/userSlice";
+
+// API Configuration
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001/api";
+
+// HTTP Methods type
+type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+
+// API Request Options
+interface ApiOptions {
+  method?: HttpMethod;
+  body?: any;
+  headers?: Record<string, string>;
+  requireAuth?: boolean;
+  showToast?: boolean;
+}
+
+// API Response wrapper
+interface ApiResponse<T = any> {
+  data: T;
+  message?: string;
+  success: boolean;
+}
+
+// API Error class
+class ApiError extends Error {
+  constructor(
+    public status: number,
+    public message: string,
+    public data?: any
+  ) {
+    super(message);
+    this.name = "ApiError";
+  }
+}
+
+// Main API middleware function
+export const apiRequest = async <T = any>(
+  endpoint: string,
+  options: ApiOptions = {}
+): Promise<T> => {
+  const {
+    method = "GET",
+    body,
+    headers = {},
+    requireAuth = true,
+    showToast = true,
+  } = options;
+
+  try {
+    // Get access token from Redux store
+    const state = store.getState();
+    const accessToken = state.user.accessToken;
+
+    // Check if auth is required but token is missing
+    if (requireAuth && !accessToken) {
+      const errorMessage = "Authentication required. Please login again.";
+      if (showToast) {
+        toast.error(errorMessage);
+      }
+      store.dispatch(logout());
+      throw new ApiError(401, errorMessage);
+    }
+
+    // Prepare headers
+    const requestHeaders: Record<string, string> = {
+      "Content-Type": "application/json",
+      ...headers,
+    };
+
+    // Add authorization header if token exists and auth is required
+    if (requireAuth && accessToken) {
+      requestHeaders.Authorization = `Bearer ${accessToken}`;
+    }
+
+    // Prepare fetch options
+    const fetchOptions: RequestInit = {
+      method,
+      headers: requestHeaders,
+    };
+
+    // Add body for methods that support it
+    if (body && !["GET", "HEAD"].includes(method)) {
+      fetchOptions.body = JSON.stringify(body);
+    }
+
+    // Make the API request
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, fetchOptions);
+
+    // Handle different response statuses
+    if (!response.ok) {
+      let errorMessage = "An error occurred";
+      let errorData = null;
+
+      try {
+        const errorResponse = await response.json();
+        errorMessage =
+          errorResponse.message || errorResponse.error || errorMessage;
+        errorData = errorResponse;
+      } catch {
+        // If response is not JSON, use status text
+        errorMessage = response.statusText || errorMessage;
+      }
+
+      // Handle 401 Unauthorized - logout user
+      if (response.status === 401) {
+        if (showToast) {
+          toast.error("Session expired. Please login again.");
+        }
+        store.dispatch(logout());
+        throw new ApiError(401, "Unauthorized", errorData);
+      }
+
+      // Handle 403 Forbidden
+      if (response.status === 403) {
+        if (showToast) {
+          toast.error(
+            "Access denied. You don't have permission for this action."
+          );
+        }
+        throw new ApiError(403, errorMessage, errorData);
+      }
+
+      // Handle 404 Not Found
+      if (response.status === 404) {
+        if (showToast) {
+          toast.error("Resource not found.");
+        }
+        throw new ApiError(404, errorMessage, errorData);
+      }
+
+      // Handle 422 Validation Error
+      if (response.status === 422) {
+        if (showToast) {
+          toast.error(errorMessage || "Validation error occurred.");
+        }
+        throw new ApiError(422, errorMessage, errorData);
+      }
+
+      // Handle 500 Server Error
+      if (response.status >= 500) {
+        if (showToast) {
+          toast.error("Server error occurred. Please try again later.");
+        }
+        throw new ApiError(response.status, errorMessage, errorData);
+      }
+
+      // Handle other client errors (4xx)
+      if (response.status >= 400) {
+        if (showToast) {
+          toast.error(errorMessage);
+        }
+        throw new ApiError(response.status, errorMessage, errorData);
+      }
+    }
+
+    // Parse response data
+    let responseData: any;
+    const contentType = response.headers.get("content-type");
+
+    if (contentType && contentType.includes("application/json")) {
+      responseData = await response.json();
+    } else {
+      responseData = await response.text();
+    }
+
+    // Return the data
+    return responseData as T;
+  } catch (error) {
+    // Handle network errors or other fetch errors
+    if (error instanceof ApiError) {
+      throw error;
+    }
+
+    const networkError =
+      "Network error occurred. Please check your connection.";
+    if (showToast) {
+      toast.error(networkError);
+    }
+    throw new ApiError(0, networkError);
+  }
+};
+
+// Convenience methods for different HTTP verbs
+export const apiGet = <T = any>(
+  endpoint: string,
+  options: Omit<ApiOptions, "method"> = {}
+): Promise<T> => apiRequest<T>(endpoint, { ...options, method: "GET" });
+
+export const apiPost = <T = any>(
+  endpoint: string,
+  body?: any,
+  options: Omit<ApiOptions, "method" | "body"> = {}
+): Promise<T> => apiRequest<T>(endpoint, { ...options, method: "POST", body });
+
+export const apiPut = <T = any>(
+  endpoint: string,
+  body?: any,
+  options: Omit<ApiOptions, "method" | "body"> = {}
+): Promise<T> => apiRequest<T>(endpoint, { ...options, method: "PUT", body });
+
+export const apiPatch = <T = any>(
+  endpoint: string,
+  body?: any,
+  options: Omit<ApiOptions, "method" | "body"> = {}
+): Promise<T> => apiRequest<T>(endpoint, { ...options, method: "PATCH", body });
+
+export const apiDelete = <T = any>(
+  endpoint: string,
+  options: Omit<ApiOptions, "method"> = {}
+): Promise<T> => apiRequest<T>(endpoint, { ...options, method: "DELETE" });
+
+// Export ApiError for use in components
+export { ApiError };
+
+// Export types
+export type { ApiOptions, ApiResponse };

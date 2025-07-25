@@ -4,6 +4,8 @@ import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "../redux/store";
 import dynamic from "next/dynamic";
+import { Toaster } from "react-hot-toast";
+import AuthProvider from "@/components/auth/AuthProvider";
 
 // Dynamically import DAppKitProvider to avoid SSR issues
 const DAppKitProvider = dynamic(
@@ -33,16 +35,43 @@ function ProvidersInner({ children }: { children: React.ReactNode }) {
       connectionCertificate={{
         message: {
           purpose: "identification",
-          payload: { type: "text", content: "test" },
+          payload: {
+            type: "text",
+            content: "054971554de3f7404839a85e620203ec",
+          },
         },
       }}
     >
       <PersistGate loading={<div>Loading...</div>} persistor={persistor}>
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </PersistGate>
 
       {/* Centralized Modal Management */}
       <ModalWrapper />
+
+      {/* React Hot Toast Notifications */}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: "#333",
+            color: "#fff",
+          },
+          success: {
+            iconTheme: {
+              primary: "#10B981",
+              secondary: "#fff",
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: "#EF4444",
+              secondary: "#fff",
+            },
+          },
+        }}
+      />
     </DAppKitProvider>
   );
 }
