@@ -56,9 +56,7 @@ const columns = [
       const user = row.original;
       return (
         <div className="flex gap-2 items-center">
-          <Link href={`/admin/users/${user.id}`} passHref legacyBehavior>
-            <span className="font-semibold text-foreground hover:underline cursor-pointer">View</span>
-          </Link>
+          <Link href={`/admin/users/${user.id}`} className="font-semibold text-foreground hover:underline cursor-pointer">View</Link>
         </div>
       );
     },

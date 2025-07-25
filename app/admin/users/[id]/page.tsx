@@ -1,5 +1,5 @@
 "use client";
-import { notFound } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import { mockUsers } from "../mockUsers";
 import { DataTable } from "@/components/ui/DataTable";
 import { useState, useMemo } from "react";
@@ -109,7 +109,8 @@ const userDetailsMap: Record<string, any> = {
   },
 };
 
-export default function UserViewPage({ params }: { params: { id: string } }) {
+export default function UserViewPage() {
+  const params = useParams();
   const user = mockUsers.find((u) => u.id === params.id);
   if (!user) return notFound();
   const userDetails = userDetailsMap[user.id] || {};
