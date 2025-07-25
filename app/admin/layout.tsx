@@ -14,6 +14,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const sidebarItems = [
     { id: 'overview', label: 'Overview', icon: '📊', path: '/admin/dashboard' },
     { id: 'users', label: 'Users', icon: '👥', path: '/admin/users' },
+    { id: 'orders', label: 'Orders', icon: '📦', path: '/admin/orders' },
     { id: 'products', label: 'Products', icon: '🛍️', path: '/admin/products' },
     { id: 'rewards', label: 'Rewards', icon: '🏆', path: '/admin/rewards' },
     { id: 'settings', label: 'Settings', icon: '⚙️', path: '/admin/settings' }
@@ -62,6 +63,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const getActiveTab = () => {
     if (pathname === '/admin' || pathname === '/admin/dashboard') return 'overview';
     if (pathname.startsWith('/admin/users')) return 'users';
+    if (pathname.startsWith('/admin/orders')) return 'orders';
     if (pathname.startsWith('/admin/products')) return 'products';
     if (pathname.startsWith('/admin/rewards')) return 'rewards';
     if (pathname.startsWith('/admin/settings')) return 'settings';
