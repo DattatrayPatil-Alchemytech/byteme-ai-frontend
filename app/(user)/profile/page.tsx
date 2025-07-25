@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { User, Award, Star } from "lucide-react";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { mockVehicles } from "./mockVehicles";
@@ -7,6 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Bell } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useSelector } from "react-redux";
+import { apiGet } from "@/lib/apiHelpers/apiMiddleware";
+import { getRequest } from "@/lib/api/apiRequests";
+import { RootState } from "@/redux/store";
 
 // Mock data for profile, badges, tier, notifications, and vehicles
 const userProfile = {
@@ -29,8 +33,20 @@ export default function UserProfilePage() {
   const [editId, setEditId] = useState<number | null>(null);
   const [editName, setEditName] = useState("");
   const [editError, setEditError] = useState("");
-  const [showNotifications, setShowNotifications] = useState(false);
+  const [fakeData, setFakeData] = useState<unknown>(null); // New state for fake API data
   const router = useRouter();
+
+  // Get user data from redux
+  const user = useSelector((state: RootState) => state.user.user);
+
+  useEffect(() => {
+    // Fake API call to /posts/1 using getRequest
+    getRequest("/posts/1")
+      .then((response) => setFakeData(response.data || response))
+      .catch((err) => setFakeData({ error: err.message }));
+  }, []);
+
+  console.log(fakeData)
 
   const handleEdit = (id: number, name: string) => {
     setEditId(id);
@@ -177,25 +193,25 @@ export default function UserProfilePage() {
         </svg>
       </button>
       {/* Profile Card */}
-      <section className="flex flex-col items-center bg-background rounded-2xl shadow-lg p-10 mb-2 transition-transform duration-300 hover:scale-[1.015] hover:shadow-2xl">
+      <section className="flex flex-col items-center bg-background rounded-2xl border border-gray-300 p-10 mb-4">
         <div className="w-28 h-28 rounded-full border-4 border-primary mb-4 flex items-center justify-center bg-muted">
           <User className="w-20 h-20 text-primary" />
         </div>
         <div className="text-center">
           <div className="text-3xl font-bold text-foreground mb-1">
-            {userProfile.name}
+            {user?.name || "Jane Doe"}
           </div>
           <div className="text-base text-muted-foreground mb-2">
-            {userProfile.email}
+            {user?.email || "jane.doe@email.com"}
           </div>
-          <div className="inline-block px-5 py-1 rounded-full bg-primary/10 text-primary font-semibold text-sm mt-2">
-            {userProfile.tier} Tier
-          </div>
+          {/* <div className="inline-block px-5 py-1 rounded-full bg-primary/10 text-primary font-semibold text-sm mt-2">
+            {user?.role === "admin" ? "Admin" : user?.role === "user" ? "Gold" : "Gold"} Tier
+          </div> */}
         </div>
       </section>
 
       {/* Badges/NFTs display */}
-      <section className="bg-card/90 rounded-2xl shadow-lg p-8 transition-transform  duration-300 hover:scale-[1.015] hover:shadow-2xl">
+      <section className="bg-card/90 rounded-2xl border border-gray-300 p-8 mb-4">
         <div className="font-bold text-xl text-foreground mb-6 text-left">
           Badges
         </div>
@@ -219,7 +235,7 @@ export default function UserProfilePage() {
       {/* Notifications panel removed */}
 
       {/* List of registered vehicles with details */}
-      <section className="bg-card/90 rounded-2xl shadow-lg p-8 mb-12 transition-transform duration-300 hover:scale-[1.015] hover:shadow-2xl">
+      <section className="bg-card/90 rounded-2xl border border-gray-300 p-8 mb-4">
         <div className="font-bold text-xl text-foreground mb-6 text-left">
           Registered Vehicles
         </div>

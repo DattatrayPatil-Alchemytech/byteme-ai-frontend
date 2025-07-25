@@ -258,11 +258,7 @@ export default function UploadsPage() {
       setProcessedImage(processedImageData);
       
       // Run OCR with enhanced settings
-      const { data: { text, confidence } } = await Tesseract.recognize(processedImageData, 'eng', {
-        logger: m => console.log(m),
-        tessedit_char_whitelist: '0123456789kmKM .',
-        tessedit_pageseg_mode: Tesseract.PSM.SPARSE_TEXT,
-      });
+      const { data: { text, confidence } } = await Tesseract.recognize(processedImageData, 'eng');
       
       console.log('OCR Text:', text);
       console.log('OCR Confidence:', confidence);

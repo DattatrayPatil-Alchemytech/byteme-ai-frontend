@@ -6,7 +6,7 @@ import { logout } from "@/redux/userSlice";
 
 // API Configuration
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001/api";
+  process.env.NEXT_PUBLIC_API_BASE_URL;
 
 // HTTP Methods type
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";

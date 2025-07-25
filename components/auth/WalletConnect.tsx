@@ -17,13 +17,14 @@ import { useDispatch, useSelector } from "react-redux";
 
 //api
 import { verifyLogin } from "@/lib/apiHelpers/user";
+import { RootState } from "@/redux/store";
 
 export function WalletConnect() {
   const { account, connectionCertificate } = useWallet();
   const { open } = useWalletModal();
   const router = useRouter();
   const dispatch = useDispatch();
-  const user = useSelector((state: any) => state.user);
+  const user = useSelector((state: RootState) => state.user);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const handleLogin = async () => {

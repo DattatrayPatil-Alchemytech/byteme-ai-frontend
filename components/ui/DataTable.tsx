@@ -39,6 +39,7 @@ export interface DataTableProps {
   pagination?: boolean;
   itemsPerPageOptions?: number[];
   defaultItemsPerPage?: number;
+  searchInputClassName?: string
   className?: string;
   onRowClick?: (row: Record<string, unknown>) => void;
   loading?: boolean;
