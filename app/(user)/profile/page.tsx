@@ -132,7 +132,7 @@ export default function UserProfilePage() {
 
       {/* Badges/NFTs display */}
       <section className="bg-white/90 rounded-2xl shadow-lg p-8 transition-transform transition-shadow duration-300 hover:scale-[1.015] hover:shadow-2xl">
-        <div className="font-bold text-xl text-foreground mb-6 text-left">Badges / NFTs</div>
+        <div className="font-bold text-xl text-foreground mb-6 text-left">Badges</div>
         <div className="flex gap-8 justify-center">
           {userProfile.badges.map(badge => (
             <div key={badge.id} className="flex flex-col items-center">
