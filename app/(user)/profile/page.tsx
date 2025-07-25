@@ -181,7 +181,7 @@ export default function UserProfilePage() {
         </svg>
       </button>
       {/* Profile Card */}
-      <section className="flex flex-col items-center bg-background rounded-2xl shadow-lg p-10 mb-2 transition-transform duration-300 hover:scale-[1.015] hover:shadow-2xl">
+      <section className="flex flex-col items-center bg-background rounded-2xl border border-gray-300 p-10 mb-4">
         <div className="w-28 h-28 rounded-full border-4 border-primary mb-4 flex items-center justify-center bg-muted">
           <User className="w-20 h-20 text-primary" />
         </div>
@@ -199,7 +199,7 @@ export default function UserProfilePage() {
       </section>
 
       {/* Badges/NFTs display */}
-      <section className="bg-card/90 rounded-2xl shadow-lg p-8 transition-transform  duration-300 hover:scale-[1.015] hover:shadow-2xl">
+      <section className="bg-card/90 rounded-2xl border border-gray-300 p-8 mb-4">
         <div className="font-bold text-xl text-foreground mb-6 text-left">
           Badges
         </div>
@@ -223,7 +223,7 @@ export default function UserProfilePage() {
       {/* Notifications panel removed */}
 
       {/* List of registered vehicles with details */}
-      <section className="bg-card/90 rounded-2xl shadow-lg p-8 mb-12 transition-transform duration-300 hover:scale-[1.015] hover:shadow-2xl">
+      <section className="bg-card/90 rounded-2xl border border-gray-300 p-8 mb-4">
         <div className="font-bold text-xl text-foreground mb-6 text-left">
           Registered Vehicles
         </div>
