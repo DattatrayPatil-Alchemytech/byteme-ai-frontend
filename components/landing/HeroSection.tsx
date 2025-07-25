@@ -108,7 +108,7 @@ export default function HeroSection() {
           </motion.div>
           
           {/* Other Stats in Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             <motion.div
               whileHover={{ scale: 1.02, y: -2 }}
               transition={{ duration: 0.2 }}
@@ -137,26 +137,14 @@ export default function HeroSection() {
               whileHover={{ scale: 1.02, y: -2 }}
               transition={{ duration: 0.2, delay: 0.1 }}
             >
-              <Card className="hover-lift gradient-ev-nature/10 border-secondary/20 backdrop-blur-sm">
+              <Card className="hover-lift gradient-ev-nature/10 border-success/20 backdrop-blur-sm">
                 <CardContent className="p-4 text-center">
                   <div className="text-2xl font-bold text-gradient-ev-light mb-1">8.7K</div>
                   <div className="text-xs text-muted-foreground">Users Joined</div>
                 </CardContent>
               </Card>
             </motion.div>
-            
-            <motion.div
-              whileHover={{ scale: 1.02, y: -2 }}
-              transition={{ duration: 0.2, delay: 0.15 }}
-            >
-              <Card className="hover-lift gradient-ev-fresh/10 border-danger/20 backdrop-blur-sm">
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-gradient-ev-light mb-1">47</div>
-                  <div className="text-xs text-muted-foreground">Blocked Users</div>
-                </CardContent>
-              </Card>
-            </motion.div>
-            
+     
             <motion.div
               whileHover={{ scale: 1.02, y: -2 }}
               transition={{ duration: 0.2, delay: 0.2 }}

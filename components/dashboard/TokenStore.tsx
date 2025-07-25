@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import CheckoutPage from '@/components/store/CheckoutPage';
 
 interface Product {
   id: number;
@@ -33,6 +34,9 @@ interface TokenStoreProps {
 export default function TokenStore({ products, userTokens, onPurchase, purchaseHistory }: TokenStoreProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isCheckout, setIsCheckout] = useState(false);
+  const [checkoutProduct, setCheckoutProduct] = useState<Product | null>(null);
+  const [checkoutQuantity, setCheckoutQuantity] = useState(1);
 
   const categories = ['all', 'electronics', 'accessories', 'clothing'];
 
@@ -42,10 +46,37 @@ export default function TokenStore({ products, userTokens, onPurchase, purchaseH
 
   const handlePurchase = (product: Product) => {
     if (userTokens >= product.price) {
-      onPurchase(product.id, 1);
-      setSelectedProduct(null);
+      setCheckoutProduct(product);
+      setCheckoutQuantity(1);
+      setIsCheckout(true);
     }
   };
+
+  const handleCheckoutComplete = (orderId: string) => {
+    if (checkoutProduct) {
+      onPurchase(checkoutProduct.id, checkoutQuantity);
+    }
+    setIsCheckout(false);
+    setCheckoutProduct(null);
+  };
+
+  const handleBackFromCheckout = () => {
+    setIsCheckout(false);
+    setCheckoutProduct(null);
+  };
+
+  // If in checkout mode, show checkout page
+  if (isCheckout && checkoutProduct) {
+    return (
+      <CheckoutPage
+        product={checkoutProduct}
+        quantity={checkoutQuantity}
+        userTokens={userTokens}
+        onBack={handleBackFromCheckout}
+        onPurchaseComplete={handleCheckoutComplete}
+      />
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -66,15 +97,15 @@ export default function TokenStore({ products, userTokens, onPurchase, purchaseH
       </Card>
 
       {/* Category Filter */}
-      <div className="flex space-x-2 overflow-x-auto pb-2">
+      <div className="flex flex-wrap gap-2">
         {categories.map((category) => (
           <button
             key={category}
             onClick={() => setSelectedCategory(category)}
-            className={`px-4 py-2 rounded-lg whitespace-nowrap transition-all ${
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               selectedCategory === category
                 ? 'gradient-ev-green text-white shadow-lg'
-                : 'bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted'
+                : 'bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80'
             }`}
           >
             {category.charAt(0).toUpperCase() + category.slice(1)}
@@ -82,10 +113,9 @@ export default function TokenStore({ products, userTokens, onPurchase, purchaseH
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Products */}
-        <div>
-          <h3 className="text-xl font-bold text-foreground mb-6">Available Products</h3>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Products List */}
+        <div className="lg:col-span-2">
           <div className="space-y-4">
             {filteredProducts.map((product) => (
               <Card key={product.id} className="hover-lift gradient-ev-light/10 border-success/20 backdrop-blur-sm cursor-pointer" onClick={() => setSelectedProduct(product)}>
@@ -113,30 +143,25 @@ export default function TokenStore({ products, userTokens, onPurchase, purchaseH
         </div>
 
         {/* Product Details / Purchase History */}
-        <div>
+        <div className="space-y-6">
           {selectedProduct ? (
-            <Card className="hover-lift gradient-ev-green/10 border-primary/20 backdrop-blur-sm">
+            <Card className="hover-lift gradient-ev-light/10 border-success/20 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="text-foreground">{selectedProduct.name}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-muted-foreground">{selectedProduct.description}</p>
+                <p className="text-muted-foreground text-sm">{selectedProduct.description}</p>
                 
-                <div className="bg-card/50 rounded-lg p-4">
-                  <h5 className="text-foreground font-semibold mb-2">Features:</h5>
+                <div className="space-y-2">
+                  <h5 className="font-semibold text-foreground">Features:</h5>
                   <ul className="space-y-1">
                     {selectedProduct.features.map((feature, index) => (
                       <li key={index} className="text-sm text-muted-foreground flex items-center">
-                        <span className="text-primary mr-2">✓</span>
+                        <span className="w-1.5 h-1.5 bg-primary rounded-full mr-2"></span>
                         {feature}
                       </li>
                     ))}
                   </ul>
-                </div>
-
-                <div className="bg-success/10 rounded-lg p-4 border border-success/20">
-                  <h5 className="text-success font-semibold mb-1">Environmental Impact</h5>
-                  <p className="text-success/80 text-sm">{selectedProduct.ecoImpact}</p>
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -149,7 +174,7 @@ export default function TokenStore({ products, userTokens, onPurchase, purchaseH
                     disabled={userTokens < selectedProduct.price}
                     className="gradient-ev-green hover:from-emerald-600 hover:to-green-700 disabled:opacity-50"
                   >
-                    {userTokens >= selectedProduct.price ? 'Purchase' : 'Insufficient Tokens'}
+                    {userTokens >= selectedProduct.price ? 'Purchase Now' : 'Insufficient Tokens'}
                   </Button>
                 </div>
               </CardContent>
