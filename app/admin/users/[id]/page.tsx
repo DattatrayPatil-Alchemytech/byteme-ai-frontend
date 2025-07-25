@@ -1,5 +1,6 @@
 "use client";
 import { notFound } from "next/navigation";
+import { use } from "react";
 import Image from 'next/image';
 import { mockUsers } from "../mockUsers";
 import { DataTable, Column } from "@/components/ui/DataTable";
@@ -117,7 +118,7 @@ const userDetailsMap: Record<string, UserDetails> = {
   },
 };
 
-export default function UserViewPage({ params }: { params: { id: string } }) {
+export default function UserViewPage({ params }: { params: Promise<{ id: string }> }) {
   // All hooks must be called before any early returns
   const [search, setSearch] = useState("");
   const [vehicleFilter, setVehicleFilter] = useState("");
@@ -128,7 +129,8 @@ export default function UserViewPage({ params }: { params: { id: string } }) {
     return Array.from(new Set(names)).map((v) => ({ value: v, label: v }));
   }, []);
 
-  const user = mockUsers.find((u) => u.id === params.id);
+  const resolvedParams = use(params);
+  const user = mockUsers.find((u) => u.id === resolvedParams.id);
   if (!user) return notFound();
   
   const userDetails = userDetailsMap[user.id] || {} as UserDetails;

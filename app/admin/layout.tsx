@@ -62,6 +62,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const getActiveTab = () => {
     if (pathname === '/admin' || pathname === '/admin/dashboard') return 'overview';
     if (pathname.startsWith('/admin/users')) return 'users';
+    if (pathname.startsWith('/admin/products')) return 'products';
     if (pathname.startsWith('/admin/rewards')) return 'rewards';
     if (pathname.startsWith('/admin/settings')) return 'settings';
     return '';
