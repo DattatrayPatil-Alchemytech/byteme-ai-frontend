@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Image from 'next/image';
+import Image from "next/image";
 import Badges from "@/components/dashboard/Badges";
 import Leaderboard from "@/components/dashboard/Leaderboard";
 import TokenStore from "@/components/dashboard/TokenStore";
@@ -19,9 +19,7 @@ function VehicleHistoryTab() {
     {
       key: "vehicle",
       label: "Vehicle",
-      render: (value) => (
-        <span className="font-medium">{value as string}</span>
-      ),
+      render: (value) => <span className="font-medium">{value as string}</span>,
     },
     { key: "submissionCount", label: "Submission Count" },
     { key: "milesDriven", label: "Miles Driven" },
@@ -62,7 +60,7 @@ function VehicleHistoryTab() {
           {mockHistory.slice(0, 20).map((vehicle) => (
             <div
               key={vehicle.id}
-              className="flex-shrink-0 bg-muted border border-border rounded-2xl shadow-lg p-4 flex flex-col items-center min-w-[160px] max-w-[180px] w-full transition-transform transition-shadow duration-300 hover:scale-[1.03] hover:shadow-2xl"
+              className="flex-shrink-0 bg-card/90 border border-border rounded-2xl shadow-lg p-4 flex flex-col items-center min-w-[160px] max-w-[180px] w-full transition-transform transition-shadow duration-300 hover:scale-[1.03] hover:shadow-2xl"
             >
               <div className="w-24 h-24 flex items-center justify-center bg-gray-100 rounded-md mb-2 border border-muted">
                 <Image
@@ -99,7 +97,7 @@ function VehicleHistoryTab() {
           className="bg-background text-foreground border border-border"
         />
       </div>
-      <div className="bg-background border border-border rounded-2xl shadow-lg p-4 transition-transform transition-shadow duration-300 hover:scale-[1.01] hover:shadow-2xl">
+      <div className="bg-card/90 rounded-2xl shadow-lg p-4 transition-transform transition-shadow duration-300 hover:scale-[1.01] hover:shadow-2xl">
         <DataTable columns={columns} data={filtered} />
       </div>
     </div>
@@ -345,8 +343,8 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="flex gap-2 bg-muted/50 rounded-lg p-1 mb-8 overflow-x-auto custom-scrollbar sm:gap-2 gap-1 px-1 sm:px-0 w-full sm:w-auto justify-center sm:justify-start">
+      {/* Desktop Tab Navigation - Hidden on mobile */}
+      <div className="hidden md:flex gap-2 bg-muted/50 rounded-lg p-1 mb-8 overflow-x-auto custom-scrollbar">
         <button
           onClick={() => setActiveTab("overview")}
           className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-all cursor-pointer ${
@@ -526,7 +524,7 @@ export default function DashboardPage() {
                             }
                           )}
                         </div>
-                        <div className="text-sm text-muted-foreground bg-white/30 backdrop-blur-sm px-2 py-1 rounded-md">
+                        <div className="text-sm text-muted-foreground bg-card/30 backdrop-blur-sm px-2 py-1 rounded-md">
                           {new Date(user.lastSubmissionDate).toLocaleTimeString(
                             "en-US",
                             {
@@ -637,6 +635,74 @@ export default function DashboardPage() {
           purchaseHistory={purchaseHistory}
         />
       )}
+
+      {/* Mobile Bottom Navigation Bar */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-xl border-t border-border shadow-lg z-50">
+        <div className="flex justify-around items-center px-2 py-3">
+          <button
+            onClick={() => setActiveTab("overview")}
+            className={`flex flex-col items-center space-y-1 px-3 py-2 rounded-lg transition-all ${
+              activeTab === "overview"
+                ? "text-primary bg-primary/10"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <span className="text-xl">📊</span>
+            <span className="text-xs font-medium">Overview</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("badges")}
+            className={`flex flex-col items-center space-y-1 px-3 py-2 rounded-lg transition-all ${
+              activeTab === "badges"
+                ? "text-primary bg-primary/10"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <span className="text-xl">🏆</span>
+            <span className="text-xs font-medium">Badges</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("leaderboard")}
+            className={`flex flex-col items-center space-y-1 px-3 py-2 rounded-lg transition-all ${
+              activeTab === "leaderboard"
+                ? "text-primary bg-primary/10"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <span className="text-xl">📈</span>
+            <span className="text-xs font-medium">Leaderboard</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("history")}
+            className={`flex flex-col items-center space-y-1 px-3 py-2 rounded-lg transition-all ${
+              activeTab === "history"
+                ? "text-primary bg-primary/10"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <span className="text-xl">🕑</span>
+            <span className="text-xs font-medium">History</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("store")}
+            className={`flex flex-col items-center space-y-1 px-3 py-2 rounded-lg transition-all ${
+              activeTab === "store"
+                ? "text-primary bg-primary/10"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <span className="text-xl">🛍️</span>
+            <span className="text-xs font-medium">Store</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Bottom padding for mobile to account for fixed navigation */}
+      <div className="md:hidden h-20"></div>
     </div>
   );
 }

@@ -137,11 +137,11 @@ export function DataTable({
     <div className={`space-y-6 ${className}`}>
       {/* Header */}
       {(title || searchable) && (
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 sm:p-0">
           {title && (
             <div>
-              <h2 className="text-2xl font-bold text-foreground">{title}</h2>
-              <p className="text-muted-foreground">
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground">{title}</h2>
+              <p className="text-sm sm:text-base text-muted-foreground">
                 {filteredData.length} {filteredData.length === 1 ? 'item' : 'items'}
               </p>
             </div>
@@ -152,7 +152,7 @@ export function DataTable({
                 placeholder={searchPlaceholder}
                 value={searchTerm}
                 onChange={handleSearch}
-                className="w-full sm:w-64"
+                className="w-full sm:w-64 text-sm sm:text-base"
               />
             </div>
           )}
@@ -163,20 +163,20 @@ export function DataTable({
       <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-lg">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <Table>
+            <Table className="min-w-full">
               <TableHeader>
                 <TableRow>
                   {columns.map((column) => (
                     <TableHead 
                       key={column.key}
                       style={{ width: column.width }}
-                      className={column.sortable ? 'cursor-pointer hover:bg-muted/50' : ''}
+                      className={`${column.sortable ? 'cursor-pointer hover:bg-muted/50' : ''} whitespace-nowrap`}
                     >
                       {column.label}
                     </TableHead>
                   ))}
                   {actions.length > 0 && (
-                    <TableHead className="w-[100px]">Actions</TableHead>
+                    <TableHead className="w-[100px] whitespace-nowrap">Actions</TableHead>
                   )}
                 </TableRow>
               </TableHeader>
@@ -200,13 +200,13 @@ export function DataTable({
                       onClick={() => onRowClick?.(row)}
                     >
                       {columns.map((column) => (
-                        <TableCell key={column.key}>
+                        <TableCell key={column.key} className="whitespace-nowrap">
                           {renderCell(column, row)}
                         </TableCell>
                       ))}
                       {actions.length > 0 && (
-                        <TableCell>
-                          <div className="flex items-center space-x-2">
+                        <TableCell className="whitespace-nowrap">
+                          <div className="flex items-center space-x-1 sm:space-x-2">
                             {actions.map((action, actionIndex) => (
                               <Button
                                 key={actionIndex}
@@ -216,7 +216,7 @@ export function DataTable({
                                   e.stopPropagation();
                                   action.onClick(row);
                                 }}
-                                className={`h-8 w-8 p-0 ${action.className || ''}`}
+                                className={`h-6 w-6 sm:h-8 sm:w-8 p-0 ${action.className || ''}`}
                               >
                                 {action.icon}
                               </Button>
@@ -233,17 +233,17 @@ export function DataTable({
 
           {/* Pagination */}
           {pagination && filteredData.length > 0 && (
-            <div className="flex items-center justify-between p-6 border-t">
-              <div className="text-sm text-muted-foreground">
+            <div className="flex flex-col sm:flex-row items-center justify-between p-4 sm:p-6 border-t gap-4">
+              <div className="text-sm text-muted-foreground text-center sm:text-left">
                 Showing {startIndex + 1} to {Math.min(endIndex, filteredData.length)} of {filteredData.length} items
               </div>
-              <div className="flex items-center space-x-4">
+              <div className="flex flex-col sm:flex-row items-center gap-4">
                 <div className="flex items-center space-x-2">
                   <label className="text-sm text-muted-foreground">Show:</label>
                   <select
                     value={itemsPerPage}
                     onChange={handleItemsPerPageChange}
-                    className="px-3 py-2 border border-border rounded-md bg-background text-foreground text-sm"
+                    className="px-2 py-1 sm:px-3 sm:py-2 border border-border rounded-md bg-background text-foreground text-sm"
                   >
                     {itemsPerPageOptions.map((option) => (
                       <option key={option} value={option}>
@@ -258,6 +258,7 @@ export function DataTable({
                     size="sm"
                     onClick={() => setCurrentPage(currentPage - 1)}
                     disabled={currentPage === 1}
+                    className="px-2 py-1 text-xs sm:px-3 sm:py-2 sm:text-sm"
                   >
                     Previous
                   </Button>
@@ -268,7 +269,7 @@ export function DataTable({
                         variant={currentPage === page ? 'default' : 'outline'}
                         size="sm"
                         onClick={() => setCurrentPage(page)}
-                        className="w-8 h-8 p-0"
+                        className="w-6 h-6 sm:w-8 sm:h-8 p-0 text-xs sm:text-sm"
                       >
                         {page}
                       </Button>
@@ -279,6 +280,7 @@ export function DataTable({
                     size="sm"
                     onClick={() => setCurrentPage(currentPage + 1)}
                     disabled={currentPage === totalPages}
+                    className="px-2 py-1 text-xs sm:px-3 sm:py-2 sm:text-sm"
                   >
                     Next
                   </Button>

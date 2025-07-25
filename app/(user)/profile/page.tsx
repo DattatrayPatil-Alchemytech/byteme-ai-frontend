@@ -6,6 +6,7 @@ import { mockVehicles } from "./mockVehicles";
 import { Button } from "@/components/ui/button";
 import { Bell } from 'lucide-react';
 import { useRouter } from "next/navigation";
+import Image from 'next/image';
 
 // Mock data for profile, badges, tier, notifications, and vehicles
 const userProfile = {
@@ -135,10 +136,8 @@ export default function UserProfilePage() {
       </button>
       {/* Header with Bell Icon removed */}
       {/* Profile Card */}
-      <section className="flex flex-col items-center bg-background border border-border rounded-2xl p-10">
-        <div className="w-28 h-28 rounded-full border-4 border-primary mb-4 flex items-center justify-center bg-muted">
-          <User className="w-20 h-20 text-primary" />
-        </div>
+              <section className="flex flex-col items-center bg-card/90 rounded-2xl shadow-lg p-10 mb-2 transition-transform duration-300 hover:scale-[1.015] hover:shadow-2xl">
+        <Image src={userProfile.avatar} alt="avatar" width={112} height={112} className="w-28 h-28 rounded-full object-cover border-4 border-primary shadow mb-4" />
         <div className="text-center">
           <div className="text-3xl font-bold text-foreground mb-1">{userProfile.name}</div>
           <div className="text-base text-muted-foreground mb-2">{userProfile.email}</div>
@@ -147,8 +146,8 @@ export default function UserProfilePage() {
       </section>
 
       {/* Badges/NFTs display */}
-      <section className="bg-background border border-border rounded-2xl p-8">
-        <div className="font-bold text-xl text-foreground mb-6 text-left">Badges</div>
+              <section className="bg-card/90 rounded-2xl shadow-lg p-8 transition-transform  duration-300 hover:scale-[1.015] hover:shadow-2xl">
+        <div className="font-bold text-xl text-foreground mb-6 text-left">Badges / NFTs</div>
         <div className="flex gap-8 justify-center">
           {userProfile.badges.map(badge => {
             const Icon = badge.icon;
@@ -167,7 +166,7 @@ export default function UserProfilePage() {
       {/* Notifications panel removed */}
 
       {/* List of registered vehicles with details */}
-      <section className="bg-background border border-border rounded-2xl p-8">
+              <section className="bg-card/90 rounded-2xl shadow-lg p-8 mb-12 transition-transform duration-300 hover:scale-[1.015] hover:shadow-2xl">
         <div className="font-bold text-xl text-foreground mb-6 text-left">Registered Vehicles</div>
         <DataTable columns={columns} data={vehicles} />
       </section>
