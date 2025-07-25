@@ -1,4 +1,4 @@
-export type OrderStatus = "pending" | "approved" | "rejected" | "delivered";
+export type OrderStatus = "pending" | "approved" | "rejected";
 
 export interface Order {
   id: string;
@@ -129,13 +129,13 @@ export const mockOrders: Order[] = [
     quantity: 1,
     price: 200,
     total: 200,
-    status: "delivered",
+    status: "pending",
     createdAt: "2024-06-07T10:00:00Z",
     updatedAt: "2024-06-07T12:00:00Z",
     history: [
       { status: "pending", changedAt: "2024-06-07T10:00:00Z", changedBy: "user" },
       { status: "approved", changedAt: "2024-06-07T11:00:00Z", changedBy: "admin" },
-      { status: "delivered", changedAt: "2024-06-07T12:00:00Z", changedBy: "admin" }
+      { status: "pending", changedAt: "2024-06-07T12:00:00Z", changedBy: "admin" }
     ]
   },
   {
@@ -246,13 +246,13 @@ export const mockOrders: Order[] = [
     quantity: 2,
     price: 23,
     total: 46,
-    status: "delivered",
+    status: "pending",
     createdAt: "2024-06-14T10:00:00Z",
     updatedAt: "2024-06-14T12:00:00Z",
     history: [
       { status: "pending", changedAt: "2024-06-14T10:00:00Z", changedBy: "user" },
       { status: "approved", changedAt: "2024-06-14T11:00:00Z", changedBy: "admin" },
-      { status: "delivered", changedAt: "2024-06-14T12:00:00Z", changedBy: "admin" }
+      { status: "pending", changedAt: "2024-06-14T12:00:00Z", changedBy: "admin" }
     ]
   },
   {
@@ -347,13 +347,13 @@ export const mockOrders: Order[] = [
     quantity: 1,
     price: 50,
     total: 50,
-    status: "delivered",
+    status: "pending",
     createdAt: "2024-06-20T10:00:00Z",
     updatedAt: "2024-06-20T12:00:00Z",
     history: [
       { status: "pending", changedAt: "2024-06-20T10:00:00Z", changedBy: "user" },
       { status: "approved", changedAt: "2024-06-20T11:00:00Z", changedBy: "admin" },
-      { status: "delivered", changedAt: "2024-06-20T12:00:00Z", changedBy: "admin" }
+      { status: "pending", changedAt: "2024-06-20T12:00:00Z", changedBy: "admin" }
     ]
   }
 ]; 
