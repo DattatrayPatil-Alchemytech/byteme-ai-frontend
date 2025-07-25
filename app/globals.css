@@ -1042,3 +1042,29 @@
     box-shadow: 0 8px 32px rgba(16, 185, 129, 0.1);
   }
 }
+
+@keyframes float-slow {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
+}
+.animate-float-slow {
+  animation: float-slow 3s ease-in-out infinite;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  height: 10px;
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #22c55e; /* Tailwind green-500 or your primary */
+  border-radius: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f3f4f6; /* Tailwind gray-100 */
+  border-radius: 8px;
+}
+.custom-scrollbar {
+  scrollbar-color: #22c55e #f3f4f6;
+  scrollbar-width: thin;
+}

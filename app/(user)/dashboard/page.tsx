@@ -5,6 +5,104 @@ import Badges from "@/components/dashboard/Badges";
 import Leaderboard from "@/components/dashboard/Leaderboard";
 import TokenStore from "@/components/dashboard/TokenStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+// Inline VehicleHistoryPage logic here for the History tab
+import { DataTable } from "@/components/ui/DataTable";
+import { ColumnDef } from "@tanstack/react-table";
+import { mockHistory } from "./mockHistory";
+import { useMemo } from "react";
+import { Select } from "@/components/ui/DropdownMenu";
+
+function VehicleHistoryTab() {
+  const [search, setSearch] = useState("");
+  const [vehicleFilter, setVehicleFilter] = useState("");
+  const columns: ColumnDef<(typeof mockHistory)[number]>[] = [
+    {
+      accessorKey: "vehicle",
+      header: "Vehicle",
+      cell: (info) => (
+        <span className="font-medium">{info.getValue() as string}</span>
+      ),
+    },
+    { accessorKey: "submissionCount", header: "Submission Count" },
+    { accessorKey: "milesDriven", header: "Miles Driven" },
+    { accessorKey: "carbonImpact", header: "Carbon Impact (tCO₂)" },
+    { accessorKey: "rewards", header: "Rewards (B3TR)" },
+    {
+      accessorKey: "imageHash",
+      header: "Image Hash",
+      cell: (info) => (
+        <span className="font-mono text-xs">{info.getValue() as string}</span>
+      ),
+    },
+    { accessorKey: "date", header: "Date" },
+  ];
+  const vehicleOptions = useMemo(() => {
+    const names = mockHistory.map((row) => row.vehicle);
+    return Array.from(new Set(names)).map((v) => ({ value: v, label: v }));
+  }, []);
+  const filtered = mockHistory.filter((row) => {
+    const matchesSearch = row.vehicle
+      .toLowerCase()
+      .includes(search.toLowerCase());
+    const matchesFilter = vehicleFilter ? row.vehicle === vehicleFilter : true;
+    return matchesSearch && matchesFilter;
+  });
+  return (
+    <div className="space-y-6">
+      <div className="text-center mb-8">
+        <h2 className="text-2xl font-bold text-foreground mb-2">
+          Your Vehicle History
+        </h2>
+        <p className="text-muted-foreground">
+          Track your vehicle driving records
+        </p>
+      </div>
+      <div className="w-full mb-6 overflow-x-auto overflow-y-hidden custom-scrollbar">
+        <div className="flex gap-4 min-w-[600px] sm:min-w-0">
+          {mockHistory.slice(0, 20).map((vehicle) => (
+            <div
+              key={vehicle.id}
+              className="flex-shrink-0 bg-white/90 border border-border rounded-2xl shadow-lg p-4 flex flex-col items-center min-w-[160px] max-w-[180px] w-full transition-transform transition-shadow duration-300 hover:scale-[1.03] hover:shadow-2xl"
+            >
+              <div className="w-24 h-24 flex items-center justify-center bg-gray-100 rounded-md mb-2 border border-muted">
+                <img
+                  src={vehicle.image}
+                  alt={vehicle.vehicle}
+                  className="w-full h-full rounded-md"
+                  loading="lazy"
+                />
+              </div>
+              <div className="font-semibold text-center text-base truncate w-full text-foreground">
+                {vehicle.vehicle}
+              </div>
+              <div className="text-xs text-muted-foreground mt-1 text-center capitalize">
+                {vehicle.type} EV
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+        <input
+          type="text"
+          placeholder="Search vehicle..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="border border-primary/30 rounded-full px-5 py-3 w-full sm:w-64 text-base font-medium shadow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary hover:ring-2 hover:ring-primary/30 hover:bg-primary/5 placeholder:text-muted-foreground"
+        />
+        <Select
+          value={vehicleFilter}
+          onChange={setVehicleFilter}
+          options={[{ value: "", label: "All Vehicles" }, ...vehicleOptions]}
+          placeholder="All Vehicles"
+        />
+      </div>
+      <div className="bg-white/90 rounded-2xl shadow-lg p-4 transition-transform transition-shadow duration-300 hover:scale-[1.01] hover:shadow-2xl">
+        <DataTable columns={columns} data={filtered} />
+      </div>
+    </div>
+  );
+}
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -235,292 +333,308 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Message */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Welcome back, {user.name}!
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            Track your sustainable driving progress and earn B3TR tokens
-          </p>
-        </div>
+      {/* Welcome Message */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-foreground mb-2">
+          Welcome back, {user.name}!
+        </h1>
+        <p className="text-muted-foreground text-lg">
+          Track your sustainable driving progress and earn B3TR tokens
+        </p>
+      </div>
 
-        {/* Tab Navigation */}
-        <div className="flex space-x-1 bg-muted/50 rounded-lg p-1 mb-8">
-          <button
-            onClick={() => setActiveTab("overview")}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-all cursor-pointer ${
-              activeTab === "overview"
-                ? "gradient-ev-green text-white shadow-lg"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted"
-            }`}
-          >
-            <span>📊</span>
-            <span>Overview</span>
-          </button>
-          <button
-            onClick={() => setActiveTab("badges")}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-all cursor-pointer ${
-              activeTab === "badges"
-                ? "gradient-ev-green text-white shadow-lg"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted"
-            }`}
-          >
-            <span>🏆</span>
-            <span>Badges</span>
-          </button>
-          <button
-            onClick={() => setActiveTab("leaderboard")}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-all cursor-pointer ${
-              activeTab === "leaderboard"
-                ? "gradient-ev-green text-white shadow-lg"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted"
-            }`}
-          >
-            <span>📈</span>
-            <span>Leaderboard</span>
-          </button>
-          <button
-            onClick={() => setActiveTab("store")}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-all cursor-pointer ${
-              activeTab === "store"
-                ? "gradient-ev-green text-white shadow-lg"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted"
-            }`}
-          >
-            <span>🛍️</span>
-            <span>Store</span>
-          </button>
-        </div>
+      {/* Tab Navigation */}
+      <div className="flex gap-2 bg-muted/50 rounded-lg p-1 mb-8 overflow-x-auto custom-scrollbar sm:gap-2 gap-1 px-1 sm:px-0 w-full sm:w-auto justify-center sm:justify-start">
+        <button
+          onClick={() => setActiveTab("overview")}
+          className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-all cursor-pointer ${
+            activeTab === "overview"
+              ? "gradient-ev-green text-white shadow-lg"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted"
+          }`}
+        >
+          <span>📊</span>
+          <span>Overview</span>
+        </button>
+        <button
+          onClick={() => setActiveTab("badges")}
+          className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-all cursor-pointer ${
+            activeTab === "badges"
+              ? "gradient-ev-green text-white shadow-lg"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted"
+          }`}
+        >
+          <span>🏆</span>
+          <span>Badges</span>
+        </button>
+        <button
+          onClick={() => setActiveTab("leaderboard")}
+          className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-all cursor-pointer ${
+            activeTab === "leaderboard"
+              ? "gradient-ev-green text-white shadow-lg"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted"
+          }`}
+        >
+          <span>📈</span>
+          <span>Leaderboard</span>
+        </button>
+        <button
+          onClick={() => setActiveTab("history")}
+          className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-all cursor-pointer ${
+            activeTab === "history"
+              ? "gradient-ev-green text-white shadow-lg"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted"
+          }`}
+        >
+          <span>🕑</span>
+          <span>History</span>
+        </button>
+        <button
+          onClick={() => setActiveTab("store")}
+          className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-all cursor-pointer ${
+            activeTab === "store"
+              ? "gradient-ev-green text-white shadow-lg"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted"
+          }`}
+        >
+          <span>🛍️</span>
+          <span>Store</span>
+        </button>
+      </div>
 
-        {/* Overview Tab */}
-        {activeTab === "overview" && (
-          <>
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <Card className="hover-lift gradient-ev-green/10 border-primary/20 backdrop-blur-sm">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
+      {/* Overview Tab */}
+      {activeTab === "overview" && (
+        <>
+          {/* Stats Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <Card className="hover-lift gradient-ev-green/10 border-primary/20 backdrop-blur-sm">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      B3TR Tokens
+                    </p>
+                    <p className="text-2xl font-bold text-gradient-ev-green">
+                      {user.b3trTokens.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-primary">Total earned</p>
+                  </div>
+                  <div className="p-1 bg-primary/20 rounded-lg">
+                    <span className="text-2xl">⚡</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="hover-lift gradient-ev-light/10 border-success/20 backdrop-blur-sm">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Sustainable Miles
+                    </p>
+                    <p className="text-2xl font-bold text-gradient-ev-light">
+                      {user.sustainableMiles.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-success">Total driven</p>
+                  </div>
+                  <div className="p-1 bg-primary/20 rounded-lg">
+                    <span className="text-2xl">🚗</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="hover-lift gradient-ev-nature/10 border-secondary/20 backdrop-blur-sm">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      CO₂ Saved
+                    </p>
+                    <p className="text-2xl font-bold text-gradient-ev-light">
+                      {user.co2Saved}
+                    </p>
+                    <p className="text-xs text-success">tons</p>
+                  </div>
+                  <div className="p-1 bg-primary/20 rounded-lg">
+                    <span className="text-2xl">🌱</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="hover-lift gradient-ev-fresh/10 border-cyan-500/20 backdrop-blur-sm">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Current Rank
+                    </p>
+                    <p className="text-2xl font-bold text-gradient-ev-green">
+                      #{user.currentRank}
+                    </p>
+                    <p className="text-xs text-primary">This week</p>
+                  </div>
+                  <div className="p-1 bg-primary/20 rounded-lg">
+                    <span className="text-2xl">🏆</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Vehicle Info & Mileage History */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <Card className="hover-lift gradient-ev-green/10 border-primary/20 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-foreground">
+                  Recent Activity
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground">
-                        B3TR Tokens
+                      <p className="text-sm text-muted-foreground">
+                        Last Miles Submitted
                       </p>
                       <p className="text-2xl font-bold text-gradient-ev-green">
-                        {user.b3trTokens.toLocaleString()}
+                        {user.lastMiles}
                       </p>
-                      <p className="text-xs text-primary">Total earned</p>
                     </div>
                     <div className="p-1 bg-primary/20 rounded-lg">
-                      <span className="text-2xl">⚡</span>
+                      <span className="text-2xl">📊</span>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
 
-              <Card className="hover-lift gradient-ev-light/10 border-success/20 backdrop-blur-sm">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
+                  <div className="flex justify-between items-center">
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground">
-                        Sustainable Miles
+                      <p className="text-sm text-muted-foreground">
+                        Last Submission
                       </p>
-                      <p className="text-2xl font-bold text-gradient-ev-light">
-                        {user.sustainableMiles.toLocaleString()}
-                      </p>
-                      <p className="text-xs text-success">Total driven</p>
+                      <div className="flex items-center space-x-2 mt-1">
+                        <div className="text-lg font-semibold text-foreground">
+                          {new Date(user.lastSubmissionDate).toLocaleDateString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "2-digit",
+                              day: "2-digit",
+                            }
+                          )}
+                        </div>
+                        <div className="text-sm text-muted-foreground bg-white/30 backdrop-blur-sm px-2 py-1 rounded-md">
+                          {new Date(user.lastSubmissionDate).toLocaleTimeString(
+                            "en-US",
+                            {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                              hour12: true,
+                            }
+                          )}
+                        </div>
+                      </div>
                     </div>
                     <div className="p-1 bg-primary/20 rounded-lg">
-                      <span className="text-2xl">🚗</span>
+                      <span className="text-2xl">📅</span>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
 
-              <Card className="hover-lift gradient-ev-nature/10 border-secondary/20 backdrop-blur-sm">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
+                  <div className="flex justify-between items-center">
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground">
-                        CO₂ Saved
+                      <p className="text-sm text-muted-foreground">
+                        Daily Submissions
                       </p>
                       <p className="text-2xl font-bold text-gradient-ev-light">
-                        {user.co2Saved}
+                        {user.dailySubmissionCount}
                       </p>
-                      <p className="text-xs text-success">tons</p>
+                    </div>
+                    <div className="p-1 bg-primary/20 rounded-lg">
+                      <span className="text-2xl">📝</span>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="text-sm text-muted-foreground">
+                        Carbon Footprint
+                      </p>
+                      <p className="text-2xl font-bold text-gradient-ev-light">
+                        {user.carbonFootprint}
+                      </p>
+                      <p className="text-xs text-success">tons CO₂</p>
                     </div>
                     <div className="p-1 bg-primary/20 rounded-lg">
                       <span className="text-2xl">🌱</span>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </CardContent>
+            </Card>
 
-              <Card className="hover-lift gradient-ev-fresh/10 border-cyan-500/20 backdrop-blur-sm">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">
-                        Current Rank
-                      </p>
-                      <p className="text-2xl font-bold text-gradient-ev-green">
-                        #{user.currentRank}
-                      </p>
-                      <p className="text-xs text-primary">This week</p>
-                    </div>
-                    <div className="p-1 bg-primary/20 rounded-lg">
-                      <span className="text-2xl">🏆</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Vehicle Info & Mileage History */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              <Card className="hover-lift gradient-ev-green/10 border-primary/20 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="text-foreground">
-                    Recent Activity
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
+            <Card className="hover-lift gradient-ev-light/10 border-success/20 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-foreground">
+                  Recent Mileage
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {mileageHistory.map((entry, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between items-center"
+                    >
                       <div>
-                        <p className="text-sm text-muted-foreground">
-                          Last Miles Submitted
+                        <p className="text-foreground text-sm font-medium">
+                          {new Date(entry.date).toLocaleDateString()}
                         </p>
-                        <p className="text-2xl font-bold text-gradient-ev-green">
-                          {user.lastMiles}
+                        <p className="text-muted-foreground text-xs">
+                          {entry.miles} miles
                         </p>
                       </div>
-                      <div className="p-1 bg-primary/20 rounded-lg">
-                        <span className="text-2xl">📊</span>
+                      <div className="text-right">
+                        <p className="text-primary font-semibold">
+                          +{entry.tokens} B3TR
+                        </p>
                       </div>
                     </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </>
+      )}
 
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="text-sm text-muted-foreground">
-                          Last Submission
-                        </p>
-                        <div className="flex items-center space-x-2 mt-1">
-                          <div className="text-lg font-semibold text-foreground">
-                            {new Date(
-                              user.lastSubmissionDate
-                            ).toLocaleDateString("en-US", {
-                              year: "numeric",
-                              month: "2-digit",
-                              day: "2-digit",
-                            })}
-                          </div>
-                          <div className="text-sm text-muted-foreground bg-white/30 backdrop-blur-sm px-2 py-1 rounded-md">
-                            {new Date(
-                              user.lastSubmissionDate
-                            ).toLocaleTimeString("en-US", {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                              hour12: true,
-                            })}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="p-1 bg-primary/20 rounded-lg">
-                        <span className="text-2xl">📅</span>
-                      </div>
-                    </div>
+      {/* Badges Tab */}
+      {activeTab === "badges" && (
+        <Badges badges={badges} onShare={handleBadgeShare} />
+      )}
 
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="text-sm text-muted-foreground">
-                          Daily Submissions
-                        </p>
-                        <p className="text-2xl font-bold text-gradient-ev-light">
-                          {user.dailySubmissionCount}
-                        </p>
-                      </div>
-                      <div className="p-1 bg-primary/20 rounded-lg">
-                        <span className="text-2xl">📝</span>
-                      </div>
-                    </div>
+      {/* Leaderboard Tab */}
+      {activeTab === "leaderboard" && (
+        <Leaderboard
+          leaderboard={leaderboard}
+          challenges={challenges}
+          userRank={{ rank: user.currentRank, miles: user.weeklyMiles }}
+          onJoinChallenge={handleJoinChallenge}
+        />
+      )}
 
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="text-sm text-muted-foreground">
-                          Carbon Footprint
-                        </p>
-                        <p className="text-2xl font-bold text-gradient-ev-light">
-                          {user.carbonFootprint}
-                        </p>
-                        <p className="text-xs text-success">tons CO₂</p>
-                      </div>
-                      <div className="p-1 bg-primary/20 rounded-lg">
-                        <span className="text-2xl">🌱</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+      {/* History Tab */}
+      {activeTab === "history" && <VehicleHistoryTab />}
 
-              <Card className="hover-lift gradient-ev-light/10 border-success/20 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="text-foreground">
-                    Recent Mileage
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {mileageHistory.map((entry, index) => (
-                      <div
-                        key={index}
-                        className="flex justify-between items-center"
-                      >
-                        <div>
-                          <p className="text-foreground text-sm font-medium">
-                            {new Date(entry.date).toLocaleDateString()}
-                          </p>
-                          <p className="text-muted-foreground text-xs">
-                            {entry.miles} miles
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-primary font-semibold">
-                            +{entry.tokens} B3TR
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </>
-        )}
-
-        {/* Badges Tab */}
-        {activeTab === "badges" && (
-          <Badges badges={badges} onShare={handleBadgeShare} />
-        )}
-
-        {/* Leaderboard Tab */}
-        {activeTab === "leaderboard" && (
-          <Leaderboard
-            leaderboard={leaderboard}
-            challenges={challenges}
-            userRank={{ rank: user.currentRank, miles: user.weeklyMiles }}
-            onJoinChallenge={handleJoinChallenge}
-          />
-        )}
-
-        {/* Store Tab */}
-        {activeTab === "store" && (
-          <TokenStore
-            products={storeProducts}
-            userTokens={user.b3trTokens}
-            onPurchase={handlePurchase}
-            purchaseHistory={purchaseHistory}
-          />
-        )}
-      </div>
-    );
+      {/* Store Tab */}
+      {activeTab === "store" && (
+        <TokenStore
+          products={storeProducts}
+          userTokens={user.b3trTokens}
+          onPurchase={handlePurchase}
+          purchaseHistory={purchaseHistory}
+        />
+      )}
+    </div>
+  );
 }
