@@ -204,19 +204,19 @@ export default function UserProfilePage() {
           Badges
         </div>
         <div className="flex gap-8 justify-center">
-          {/* {userProfile.badges.map((badge) => { */}
-          {/*   const Icon = badge.icon; */}
-          {/*   return ( */}
-          {/*     <div key={badge.id} className="flex flex-col items-center"> */}
-          {/*       <div className="w-16 h-16 rounded-full border-2 border-primary mb-2 flex items-center justify-center bg-muted"> */}
-          {/*         <Icon className="w-10 h-10 text-primary" /> */}
-          {/*       </div> */}
-          {/*       <span className="text-xs text-center text-muted-foreground font-medium"> */}
-          {/*         {badge.name} */}
-          {/*       </span> */}
-          {/*     </div> */}
-          {/*   ); */}
-          {/* })} */}
+          {userProfile.badges.map((badge) => {
+            const Icon = badge.icon;
+            return (
+              <div key={badge.id} className="flex flex-col items-center">
+                <div className="w-16 h-16 rounded-full border-2 border-primary mb-2 flex items-center justify-center bg-muted">
+                  <Icon className="w-10 h-10 text-primary" />
+                </div>
+                <span className="text-xs text-center text-muted-foreground font-medium">
+                  {badge.name}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </section>
 
