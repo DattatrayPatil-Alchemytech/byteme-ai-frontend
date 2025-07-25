@@ -106,7 +106,7 @@ function VehicleHistoryTab() {
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("overview");
-  const [user, setUser] = useState({
+  const [user] = useState({
     name: "John Doe",
     email: "user@byteme.in",
     b3trTokens: 1250,

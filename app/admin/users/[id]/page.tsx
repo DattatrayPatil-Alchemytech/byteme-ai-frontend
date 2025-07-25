@@ -6,7 +6,15 @@ import { useState, useMemo } from "react";
 import { Select } from "@/components/ui/DropdownMenu";
 import { mockHistory } from "@/app/(user)/dashboard/mockHistory";
 import { ColumnDef } from "@tanstack/react-table";
-import { Mail, Phone, MapPin, Calendar, BadgeCheck, Wallet, User } from "lucide-react";
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  BadgeCheck,
+  Wallet,
+  User,
+} from "lucide-react";
 
 // More mock user history data for a richer table and carousel
 const mockUserHistory = [
@@ -84,46 +92,44 @@ const mockUserHistory = [
   },
 ];
 
+// Define proper types for user details
+interface UserDetails {
+  phone?: string;
+  address?: string;
+  registrationDate?: string;
+  status?: string;
+  wallet?: string;
+}
+
 // Add more mock user details for demonstration
-const userDetailsMap: Record<string, any> = {
-  '1': {
-    phone: '+1 555-123-4567',
-    address: '123 Green Lane, Eco City, CA',
-    registrationDate: '2023-01-15',
-    status: 'Active',
-    wallet: '0xA1B2C3D4E5F6G7H8I9J0',
+const userDetailsMap: Record<string, UserDetails> = {
+  "1": {
+    phone: "+1 555-123-4567",
+    address: "123 Green Lane, Eco City, CA",
+    registrationDate: "2023-01-15",
+    status: "Active",
+    wallet: "0xA1B2C3D4E5F6G7H8I9J0",
   },
-  '2': {
-    phone: '+1 555-987-6543',
-    address: '456 Blue Ave, Clean Town, NY',
-    registrationDate: '2023-03-22',
-    status: 'Inactive',
-    wallet: '0xB2C3D4E5F6G7H8I9J0A1',
+  "2": {
+    phone: "+1 555-987-6543",
+    address: "456 Blue Ave, Clean Town, NY",
+    registrationDate: "2023-03-22",
+    status: "Inactive",
+    wallet: "0xB2C3D4E5F6G7H8I9J0A1",
   },
-  '3': {
-    phone: '+1 555-222-3333',
-    address: '789 Solar Rd, Sunville, TX',
-    registrationDate: '2023-05-10',
-    status: 'Active',
-    wallet: '0xC3D4E5F6G7H8I9J0A1B2',
+  "3": {
+    phone: "+1 555-222-3333",
+    address: "789 Solar Rd, Sunville, TX",
+    registrationDate: "2023-05-10",
+    status: "Active",
+    wallet: "0xC3D4E5F6G7H8I9J0A1B2",
   },
 };
 
 export default function UserViewPage() {
   const params = useParams();
-  const user = mockUsers.find((u) => u.id === params.id);
-  if (!user) return notFound();
-  const userDetails = userDetailsMap[user.id] || {};
 
-  // Mock dashboard summary data for this user
-  const summary = {
-    tokens: user.totalRewards,
-    miles: user.totalMiles,
-    co2: (user.totalMiles * 0.00025).toFixed(2), // Example: 0.25kg/km
-    rank: user.tier === 'Platinum' ? 1 : user.tier === 'Gold' ? 2 : 3,
-  };
-
-  // State for search and filter
+  // All hooks must be called before any conditional returns
   const [search, setSearch] = useState("");
   const [vehicleFilter, setVehicleFilter] = useState("");
 
@@ -132,6 +138,20 @@ export default function UserViewPage() {
     const names = mockUserHistory.map((row) => row.vehicle);
     return Array.from(new Set(names)).map((v) => ({ value: v, label: v }));
   }, []);
+
+  // Find user after hooks are declared
+  const user = mockUsers.find((u) => u.id === params.id);
+  if (!user) return notFound();
+
+  const userDetails = userDetailsMap[user.id] || {};
+
+  // Mock dashboard summary data for this user
+  const summary = {
+    tokens: user.totalRewards,
+    miles: user.totalMiles,
+    co2: (user.totalMiles * 0.00025).toFixed(2), // Example: 0.25kg/km
+    rank: user.tier === "Platinum" ? 1 : user.tier === "Gold" ? 2 : 3,
+  };
 
   // Filtered history
   const filtered = mockHistory.filter((row) => {
@@ -170,36 +190,74 @@ export default function UserViewPage() {
       <div className="w-full flex flex-col md:flex-row items-center justify-between gap-6 bg-white/90 rounded-xl shadow p-6 border border-muted mb-4 animate-fade-in">
         <div className="flex items-center gap-4 w-full md:w-auto">
           <User className="text-primary" size={32} />
-          <span className="text-2xl font-extrabold text-gradient-ev-green tracking-tight">{user.name}</span>
+          <span className="text-2xl font-extrabold text-gradient-ev-green tracking-tight">
+            {user.name}
+          </span>
         </div>
         <div className="flex flex-wrap gap-x-8 gap-y-2 items-center w-full md:w-auto justify-between">
-          <div className="flex items-center gap-2"><Mail className="text-primary" size={20} /><span className="font-semibold">{user.email}</span></div>
-          <div className="flex items-center gap-2"><Phone className="text-primary" size={20} /><span>{userDetails.phone || '—'}</span></div>
-          <div className="flex items-center gap-2"><MapPin className="text-primary" size={20} /><span>{userDetails.address || '—'}</span></div>
-          <div className="flex items-center gap-2"><Calendar className="text-primary" size={20} /><span>{userDetails.registrationDate || '—'}</span></div>
-          <div className="flex items-center gap-2"><BadgeCheck className="text-primary" size={20} /><span className={userDetails.status === 'Active' ? 'text-green-600 font-bold' : 'text-red-600 font-bold'}>{userDetails.status || '—'}</span></div>
-          <div className="flex items-center gap-2"><Wallet className="text-primary" size={20} /><span className="font-mono text-xs">{userDetails.wallet || '—'}</span></div>
+          <div className="flex items-center gap-2">
+            <Mail className="text-primary" size={20} />
+            <span className="font-semibold">{user.email}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Phone className="text-primary" size={20} />
+            <span>{userDetails.phone || "—"}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <MapPin className="text-primary" size={20} />
+            <span>{userDetails.address || "—"}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Calendar className="text-primary" size={20} />
+            <span>{userDetails.registrationDate || "—"}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <BadgeCheck className="text-primary" size={20} />
+            <span
+              className={
+                userDetails.status === "Active"
+                  ? "text-green-600 font-bold"
+                  : "text-red-600 font-bold"
+              }
+            >
+              {userDetails.status || "—"}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Wallet className="text-primary" size={20} />
+            <span className="font-mono text-xs">
+              {userDetails.wallet || "—"}
+            </span>
+          </div>
         </div>
       </div>
       {/* User Overview Summary Cards with dashboard icons */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8 animate-fade-in">
         <div className="rounded-xl bg-white/90 shadow flex flex-col items-center p-6 border border-muted hover:shadow-lg transition-all">
-          <div className="text-3xl font-extrabold text-gradient-ev-green animate-pulse">{summary.tokens.toLocaleString()}</div>
+          <div className="text-3xl font-extrabold text-gradient-ev-green animate-pulse">
+            {summary.tokens.toLocaleString()}
+          </div>
           <div className="text-muted-foreground text-sm">B3TR Tokens</div>
           <div className="mt-2 p-2 bg-primary/20 rounded-lg text-2xl">⚡</div>
         </div>
         <div className="rounded-xl bg-white/90 shadow flex flex-col items-center p-6 border border-muted hover:shadow-lg transition-all">
-          <div className="text-3xl font-extrabold text-gradient-ev-green animate-pulse">{summary.miles.toLocaleString()}</div>
+          <div className="text-3xl font-extrabold text-gradient-ev-green animate-pulse">
+            {summary.miles.toLocaleString()}
+          </div>
           <div className="text-muted-foreground text-sm">Sustainable Miles</div>
           <div className="mt-2 p-2 bg-primary/20 rounded-lg text-2xl">🚗</div>
         </div>
         <div className="rounded-xl bg-white/90 shadow flex flex-col items-center p-6 border border-muted hover:shadow-lg transition-all">
-          <div className="text-3xl font-extrabold text-gradient-ev-green animate-pulse">{summary.co2}</div>
+          <div className="text-3xl font-extrabold text-gradient-ev-green animate-pulse">
+            {summary.co2}
+          </div>
           <div className="text-muted-foreground text-sm">CO₂ Saved (t)</div>
           <div className="mt-2 p-2 bg-primary/20 rounded-lg text-2xl">🌱</div>
         </div>
         <div className="rounded-xl bg-white/90 shadow flex flex-col items-center p-6 border border-muted hover:shadow-lg transition-all">
-          <div className="text-3xl font-extrabold text-gradient-ev-green animate-pulse">#{summary.rank}</div>
+          <div className="text-3xl font-extrabold text-gradient-ev-green animate-pulse">
+            #{summary.rank}
+          </div>
           <div className="text-muted-foreground text-sm">Current Rank</div>
           <div className="mt-2 p-2 bg-primary/20 rounded-lg text-2xl">🏆</div>
         </div>
