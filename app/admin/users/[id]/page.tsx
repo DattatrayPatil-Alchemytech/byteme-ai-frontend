@@ -1,7 +1,7 @@
 "use client";
 import { notFound } from "next/navigation";
 import { use } from "react";
-import Image from 'next/image';
+import Image from "next/image";
 import { mockUsers } from "../mockUsers";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { useState, useMemo } from "react";
@@ -130,7 +130,11 @@ const userDetailsMap: Record<string, UserDetails> = {
   },
 };
 
-export default function UserViewPage({ params }: { params: Promise<{ id: string }> }) {
+export default function UserViewPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   // All hooks must be called before any early returns
   const [search, setSearch] = useState("");
   const [vehicleFilter, setVehicleFilter] = useState("");
@@ -341,7 +345,7 @@ export default function UserViewPage({ params }: { params: Promise<{ id: string 
           </div>
           <DataTable
             columns={columns}
-            data={filtered as Record<string, unknown>[]}
+            data={filtered as unknown as Record<string, unknown>[]}
           />
         </CardContent>
       </Card>

@@ -6,8 +6,6 @@ import { useRouter, usePathname } from "next/navigation";
 import { RootState } from "@/redux/store";
 import { loginSuccess, logout } from "@/redux/userSlice";
 import { refreshToken } from "@/lib/apiHelpers/user";
-import toast from "react-hot-toast";
-import { useWallet } from "@vechain/dapp-kit-react";
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -23,8 +21,14 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   const dispatch = useDispatch();
   const router = useRouter();
   const pathname = usePathname();
-  const { account } = useWallet();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [isAuthDone, setIsAuthDone] = useState(false);
+
+  // Check if current route is protected
+  const isProtectedRoute = PROTECTED_ROUTES.some((route) =>
+    pathname.startsWith(route)
+  );
+  const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
 
   // Initial authentication check and token refresh
   useEffect(() => {
@@ -57,18 +61,8 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     // Don't do route protection while we're still checking auth status
     if (isCheckingAuth) return;
 
-    const isProtectedRoute = PROTECTED_ROUTES.some((route) =>
-      pathname.startsWith(route)
-    );
-    const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
-
     // Handle protected routes
     if (isProtectedRoute) {
-      // Check wallet connection first
-      if (!account) {
-        router.push("/");
-      }
-
       // Check authentication status
       if (!isAuthenticated || !accessToken) {
         router.push("/");
@@ -79,13 +73,34 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     // Optional: Redirect authenticated users from landing page to dashboard
     if (isAuthenticated && isPublicRoute && pathname === "/") {
       router.push("/dashboard");
+      return;
     }
-  }, [isCheckingAuth, isAuthenticated, accessToken, account, pathname, router]);
 
-  // Show loading state while checking authentication
-  if (isCheckingAuth) {
+    // Mark auth check as complete
+    setIsAuthDone(true);
+  }, [
+    isCheckingAuth,
+    isAuthenticated,
+    accessToken,
+    pathname,
+    router,
+    isProtectedRoute,
+    isPublicRoute,
+  ]);
+
+  // Show loading state while checking authentication or during redirects
+  if (isCheckingAuth || !isAuthDone) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Block protected routes if not authenticated (safety check)
+  if (isProtectedRoute && (!isAuthenticated || !accessToken)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );

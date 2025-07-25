@@ -1,15 +1,18 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from "react";
 
 // Throttle function to limit scroll event frequency
-function throttle<T extends (...args: any[]) => any>(func: T, limit: number): T {
+function throttle<T extends (...args: unknown[]) => void>(
+  func: T,
+  limit: number
+): T {
   let inThrottle: boolean;
-  return ((...args: any[]) => {
+  return ((...args: Parameters<T>) => {
     if (!inThrottle) {
       func(...args);
       inThrottle = true;
-      setTimeout(() => inThrottle = false, limit);
+      setTimeout(() => (inThrottle = false), limit);
     }
   }) as T;
 }
@@ -27,7 +30,7 @@ export function useScrollAnimation(threshold = 0.1) {
       },
       {
         threshold,
-        rootMargin: '0px 0px -50px 0px',
+        rootMargin: "0px 0px -50px 0px",
         // Performance optimizations
         root: null,
       }
@@ -66,7 +69,7 @@ export function useScrollAnimationWithDelay(delay = 0, threshold = 0.1) {
       },
       {
         threshold,
-        rootMargin: '0px 0px -50px 0px',
+        rootMargin: "0px 0px -50px 0px",
         // Performance optimizations
         root: null,
       }
@@ -99,9 +102,9 @@ export function useOptimizedScroll() {
   );
 
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
   return scrollY;
-} 
+}

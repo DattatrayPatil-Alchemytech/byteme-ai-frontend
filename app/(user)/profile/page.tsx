@@ -223,7 +223,10 @@ export default function UserProfilePage() {
         <div className="font-bold text-xl text-foreground mb-6 text-left">
           Registered Vehicles
         </div>
-        <DataTable columns={columns} data={vehicles} />
+        <DataTable
+          columns={columns}
+          data={vehicles as unknown as Record<string, unknown>[]}
+        />
       </section>
     </div>
   );
