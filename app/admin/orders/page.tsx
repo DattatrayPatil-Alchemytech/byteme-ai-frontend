@@ -202,7 +202,7 @@ export default function OrdersPage() {
               ))}
             </select>
           </div>
-          <DataTable
+          {/* <DataTable
             columns={columns.map((col) => {
               if (col.id === "actions") {
                 return {
@@ -245,7 +245,7 @@ export default function OrdersPage() {
               return col;
             })}
             data={filteredOrders}
-          />
+          /> */}
         </Card>
       </div>
     </div>

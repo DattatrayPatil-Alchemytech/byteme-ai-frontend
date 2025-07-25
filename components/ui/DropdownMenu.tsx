@@ -39,10 +39,10 @@ export const Select: React.FC<SelectProps> = ({
   }, [open]);
 
   return (
-    <div className={`relative w-full sm:w-64 max-w-full ${className}`} ref={menuRef}>
+    <div className={`relative w-full sm:w-64 max-w-full`} ref={menuRef}>
       <button
         type="button"
-        className="flex items-center justify-between border border-primary/30 rounded-full py-3 px-5 w-full bg-white/90 text-base font-medium shadow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary hover:ring-2 hover:ring-primary/30 hover:bg-primary/5"
+        className="flex items-center justify-between border border-border rounded-full py-3 px-5 w-full bg-background text-base font-medium shadow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary hover:ring-2 hover:ring-primary/30 hover:bg-muted"
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -54,13 +54,13 @@ export const Select: React.FC<SelectProps> = ({
       </button>
       {open && (
         <div
-          className="absolute left-0 z-20 mt-2 w-full rounded-2xl bg-white/95 shadow-xl border border-primary/10 max-h-60 overflow-y-auto custom-scrollbar animate-fade-in"
+          className="absolute left-0 z-20 mt-2 w-full rounded-2xl bg-background text-foreground shadow-xl border border-border max-h-60 overflow-y-auto custom-scrollbar animate-fade-in"
           role="listbox"
           tabIndex={-1}
         >
           {placeholder && (
             <div
-              className={`px-4 py-2 cursor-pointer text-muted-foreground transition-all duration-200 rounded ${value === "" ? "bg-primary/20 text-primary font-semibold" : "hover:bg-primary/10 hover:text-primary focus:bg-primary/10 focus:text-primary"}`}
+              className={`px-4 py-2 cursor-pointer text-muted-foreground transition-all duration-200 rounded ${value === "" ? "bg-primary/20 text-primary font-semibold" : "hover:bg-muted hover:text-primary focus:bg-muted focus:text-primary"}`}
               onClick={() => { onChange(""); setOpen(false); }}
               role="option"
               aria-selected={value === ""}
@@ -72,7 +72,7 @@ export const Select: React.FC<SelectProps> = ({
           {options.map(opt => (
             <div
               key={opt.value}
-              className={`px-4 py-2 cursor-pointer text-base font-medium rounded transition-all duration-200 ${value === opt.value ? "bg-primary/20 text-primary font-semibold" : "hover:bg-primary/10 hover:text-primary focus:bg-primary/10 focus:text-primary text-foreground"}`}
+              className={`px-4 py-2 cursor-pointer text-base font-medium rounded transition-all duration-200 ${value === opt.value ? "bg-primary/20 text-primary font-semibold" : "hover:bg-muted hover:text-primary focus:bg-muted focus:text-primary text-foreground"}`}
               onClick={() => { onChange(opt.value); setOpen(false); }}
               role="option"
               aria-selected={value === opt.value}

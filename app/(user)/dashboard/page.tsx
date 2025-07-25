@@ -62,7 +62,7 @@ function VehicleHistoryTab() {
           {mockHistory.slice(0, 20).map((vehicle) => (
             <div
               key={vehicle.id}
-              className="flex-shrink-0 bg-white/90 border border-border rounded-2xl shadow-lg p-4 flex flex-col items-center min-w-[160px] max-w-[180px] w-full transition-transform transition-shadow duration-300 hover:scale-[1.03] hover:shadow-2xl"
+              className="flex-shrink-0 bg-muted border border-border rounded-2xl shadow-lg p-4 flex flex-col items-center min-w-[160px] max-w-[180px] w-full transition-transform transition-shadow duration-300 hover:scale-[1.03] hover:shadow-2xl"
             >
               <div className="w-24 h-24 flex items-center justify-center bg-gray-100 rounded-md mb-2 border border-muted">
                 <Image
@@ -89,16 +89,17 @@ function VehicleHistoryTab() {
           placeholder="Search vehicle..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="border border-primary/30 rounded-full px-5 py-3 w-full sm:w-64 text-base font-medium shadow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary hover:ring-2 hover:ring-primary/30 hover:bg-primary/5 placeholder:text-muted-foreground"
+          className="border border-border bg-background text-foreground rounded-full px-5 py-3 w-full sm:w-64 text-base font-medium shadow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary hover:ring-2 hover:ring-primary/30 hover:bg-muted placeholder:text-muted-foreground"
         />
         <Select
           value={vehicleFilter}
           onChange={setVehicleFilter}
           options={[{ value: "", label: "All Vehicles" }, ...vehicleOptions]}
           placeholder="All Vehicles"
+          className="bg-background text-foreground border border-border"
         />
       </div>
-      <div className="bg-white/90 rounded-2xl shadow-lg p-4 transition-transform transition-shadow duration-300 hover:scale-[1.01] hover:shadow-2xl">
+      <div className="bg-background border border-border rounded-2xl shadow-lg p-4 transition-transform transition-shadow duration-300 hover:scale-[1.01] hover:shadow-2xl">
         <DataTable columns={columns} data={filtered} />
       </div>
     </div>
