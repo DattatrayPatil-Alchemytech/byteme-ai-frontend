@@ -4,6 +4,7 @@ import { DataTable } from "@/components/ui/DataTable";
 import { ColumnDef } from "@tanstack/react-table";
 import { mockVehicles } from "./mockVehicles";
 import { Button } from "@/components/ui/button";
+import { Bell } from 'lucide-react';
 
 // Mock data for profile, badges, tier, notifications, and vehicles
 const userProfile = {
@@ -26,6 +27,7 @@ export default function UserProfilePage() {
   const [editId, setEditId] = useState<number | null>(null);
   const [editName, setEditName] = useState("");
   const [editError, setEditError] = useState("");
+  const [showNotifications, setShowNotifications] = useState(false);
 
   const handleEdit = (id: number, name: string) => {
     setEditId(id);
@@ -117,6 +119,7 @@ export default function UserProfilePage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-10 mt-10">
+      {/* Header with Bell Icon removed */}
       {/* Profile Card */}
       <section className="flex flex-col items-center bg-white/90 rounded-2xl shadow-lg p-10 mb-2 transition-transform transition-shadow duration-300 hover:scale-[1.015] hover:shadow-2xl">
         <img src={userProfile.avatar} alt="avatar" className="w-28 h-28 rounded-full object-cover border-4 border-primary shadow mb-4" />
@@ -140,17 +143,7 @@ export default function UserProfilePage() {
         </div>
       </section>
 
-      {/* Notifications panel */}
-      <section className="bg-white/90 rounded-2xl shadow-lg p-8 transition-transform transition-shadow duration-300 hover:scale-[1.015] hover:shadow-2xl">
-        <div className="font-bold text-xl text-foreground mb-6 text-left">Notifications</div>
-        <ul className="space-y-2">
-          {userProfile.notifications.map(note => (
-            <li key={note.id} className={note.read ? "text-gray-400" : "font-medium text-foreground"}>
-              {note.message}
-            </li>
-          ))}
-        </ul>
-      </section>
+      {/* Notifications panel removed */}
 
       {/* List of registered vehicles with details */}
       <section className="bg-white/90 rounded-2xl shadow-lg p-8 mb-12 transition-transform duration-300 hover:scale-[1.015] hover:shadow-2xl">
