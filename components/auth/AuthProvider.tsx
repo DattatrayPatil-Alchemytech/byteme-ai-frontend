@@ -65,21 +65,21 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     // Handle protected routes
     if (isProtectedRoute) {
       // Check wallet connection first
-      if (!account) {
-        router.push("/");
-      }
+      // if (!account) {
+      //   router.push("/");
+      // }
 
       // Check authentication status
-      if (!isAuthenticated || !accessToken) {
-        router.push("/");
-        return;
-      }
+      // if (!isAuthenticated || !accessToken) {
+      //   router.push("/");
+      //   return;
+      // }
     }
 
     // Optional: Redirect authenticated users from landing page to dashboard
-    if (isAuthenticated && isPublicRoute && pathname === "/") {
-      router.push("/dashboard");
-    }
+    // if (isAuthenticated && isPublicRoute && pathname === "/") {
+    //   router.push("/dashboard");
+    // }
   }, [isCheckingAuth, isAuthenticated, accessToken, account, pathname, router]);
 
   // Show loading state while checking authentication

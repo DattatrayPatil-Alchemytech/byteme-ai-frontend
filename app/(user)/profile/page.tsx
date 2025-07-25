@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { User, Award, Star } from "lucide-react";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { mockVehicles } from "./mockVehicles";
@@ -8,6 +8,8 @@ import { Bell } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useSelector } from "react-redux";
+import { apiGet } from "@/lib/apiHelpers/apiMiddleware";
+import { getRequest } from "@/lib/api/apiRequests";
 
 // Mock data for profile, badges, tier, notifications, and vehicles
 const userProfile = {
@@ -31,10 +33,20 @@ export default function UserProfilePage() {
   const [editName, setEditName] = useState("");
   const [editError, setEditError] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
+  const [fakeData, setFakeData] = useState<any>(null); // New state for fake API data
   const router = useRouter();
 
   // Get user data from redux
   const user = useSelector((state: any) => state.user.user);
+
+  useEffect(() => {
+    // Fake API call to /posts/1 using getRequest
+    getRequest("/posts/1")
+      .then((response) => setFakeData(response.data || response))
+      .catch((err) => setFakeData({ error: err.message }));
+  }, []);
+
+  console.log(fakeData)
 
   const handleEdit = (id: number, name: string) => {
     setEditId(id);
