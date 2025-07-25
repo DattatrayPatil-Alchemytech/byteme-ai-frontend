@@ -5,7 +5,9 @@ import { mockUsers } from "../mockUsers";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { useState, useMemo } from "react";
 import { Select } from "@/components/ui/DropdownMenu";
-import { Mail, Phone, MapPin, Calendar, BadgeCheck, Wallet, User } from "lucide-react";
+import { Mail, Phone, MapPin, Calendar, BadgeCheck, Wallet, User, ArrowLeft } from "lucide-react";
+import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
+import { useRouter } from 'next/navigation';
 
 // More mock user history data for a richer table and carousel
 const mockUserHistory = [
@@ -121,6 +123,7 @@ export default function UserViewPage({ params }: { params: { id: string } }) {
   // All hooks must be called before any early returns
   const [search, setSearch] = useState("");
   const [vehicleFilter, setVehicleFilter] = useState("");
+  const router = useRouter();
 
   // Vehicle options for dropdown - moved before early return
   const vehicleOptions = useMemo(() => {
@@ -173,89 +176,113 @@ export default function UserViewPage({ params }: { params: { id: string } }) {
   ];
 
   return (
-    <div className="p-6 space-y-8">
-      {/* User Basic Details Card - Top of Page */}
-      <div className="w-full flex flex-col md:flex-row items-center justify-between gap-6 bg-white/90 rounded-xl shadow p-6 border border-muted mb-4 animate-fade-in">
-        <div className="flex items-center gap-4 w-full md:w-auto">
-          <User className="text-primary" size={32} />
-          <span className="text-2xl font-extrabold text-gradient-ev-green tracking-tight">{user.name}</span>
-        </div>
-        <div className="flex flex-wrap gap-x-8 gap-y-2 items-center w-full md:w-auto justify-between">
-          <div className="flex items-center gap-2"><Mail className="text-primary" size={20} /><span className="font-semibold">{user.email}</span></div>
-          <div className="flex items-center gap-2"><Phone className="text-primary" size={20} /><span>{userDetails.phone || '—'}</span></div>
-          <div className="flex items-center gap-2"><MapPin className="text-primary" size={20} /><span>{userDetails.address || '—'}</span></div>
-          <div className="flex items-center gap-2"><Calendar className="text-primary" size={20} /><span>{userDetails.registrationDate || '—'}</span></div>
-          <div className="flex items-center gap-2"><BadgeCheck className="text-primary" size={20} /><span className={userDetails.status === 'Active' ? 'text-green-600 font-bold' : 'text-red-600 font-bold'}>{userDetails.status || '—'}</span></div>
-          <div className="flex items-center gap-2"><Wallet className="text-primary" size={20} /><span className="font-mono text-xs">{userDetails.wallet || '—'}</span></div>
+    <div className="space-y-6 p-6">
+      {/* Header */}
+      <div className="flex items-center space-x-4 mb-2">
+        <button onClick={() => router.push('/admin/users')} className="p-2 rounded hover:bg-muted transition-colors">
+          <ArrowLeft className="w-5 h-5 text-foreground" />
+        </button>
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">User Details</h1>
+          <p className="text-muted-foreground">View and manage user information</p>
         </div>
       </div>
+      {/* User Basic Details Card - Top of Page */}
+      <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-lg animate-fade-in">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-4 text-foreground">
+            <User className="text-primary" size={32} />
+            <span className="text-2xl font-extrabold text-gradient-ev-green tracking-tight">{user.name}</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center gap-2"><Mail className="text-primary" size={20} /><span className="font-semibold">{user.email}</span></div>
+            <div className="flex items-center gap-2"><Phone className="text-primary" size={20} /><span>{userDetails.phone || '—'}</span></div>
+            <div className="flex items-center gap-2"><MapPin className="text-primary" size={20} /><span>{userDetails.address || '—'}</span></div>
+            <div className="flex items-center gap-2"><Calendar className="text-primary" size={20} /><span>{userDetails.registrationDate || '—'}</span></div>
+            <div className="flex items-center gap-2"><BadgeCheck className="text-primary" size={20} /><span className={userDetails.status === 'Active' ? 'text-green-600 font-bold' : 'text-red-600 font-bold'}>{userDetails.status || '—'}</span></div>
+            <div className="flex items-center gap-2"><Wallet className="text-primary" size={20} /><span className="font-mono text-xs">{userDetails.wallet || '—'}</span></div>
+          </div>
+        </CardContent>
+      </Card>
       {/* User Overview Summary Cards with dashboard icons */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8 animate-fade-in">
-        <div className="rounded-xl bg-white/90 shadow flex flex-col items-center p-6 border border-muted hover:shadow-lg transition-all">
-          <div className="text-3xl font-extrabold text-gradient-ev-green animate-pulse">{summary.tokens.toLocaleString()}</div>
-          <div className="text-muted-foreground text-sm">B3TR Tokens</div>
-          <div className="mt-2 p-2 bg-primary/20 rounded-lg text-2xl">⚡</div>
-        </div>
-        <div className="rounded-xl bg-white/90 shadow flex flex-col items-center p-6 border border-muted hover:shadow-lg transition-all">
-          <div className="text-3xl font-extrabold text-gradient-ev-green animate-pulse">{summary.miles.toLocaleString()}</div>
-          <div className="text-muted-foreground text-sm">Sustainable Miles</div>
-          <div className="mt-2 p-2 bg-primary/20 rounded-lg text-2xl">🚗</div>
-        </div>
-        <div className="rounded-xl bg-white/90 shadow flex flex-col items-center p-6 border border-muted hover:shadow-lg transition-all">
-          <div className="text-3xl font-extrabold text-gradient-ev-green animate-pulse">{summary.co2}</div>
-          <div className="text-muted-foreground text-sm">CO₂ Saved (t)</div>
-          <div className="mt-2 p-2 bg-primary/20 rounded-lg text-2xl">🌱</div>
-        </div>
-        <div className="rounded-xl bg-white/90 shadow flex flex-col items-center p-6 border border-muted hover:shadow-lg transition-all">
-          <div className="text-3xl font-extrabold text-gradient-ev-green animate-pulse">#{summary.rank}</div>
-          <div className="text-muted-foreground text-sm">Current Rank</div>
-          <div className="mt-2 p-2 bg-primary/20 rounded-lg text-2xl">🏆</div>
-        </div>
+        {[{
+          value: summary.tokens.toLocaleString(),
+          label: 'B3TR Tokens',
+          icon: '⚡',
+        }, {
+          value: summary.miles.toLocaleString(),
+          label: 'Sustainable Miles',
+          icon: '🚗',
+        }, {
+          value: summary.co2,
+          label: 'CO₂ Saved (t)',
+          icon: '🌱',
+        }, {
+          value: `#${summary.rank}`,
+          label: 'Current Rank',
+          icon: '🏆',
+        }].map((item, idx) => (
+          <Card key={item.label} className="bg-card/80 backdrop-blur-sm border-0 shadow-lg flex flex-col items-center p-6 hover:shadow-xl transition-all">
+            <CardContent className="flex flex-col items-center p-0">
+              <div className="text-3xl font-extrabold text-gradient-ev-green animate-pulse">{item.value}</div>
+              <div className="text-muted-foreground text-sm">{item.label}</div>
+              <div className="mt-2 p-2 bg-primary/20 rounded-lg text-2xl">{item.icon}</div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
-      <div className="w-full mb-6 overflow-x-auto overflow-y-hidden custom-scrollbar">
-        <div className="flex gap-4 min-w-[600px] sm:min-w-0">
-          {mockUserHistory.slice(0, 20).map((vehicle) => (
-            <div
-              key={vehicle.id}
-              className="flex-shrink-0 bg-white/90 border border-border rounded-2xl shadow-lg p-4 flex flex-col items-center min-w-[160px] max-w-[180px] w-full transition-transform transition-shadow duration-300 hover:scale-[1.03] hover:shadow-2xl"
-            >
-              <div className="w-24 h-24 flex items-center justify-center bg-gray-100 rounded-md mb-2 border border-muted">
-                <Image
-                  src={vehicle.image}
-                  alt={vehicle.vehicle}
-                  width={96}
-                  height={96}
-                  className="w-full h-full rounded-md"
-                />
-              </div>
-              <div className="font-semibold text-center text-base truncate w-full text-foreground">
-                {vehicle.vehicle}
-              </div>
-              <div className="text-xs text-muted-foreground mt-1 text-center capitalize">
-                {vehicle.type} EV
-              </div>
+      <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-lg">
+        <CardHeader>
+          <CardTitle className="text-foreground text-lg">Vehicles</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="w-full mb-6 overflow-x-auto overflow-y-hidden custom-scrollbar">
+            <div className="flex gap-4 min-w-[600px] sm:min-w-0">
+              {mockUserHistory.slice(0, 20).map((vehicle) => (
+                <Card key={vehicle.id} className="flex-shrink-0 bg-card/80 border-0 shadow p-4 flex flex-col items-center min-w-[160px] max-w-[180px] w-full transition-transform transition-shadow duration-300 hover:scale-[1.03] hover:shadow-2xl">
+                  <div className="w-24 h-24 flex items-center justify-center bg-gray-100 dark:bg-muted rounded-md mb-2 border border-muted">
+                    <Image
+                      src={vehicle.image}
+                      alt={vehicle.vehicle}
+                      width={96}
+                      height={96}
+                      className="w-full h-full rounded-md"
+                    />
+                  </div>
+                  <div className="font-semibold text-center text-base truncate w-full text-foreground">
+                    {vehicle.vehicle}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1 text-center capitalize">
+                    {vehicle.type} EV
+                  </div>
+                </Card>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-        <input
-          type="text"
-          placeholder="Search vehicle..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="border border-primary/30 rounded-full px-5 py-3 w-full sm:w-64 text-base font-medium shadow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary hover:ring-2 hover:ring-primary/30 hover:bg-primary/5 placeholder:text-muted-foreground"
-        />
-        <Select
-          value={vehicleFilter}
-          onChange={setVehicleFilter}
-          options={[...vehicleOptions]}
-          placeholder="All Vehicles"
-        />
-      </div>
-      <div className="bg-white/90 rounded-2xl shadow-lg p-4 transition-transform duration-300 hover:scale-[1.01] hover:shadow-2xl">
-        <DataTable columns={columns} data={filtered as Record<string, unknown>[]} />
-      </div>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+            <input
+              type="text"
+              placeholder="Search vehicle..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="border border-border bg-background text-foreground rounded-full px-5 py-3 w-full sm:w-64 text-base font-medium shadow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary hover:ring-2 hover:ring-primary/30 hover:bg-muted/60 placeholder:text-muted-foreground"
+            />
+            <Select
+              value={vehicleFilter}
+              onChange={setVehicleFilter}
+              options={[...vehicleOptions]}
+              placeholder="All Vehicles"
+              className="bg-background text-foreground border border-border hover:bg-muted/60"
+            />
+          </div>
+          <div className="bg-card/80 rounded-2xl shadow-lg p-4 transition-transform duration-300 hover:scale-[1.01] hover:shadow-2xl">
+            <DataTable columns={columns} data={filtered as Record<string, unknown>[]} />
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
