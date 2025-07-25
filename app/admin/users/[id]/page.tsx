@@ -176,7 +176,7 @@ export default function UserViewPage({ params }: { params: { id: string } }) {
   ];
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center space-x-4 mb-2">
         <button onClick={() => router.push('/admin/users')} className="p-2 rounded hover:bg-muted transition-colors">
