@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useScrollAnimation, useScrollAnimationWithDelay } from '@/lib/scroll-animation';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 export default function HeroSection() {
   const { ref: titleRef, isVisible: titleVisible } = useScrollAnimation();
@@ -73,7 +74,7 @@ export default function HeroSection() {
             size="xl"
             className="hover-lift hover-scale border-2 border-primary/20 hover:border-primary/40 px-8 py-4 text-lg"
           >
-            Learn More
+           <Link href='#features'> Learn More</Link>
           </Button>
         </motion.div>
 
