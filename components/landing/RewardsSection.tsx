@@ -117,15 +117,6 @@ export default function RewardsSection() {
                 
                 <CardContent className="relative z-10">
                 
-                  
-                  {/* CTA Button */}
-                  <motion.button
-                    className="w-full mt-6 py-3 px-6 btn-gradient-hover text-white font-semibold rounded-lg hover:shadow-lg"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    Choose {tier.name}
-                  </motion.button>
                 </CardContent>
                 
                 {/* Floating Particles Effect */}

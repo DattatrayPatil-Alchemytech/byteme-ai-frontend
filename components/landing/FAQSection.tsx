@@ -206,6 +206,7 @@ export default function FAQSection() {
                     variant="outline" 
                     size="lg"
                     className="hover-lift hover-scale"
+                    onClick={() => window.location.href = '/documentation'}
                   >
                     Read Documentation
                   </Button>

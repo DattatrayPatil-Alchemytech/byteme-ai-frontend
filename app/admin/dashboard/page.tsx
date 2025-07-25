@@ -1,18 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 
 // Dynamically import ApexCharts to avoid SSR issues
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 export default function AdminDashboardPage() {
-  const router = useRouter();
-  const [activeTab, setActiveTab] = useState('overview');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [adminUsername, setAdminUsername] = useState('');
 
   // Comprehensive Global Stats
@@ -326,18 +321,18 @@ export default function AdminDashboardPage() {
     }
   ]);
 
-  // Chart configurations
+  // Chart configurations with proper TypeScript types
   const userGrowthChart = {
     options: {
       chart: {
-        type: 'area',
+        type: 'area' as const,
         toolbar: { show: false },
         background: 'transparent'
       },
       colors: ['#10B981', '#34D399'],
       dataLabels: { enabled: false },
       stroke: {
-        curve: 'smooth',
+        curve: 'smooth' as const,
         width: 3
       },
       fill: {
@@ -382,7 +377,7 @@ export default function AdminDashboardPage() {
   const milesChart = {
     options: {
       chart: {
-        type: 'bar',
+        type: 'bar' as const,
         toolbar: { show: false },
         background: 'transparent'
       },
@@ -426,7 +421,7 @@ export default function AdminDashboardPage() {
   const tokensDistributionChart = {
     options: {
       chart: {
-        type: 'donut',
+        type: 'donut' as const,
         background: 'transparent'
       },
       colors: ['#10B981', '#34D399', '#6EE7B7', '#A7F3D0', '#D1FAE5'],
@@ -463,13 +458,13 @@ export default function AdminDashboardPage() {
   const weeklyActivityChart = {
     options: {
       chart: {
-        type: 'line',
+        type: 'line' as const,
         toolbar: { show: false },
         background: 'transparent'
       },
       colors: ['#F59E0B', '#10B981'],
       stroke: {
-        curve: 'smooth',
+        curve: 'smooth' as const,
         width: 3
       },
       markers: {
@@ -506,48 +501,12 @@ export default function AdminDashboardPage() {
   };
 
   useEffect(() => {
-    // Check if admin is logged in
-    const isAdminLoggedIn = localStorage.getItem('adminLoggedIn');
+    // Get admin username from localStorage
     const username = localStorage.getItem('adminUsername');
-    
-    if (isAdminLoggedIn !== 'true') {
-      router.push('/admin/login');
-      return;
-    }
-    
     if (username) {
       setAdminUsername(username);
     }
-  }, [router]);
-
-  const handleLogout = () => {
-    // Clear all admin-related data
-    localStorage.removeItem('adminLoggedIn');
-    localStorage.removeItem('adminUsername');
-    localStorage.removeItem('adminWalletAddress');
-    localStorage.removeItem('adminSession');
-    
-    // Clear any other potential admin data
-    const keysToRemove = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('admin')) {
-        keysToRemove.push(key);
-      }
-    }
-    keysToRemove.forEach(key => localStorage.removeItem(key));
-    
-    router.push('/admin/login');
-  };
-
-  const sidebarItems = [
-    { id: 'overview', label: 'Overview', icon: '📊' },
-    { id: 'users', label: 'Users', icon: '👥' },
-    { id: 'rewards', label: 'Rewards', icon: '🏆' },
-    { id: 'submissions', label: 'Submissions', icon: '📝' },
-    { id: 'analytics', label: 'Analytics', icon: '📈' },
-    { id: 'settings', label: 'Settings', icon: '⚙️' }
-  ];
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -559,422 +518,307 @@ export default function AdminDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex">
-      {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white/90 backdrop-blur-xl border-r border-gray-200 shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
-        isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
-        <div className="flex flex-col h-full">
-          {/* Header */}
-          <div className="p-6 border-b border-gray-200">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-              ByteMe AI
-            </h1>
-            <p className="text-sm text-gray-600">Admin Panel</p>
-          </div>
-
-          {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-2">
-            {sidebarItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-                  activeTab === item.id
-                    ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg transform scale-105'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                }`}
-              >
-                <span className="text-lg">{item.icon}</span>
-                <span className="font-medium">{item.label}</span>
-              </button>
-            ))}
-          </nav>
-
-          {/* Footer */}
-          <div className="p-4 border-t border-gray-200">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
-                <span className="text-white text-sm font-bold">A</span>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-900">{adminUsername}</p>
-                <p className="text-xs text-gray-500">Administrator</p>
-              </div>
-            </div>
-            <Button
-              onClick={handleLogout}
-              variant="outline"
-              className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 transition-colors"
-            >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-              Logout
-            </Button>
-          </div>
-        </div>
+    <div className="space-y-8">
+      {/* Welcome */}
+      <div>
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">
+          Welcome back, {adminUsername}! 👋
+        </h1>
+        <p className="text-gray-600 text-lg">
+          Here&apos;s your comprehensive overview of ByteMe AI platform performance.
+        </p>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col lg:ml-0">
-        {/* Top Bar */}
-        <header className="bg-white/90 backdrop-blur-xl border-b border-gray-200 p-4 lg:hidden shadow-sm">
-          <div className="flex items-center justify-between">
-            <button
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-              Admin Dashboard
-            </h1>
-            <button
-              onClick={handleLogout}
-              className="p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-              title="Logout"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-            </button>
-          </div>
-        </header>
-
-        {/* Content */}
-        <main className="flex-1 p-6">
-          {activeTab === 'overview' && (
-            <div className="space-y-8">
-              {/* Welcome */}
+      {/* Global Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                  Welcome back, {adminUsername}! 👋
-                </h1>
-                <p className="text-gray-600 text-lg">
-                  Here's your comprehensive overview of ByteMe AI platform performance.
+                <p className="text-sm font-medium text-gray-600">Total Users</p>
+                <p className="text-3xl font-bold text-green-600">
+                  {globalStats.totalUsers.toLocaleString()}
                 </p>
+                <p className="text-xs text-green-500">+{globalStats.monthlyGrowth}% this month</p>
               </div>
+              <div className="p-4 bg-green-100 rounded-xl">
+                <span className="text-3xl">👥</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-              {/* Global Stats Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
+        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Miles</p>
+                <p className="text-3xl font-bold text-blue-600">
+                  {globalStats.totalMiles.toLocaleString()}
+                </p>
+                <p className="text-xs text-blue-500">Sustainable driving</p>
+              </div>
+              <div className="p-4 bg-blue-100 rounded-xl">
+                <span className="text-3xl">🚗</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Tokens</p>
+                <p className="text-3xl font-bold text-purple-600">
+                  {globalStats.totalTokens.toLocaleString()}
+                </p>
+                <p className="text-xs text-purple-500">B3TR distributed</p>
+              </div>
+              <div className="p-4 bg-purple-100 rounded-xl">
+                <span className="text-3xl">⚡</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Carbon Offset</p>
+                <p className="text-3xl font-bold text-emerald-600">
+                  {globalStats.carbonOffset.toLocaleString()}
+                </p>
+                <p className="text-xs text-emerald-500">kg CO2 saved</p>
+              </div>
+              <div className="p-4 bg-emerald-100 rounded-xl">
+                <span className="text-3xl">🌱</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Additional Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+          <CardContent className="p-6">
+            <div className="text-center">
+              <p className="text-sm font-medium text-gray-600">Active Users</p>
+              <p className="text-2xl font-bold text-green-600">{globalStats.activeUsers}</p>
+              <p className="text-xs text-gray-500">Daily: {globalStats.dailyActiveUsers}</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+          <CardContent className="p-6">
+            <div className="text-center">
+              <p className="text-sm font-medium text-gray-600">Pending Submissions</p>
+              <p className="text-2xl font-bold text-yellow-600">{globalStats.pendingSubmissions}</p>
+              <p className="text-xs text-gray-500">Awaiting review</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+          <CardContent className="p-6">
+            <div className="text-center">
+              <p className="text-sm font-medium text-gray-600">Retention Rate</p>
+              <p className="text-2xl font-bold text-blue-600">{globalStats.userRetentionRate}%</p>
+              <p className="text-xs text-gray-500">Monthly average</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+          <CardContent className="p-6">
+            <div className="text-center">
+              <p className="text-sm font-medium text-gray-600">Platform Revenue</p>
+              <p className="text-2xl font-bold text-purple-600">${globalStats.platformRevenue.toLocaleString()}</p>
+              <p className="text-xs text-gray-500">Total earnings</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* User Growth Chart */}
+        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-gray-900">User Growth Trend</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Chart
+              options={userGrowthChart.options}
+              series={userGrowthChart.series}
+              type="area"
+              height={300}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Miles Chart */}
+        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-gray-900">Monthly Miles Driven</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Chart
+              options={milesChart.options}
+              series={milesChart.series}
+              type="bar"
+              height={300}
+            />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Additional Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Tokens Distribution */}
+        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-gray-900">Token Distribution by User Type</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Chart
+              options={tokensDistributionChart.options}
+              series={tokensDistributionChart.series}
+              type="donut"
+              height={300}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Weekly Activity */}
+        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-gray-900">Weekly Activity</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Chart
+              options={weeklyActivityChart.options}
+              series={weeklyActivityChart.series}
+              type="line"
+              height={300}
+            />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Top 10 Users */}
+      <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+        <CardHeader>
+          <CardTitle className="text-gray-900">Top 10 Users</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left py-3 px-4 font-medium text-gray-600">Rank</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-600">User</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-600">Vehicle</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-600">Miles</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-600">Tokens</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-600">Carbon Offset</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-600">Badges</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-600">Last Active</th>
+                </tr>
+              </thead>
+              <tbody>
+                {topUsers.map((user) => (
+                  <tr key={user.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    <td className="py-3 px-4">
+                      <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">#{user.rank}</span>
+                      </div>
+                    </td>
+                    <td className="py-3 px-4">
                       <div>
-                        <p className="text-sm font-medium text-gray-600">Total Users</p>
-                        <p className="text-3xl font-bold text-green-600">
-                          {globalStats.totalUsers.toLocaleString()}
-                        </p>
-                        <p className="text-xs text-green-500">+{globalStats.monthlyGrowth}% this month</p>
+                        <p className="font-medium text-gray-900">{user.name}</p>
+                        <p className="text-sm text-gray-500">{user.email}</p>
                       </div>
-                      <div className="p-4 bg-green-100 rounded-xl">
-                        <span className="text-3xl">👥</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600">Total Miles</p>
-                        <p className="text-3xl font-bold text-blue-600">
-                          {globalStats.totalMiles.toLocaleString()}
-                        </p>
-                        <p className="text-xs text-blue-500">Sustainable driving</p>
-                      </div>
-                      <div className="p-4 bg-blue-100 rounded-xl">
-                        <span className="text-3xl">🚗</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600">Total Tokens</p>
-                        <p className="text-3xl font-bold text-purple-600">
-                          {globalStats.totalTokens.toLocaleString()}
-                        </p>
-                        <p className="text-xs text-purple-500">B3TR distributed</p>
-                      </div>
-                      <div className="p-4 bg-purple-100 rounded-xl">
-                        <span className="text-3xl">⚡</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600">Carbon Offset</p>
-                        <p className="text-3xl font-bold text-emerald-600">
-                          {globalStats.carbonOffset.toLocaleString()}
-                        </p>
-                        <p className="text-xs text-emerald-500">kg CO2 saved</p>
-                      </div>
-                      <div className="p-4 bg-emerald-100 rounded-xl">
-                        <span className="text-3xl">🌱</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Additional Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-                  <CardContent className="p-6">
-                    <div className="text-center">
-                      <p className="text-sm font-medium text-gray-600">Active Users</p>
-                      <p className="text-2xl font-bold text-green-600">{globalStats.activeUsers}</p>
-                      <p className="text-xs text-gray-500">Daily: {globalStats.dailyActiveUsers}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-                  <CardContent className="p-6">
-                    <div className="text-center">
-                      <p className="text-sm font-medium text-gray-600">Pending Submissions</p>
-                      <p className="text-2xl font-bold text-yellow-600">{globalStats.pendingSubmissions}</p>
-                      <p className="text-xs text-gray-500">Awaiting review</p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-                  <CardContent className="p-6">
-                    <div className="text-center">
-                      <p className="text-sm font-medium text-gray-600">Retention Rate</p>
-                      <p className="text-2xl font-bold text-blue-600">{globalStats.userRetentionRate}%</p>
-                      <p className="text-xs text-gray-500">Monthly average</p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-                  <CardContent className="p-6">
-                    <div className="text-center">
-                      <p className="text-sm font-medium text-gray-600">Platform Revenue</p>
-                      <p className="text-2xl font-bold text-purple-600">${globalStats.platformRevenue.toLocaleString()}</p>
-                      <p className="text-xs text-gray-500">Total earnings</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Charts Section */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* User Growth Chart */}
-                <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-                  <CardHeader>
-                    <CardTitle className="text-gray-900">User Growth Trend</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <Chart
-                      options={userGrowthChart.options}
-                      series={userGrowthChart.series}
-                      type="area"
-                      height={300}
-                    />
-                  </CardContent>
-                </Card>
-
-                {/* Miles Chart */}
-                <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-                  <CardHeader>
-                    <CardTitle className="text-gray-900">Monthly Miles Driven</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <Chart
-                      options={milesChart.options}
-                      series={milesChart.series}
-                      type="bar"
-                      height={300}
-                    />
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Additional Charts */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Tokens Distribution */}
-                <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-                  <CardHeader>
-                    <CardTitle className="text-gray-900">Token Distribution by User Type</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <Chart
-                      options={tokensDistributionChart.options}
-                      series={tokensDistributionChart.series}
-                      type="donut"
-                      height={300}
-                    />
-                  </CardContent>
-                </Card>
-
-                {/* Weekly Activity */}
-                <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-                  <CardHeader>
-                    <CardTitle className="text-gray-900">Weekly Activity</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <Chart
-                      options={weeklyActivityChart.options}
-                      series={weeklyActivityChart.series}
-                      type="line"
-                      height={300}
-                    />
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Top 10 Users */}
-              <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-gray-900">Top 10 Users</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b border-gray-200">
-                          <th className="text-left py-3 px-4 font-medium text-gray-600">Rank</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-600">User</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-600">Vehicle</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-600">Miles</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-600">Tokens</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-600">Carbon Offset</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-600">Badges</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-600">Last Active</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {topUsers.map((user) => (
-                          <tr key={user.id} className="border-b border-gray-100 hover:bg-gray-50">
-                            <td className="py-3 px-4">
-                              <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
-                                <span className="text-white text-xs font-bold">#{user.rank}</span>
-                              </div>
-                            </td>
-                            <td className="py-3 px-4">
-                              <div>
-                                <p className="font-medium text-gray-900">{user.name}</p>
-                                <p className="text-sm text-gray-500">{user.email}</p>
-                              </div>
-                            </td>
-                            <td className="py-3 px-4 text-gray-700">{user.vehicleModel}</td>
-                            <td className="py-3 px-4">
-                              <span className="font-semibold text-blue-600">{user.totalMiles.toLocaleString()}</span>
-                            </td>
-                            <td className="py-3 px-4">
-                              <span className="font-semibold text-purple-600">{user.totalTokens}</span>
-                            </td>
-                            <td className="py-3 px-4">
-                              <span className="font-semibold text-emerald-600">{user.carbonOffset} kg</span>
-                            </td>
-                            <td className="py-3 px-4">
-                              <div className="flex flex-wrap gap-1">
-                                {user.badges.map((badge, index) => (
-                                  <span key={index} className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
-                                    {badge}
-                                  </span>
-                                ))}
-                              </div>
-                            </td>
-                            <td className="py-3 px-4 text-sm text-gray-500">{user.lastActive}</td>
-                          </tr>
+                    </td>
+                    <td className="py-3 px-4 text-gray-700">{user.vehicleModel}</td>
+                    <td className="py-3 px-4">
+                      <span className="font-semibold text-blue-600">{user.totalMiles.toLocaleString()}</span>
+                    </td>
+                    <td className="py-3 px-4">
+                      <span className="font-semibold text-purple-600">{user.totalTokens}</span>
+                    </td>
+                    <td className="py-3 px-4">
+                      <span className="font-semibold text-emerald-600">{user.carbonOffset} kg</span>
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="flex flex-wrap gap-1">
+                        {user.badges.map((badge, index) => (
+                          <span key={index} className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                            {badge}
+                          </span>
                         ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Last Claims */}
-              <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-gray-900">Recent Claims & Submissions</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {lastClaims.map((claim) => (
-                      <div key={claim.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        <div className="flex items-center space-x-4">
-                          <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
-                            <span className="text-white text-sm font-bold">
-                              {claim.user.charAt(0)}
-                            </span>
-                          </div>
-                          <div>
-                            <p className="font-medium text-gray-900">{claim.user}</p>
-                            <p className="text-sm text-gray-600">{claim.claimType}</p>
-                            <p className="text-xs text-gray-500">ID: {claim.submissionId}</p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="flex items-center space-x-2 mb-1">
-                            {claim.miles && (
-                              <span className="text-sm font-semibold text-blue-600">+{claim.miles} miles</span>
-                            )}
-                            {claim.tokens && (
-                              <span className="text-sm font-semibold text-purple-600">+{claim.tokens} B3TR</span>
-                            )}
-                            {claim.badge && (
-                              <span className="text-sm font-semibold text-yellow-600">🏆 {claim.badge}</span>
-                            )}
-                            {claim.bonus && (
-                              <span className="text-sm font-semibold text-green-600">🎁 {claim.bonus}</span>
-                            )}
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(claim.status)}`}>
-                              {claim.status}
-                            </span>
-                            <span className="text-xs text-gray-500">{claim.time}</span>
-                          </div>
-                        </div>
                       </div>
-                    ))}
+                    </td>
+                    <td className="py-3 px-4 text-sm text-gray-500">{user.lastActive}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Last Claims */}
+      <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+        <CardHeader>
+          <CardTitle className="text-gray-900">Recent Claims & Submissions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {lastClaims.map((claim) => (
+              <div key={claim.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <div className="flex items-center space-x-4">
+                  <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm font-bold">
+                      {claim.user.charAt(0)}
+                    </span>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
-          {/* Other tabs placeholder */}
-          {activeTab !== 'overview' && (
-            <div className="flex items-center justify-center h-64">
-              <div className="text-center">
-                <div className="text-6xl mb-4">🚧</div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                  {sidebarItems.find(item => item.id === activeTab)?.label} Module
-                </h2>
-                <p className="text-gray-600">
-                  This module is under development and will be implemented soon.
-                </p>
+                  <div>
+                    <p className="font-medium text-gray-900">{claim.user}</p>
+                    <p className="text-sm text-gray-600">{claim.claimType}</p>
+                    <p className="text-xs text-gray-500">ID: {claim.submissionId}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="flex items-center space-x-2 mb-1">
+                    {claim.miles && (
+                      <span className="text-sm font-semibold text-blue-600">+{claim.miles} miles</span>
+                    )}
+                    {claim.tokens && (
+                      <span className="text-sm font-semibold text-purple-600">+{claim.tokens} B3TR</span>
+                    )}
+                    {claim.badge && (
+                      <span className="text-sm font-semibold text-yellow-600">🏆 {claim.badge}</span>
+                    )}
+                    {claim.bonus && (
+                      <span className="text-sm font-semibold text-green-600">🎁 {claim.bonus}</span>
+                    )}
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(claim.status)}`}>
+                      {claim.status}
+                    </span>
+                    <span className="text-xs text-gray-500">{claim.time}</span>
+                  </div>
+                </div>
               </div>
-            </div>
-          )}
-        </main>
-      </div>
-
-      {/* Mobile Overlay */}
-      {isSidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-          onClick={() => setIsSidebarOpen(false)}
-        />
-      )}
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 } 
