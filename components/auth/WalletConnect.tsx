@@ -15,6 +15,7 @@ export function WalletConnect() {
   // 4. When connectionCertificate arrives, POST it back to your backend
   useEffect(() => {
     if (connectionCertificate) {
+      alert(JSON.stringify(connectionCertificate));
     }
   }, [connectionCertificate]);
 
