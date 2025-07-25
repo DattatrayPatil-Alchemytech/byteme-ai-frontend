@@ -1,30 +1,45 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Bell } from 'lucide-react';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
+import React, { useState, useEffect, useRef } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Bell } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { useWallet } from "@vechain/dapp-kit-react";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "@/redux/userSlice";
+import { logoutUser } from "@/lib/apiHelpers/user";
+import { RootState } from "@/redux/store";
+import toast from "react-hot-toast";
 
 // Mock notifications (replace with real data or context as needed)
 const notifications = [
-  { id: 1, message: 'Your vehicle registration is approved!', read: false },
-  { id: 2, message: 'New badge earned: Eco Warrior!', read: true },
+  { id: 1, message: "Your vehicle registration is approved!", read: false },
+  { id: 2, message: "New badge earned: Eco Warrior!", read: true },
 ];
 
 export default function Header() {
   const router = useRouter();
-  const [userName, setUserName] = useState('');
+  const dispatch = useDispatch();
+  const { disconnect } = useWallet();
+  const { user } = useSelector((state: RootState) => state.user);
+  const [userName, setUserName] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const bellRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const storedUserName = localStorage.getItem('userName');
-    
-    if (storedUserName) {
-      setUserName(storedUserName);
+    // Use Redux user data instead of localStorage
+    if (user?.name) {
+      setUserName(user.name);
+    } else {
+      // Fallback to localStorage for backward compatibility
+      const storedUserName = localStorage.getItem("userName");
+      if (storedUserName) {
+        setUserName(storedUserName);
+      }
     }
-  }, []);
+  }, [user]);
 
   // Close popover on outside click
   useEffect(() => {
@@ -34,19 +49,49 @@ export default function Header() {
       }
     }
     if (showNotifications) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     } else {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showNotifications]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('userLoggedIn');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('userName');
-    localStorage.removeItem('userWalletAddress');
-    router.push('/auth/login');
+  const handleLogout = async () => {
+    if (isLoggingOut) return; // Prevent multiple logout attempts
+
+    setIsLoggingOut(true);
+
+    try {
+      // Call logout API to invalidate token on server
+      await logoutUser();
+    } catch (error) {
+      console.error("Logout API error:", error);
+      // Continue with local logout even if API fails
+    }
+
+    // Always perform local logout regardless of API success/failure
+    try {
+      // Navigate to home page first
+      router.push("/");
+
+      // Clear Redux state first (this makes user unauthenticated)
+      dispatch(logout());
+      toast.success("Logged out successfully");
+      setTimeout(() => {
+        disconnect();
+      }, 50);
+    } catch (error) {
+      console.error("Local logout error:", error);
+      // Clear Redux state and redirect even if other cleanup fails
+      dispatch(logout());
+      router.push("/");
+      // Still disconnect wallet in error case after delay
+      setTimeout(() => {
+        disconnect();
+      }, 50);
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   return (
@@ -61,16 +106,16 @@ export default function Header() {
               ByteMe AI
             </Link>
           </div>
-          
+
           <div className="flex items-center space-x-4 relative">
             {userName && (
               <span className="text-sm text-muted-foreground hidden md:block">
                 Welcome, {userName}
               </span>
             )}
-            
+
             <ThemeToggle />
-            
+
             <Link
               href="/uploads"
               className="text-muted-foreground hover:text-foreground transition-colors"
@@ -90,28 +135,37 @@ export default function Header() {
                 />
               </svg>
             </Link>
-            
+
             {/* Notification Bell */}
             <button
               ref={bellRef}
               className="relative p-2 rounded-full hover:bg-primary/10 transition"
-              onClick={() => setShowNotifications(v => !v)}
+              onClick={() => setShowNotifications((v) => !v)}
               aria-label="Show notifications"
             >
               <Bell className="w-6 h-6 text-primary" />
-              {notifications.some(n => !n.read) && (
+              {notifications.some((n) => !n.read) && (
                 <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-ping" />
               )}
             </button>
             {showNotifications && (
               <div className="absolute right-0 top-12 w-80 bg-white rounded-xl shadow-xl border border-muted z-50 p-4 animate-fade-in">
-                <div className="font-bold text-lg mb-2 text-foreground">Notifications</div>
+                <div className="font-bold text-lg mb-2 text-foreground">
+                  Notifications
+                </div>
                 <ul className="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
                   {notifications.length === 0 ? (
                     <li className="text-muted-foreground">No notifications</li>
                   ) : (
-                    notifications.map(note => (
-                      <li key={note.id} className={note.read ? "text-gray-400" : "font-medium text-foreground"}>
+                    notifications.map((note) => (
+                      <li
+                        key={note.id}
+                        className={
+                          note.read
+                            ? "text-gray-400"
+                            : "font-medium text-foreground"
+                        }
+                      >
                         {note.message}
                       </li>
                     ))
@@ -139,29 +193,34 @@ export default function Header() {
                 />
               </svg>
             </Link>
-            
+
             <button
               onClick={handleLogout}
-              className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-              title="Logout"
+              disabled={isLoggingOut}
+              className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              title={isLoggingOut ? "Logging out..." : "Logout"}
             >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                />
-              </svg>
+              {isLoggingOut ? (
+                <div className="w-6 h-6 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
+              ) : (
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                  />
+                </svg>
+              )}
             </button>
           </div>
         </div>
       </div>
     </header>
   );
-} 
+}

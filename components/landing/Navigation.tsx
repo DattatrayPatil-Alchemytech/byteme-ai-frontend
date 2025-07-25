@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import WalletConnect from "../auth/WalletConnect";
 
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -97,14 +98,7 @@ export default function Navigation() {
           >
             <ThemeToggle />
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Link href="/login">
-                <Button
-                  size="lg"
-                  className="gradient-ev-green hover-glow text-white font-semibold px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
-                >
-                  Get Started
-                </Button>
-              </Link>
+              <WalletConnect />
             </motion.div>
           </motion.div>
 
