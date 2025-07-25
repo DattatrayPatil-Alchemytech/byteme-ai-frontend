@@ -1,24 +1,15 @@
 'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
 import { DataTable, Column, Action } from '@/components/ui/DataTable';
 import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
 import { Eye, CheckCircle, XCircle } from 'lucide-react';
-import Link from 'next/link';
 import { mockOrders, Order } from './mockOrders';
 import { Toaster, toast } from 'react-hot-toast';
 
 export default function OrdersPage() {
-  const router = useRouter();
   const [orders, setOrders] = React.useState<Order[]>(mockOrders);
-  const [notification, setNotification] = React.useState<string>("");
 
-  // Action handlers
-  const handleView = (order: Record<string, unknown>) => {
-    router.push(`/admin/orders/${order.id}`);
-  };
   const handleApprove = (order: Record<string, unknown>) => {
     if (order.status === 'pending') {
       setOrders((prev) =>
@@ -40,6 +31,7 @@ export default function OrdersPage() {
             : o
         )
       );
+      toast.dismiss(); // Dismiss any existing toasts
       toast.success(`Order #${order.id} approved!`);
     }
   };
@@ -64,26 +56,18 @@ export default function OrdersPage() {
             : o
         )
       );
+      toast.dismiss(); // Dismiss any existing toasts
       toast.error(`Order #${order.id} rejected!`);
     }
   };
 
   // Define columns for the DataTable
   const columns: Column[] = [
-    {
-      key: 'id',
-      label: 'Order ID',
-      render: (value) => (
-        <Link href={`/admin/orders/${value}`} className="text-blue-600 hover:underline">
-          {value as string}
-        </Link>
-      ),
-    },
     { key: 'userName', label: 'User' },
     { key: 'productName', label: 'Product' },
     { key: 'quantity', label: 'Qty' },
-    { key: 'price', label: 'Price (B3TR)', render: (value) => `₿${value}` },
-    { key: 'total', label: 'Total (B3TR)', render: (value) => `₿${value}` },
+    { key: 'price', label: 'Price (B3TR)', render: (value) => `${value}` },
+    { key: 'total', label: 'Total (B3TR)', render: (value) => `${value}` },
     {
       key: 'status',
       label: 'Status',
@@ -106,16 +90,43 @@ export default function OrdersPage() {
         </span>
       ),
     },
+    {
+      key: 'actions',
+      label: 'Actions',
+      render: (_value, row) => {
+        if (row.status === 'pending') {
+          return (
+            <div className="flex items-center space-x-1 sm:space-x-2">
+              <button
+                className="h-6 w-6 sm:h-8 sm:w-8 p-0 bg-green-600 hover:bg-green-700 text-white rounded flex items-center justify-center"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleApprove(row);
+                }}
+                title="Approve"
+              >
+                <CheckCircle className="h-4 w-4" />
+              </button>
+              <button
+                className="h-6 w-6 sm:h-8 sm:w-8 p-0 bg-red-600 hover:bg-red-700 text-white rounded flex items-center justify-center"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleReject(row);
+                }}
+                title="Reject"
+              >
+                <XCircle className="h-4 w-4" />
+              </button>
+            </div>
+          );
+        }
+        return <span className="text-muted-foreground">-</span>;
+      },
+    },
   ];
 
   // Define actions for the DataTable
   const actions: Action[] = [
-    {
-      label: 'View',
-      icon: <Eye className="h-4 w-4" />,
-      onClick: handleView,
-      variant: 'ghost',
-    },
     {
       label: 'Approve',
       icon: <CheckCircle className="h-4 w-4" />,
@@ -143,11 +154,9 @@ export default function OrdersPage() {
           <p className="text-muted-foreground">Manage your order history and approve B3TR token purchases for eco-products.</p>
         </div>
       </div>
-      <Card className="p-6 bg-white/90 backdrop-blur-md shadow-xl overflow-x-auto">
         <DataTable
           data={orders as unknown as Record<string, unknown>[]}
           columns={columns}
-          actions={actions}
           title="Order List"
           searchable={true}
           searchPlaceholder="Search orders by user, product, or status..."
@@ -162,7 +171,6 @@ export default function OrdersPage() {
           style: { background: 'var(--card)', color: 'var(--foreground)' },
           className: 'shadow-lg rounded-lg',
         }} />
-      </Card>
     </div>
   );
 } 
