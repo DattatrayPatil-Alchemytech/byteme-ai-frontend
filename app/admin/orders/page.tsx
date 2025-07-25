@@ -1,253 +1,168 @@
-"use client";
-import { useState } from "react";
-import { mockOrders, Order, OrderStatus } from "./mockOrders";
-import { DataTable } from "@/components/ui/DataTable";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+'use client';
 
-const statusOptions: OrderStatus[] = [
-  "pending",
-  "approved",
-  "rejected",
-  "delivered",
-];
-
-const columns = [
-  {
-    accessorKey: "id",
-    header: "Order ID",
-    cell: ({ getValue }: { getValue: () => string }) => (
-      <Link
-        href={`/admin/orders/${getValue()}`}
-        className="text-blue-600 hover:underline"
-      >
-        {getValue()}
-      </Link>
-    ),
-  },
-  { accessorKey: "userName", header: "User" },
-  { accessorKey: "productName", header: "Product" },
-  { accessorKey: "quantity", header: "Qty" },
-  { accessorKey: "price", header: "Price (B3TR)" },
-  { accessorKey: "total", header: "Total (B3TR)" },
-  { accessorKey: "status", header: "Status" },
-  { accessorKey: "createdAt", header: "Date" },
-  {
-    id: "actions",
-    header: "Actions",
-    cell: ({ row, table }: { row: { original: Order }; table: { options: { meta: { approveOrder: (id: string) => void; rejectOrder: (id: string) => void } } } }) => {
-      const order: Order = row.original;
-      const approve = table.options.meta?.approveOrder;
-      const reject = table.options.meta?.rejectOrder;
-      return (
-        <div className="flex gap-2 items-center">
-          <Link
-            href={`/admin/orders/${order.id}`}
-            className="text-green-700 hover:underline font-semibold"
-          >
-            View
-          </Link>
-          {order.status === "pending" && (
-            <>
-              <Button
-                size="sm"
-                variant="default"
-                className="px-2 py-1 bg-green-600 hover:bg-green-700 text-white"
-                onClick={() => approve(order.id)}
-              >
-                Approve
-              </Button>
-              <Button
-                size="sm"
-                variant="destructive"
-                className="px-2 py-1"
-                onClick={() => reject(order.id)}
-              >
-                Reject
-              </Button>
-            </>
-          )}
-        </div>
-      );
-    },
-  },
-];
+import React from 'react';
+import { useRouter } from 'next/navigation';
+import { DataTable, Column, Action } from '@/components/ui/DataTable';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
+import { Eye, CheckCircle, XCircle } from 'lucide-react';
+import Link from 'next/link';
+import { mockOrders, Order } from './mockOrders';
+import { Toaster, toast } from 'react-hot-toast';
 
 export default function OrdersPage() {
-  const [orders, setOrders] = useState<Order[]>(mockOrders);
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("");
-  const [notification, setNotification] = useState<string>("");
+  const router = useRouter();
+  const [orders, setOrders] = React.useState<Order[]>(mockOrders);
+  const [notification, setNotification] = React.useState<string>("");
 
-  // Filter and search logic
-  const filteredOrders = orders.filter((order) => {
-    const matchesSearch =
-      order.userName.toLowerCase().includes(search.toLowerCase()) ||
-      order.productName.toLowerCase().includes(search.toLowerCase());
-    const matchesStatus = statusFilter ? order.status === statusFilter : true;
-    return matchesSearch && matchesStatus;
-  });
+  // Action handlers
+  const handleView = (order: Record<string, unknown>) => {
+    router.push(`/admin/orders/${order.id}`);
+  };
+  const handleApprove = (order: Record<string, unknown>) => {
+    if (order.status === 'pending') {
+      setOrders((prev) =>
+        prev.map((o) =>
+          o.id === order.id
+            ? {
+                ...o,
+                status: 'approved',
+                updatedAt: new Date().toISOString(),
+                history: [
+                  ...o.history,
+                  {
+                    status: 'approved',
+                    changedAt: new Date().toISOString(),
+                    changedBy: 'admin',
+                  },
+                ],
+              }
+            : o
+        )
+      );
+      toast.success(`Order #${order.id} approved!`);
+    }
+  };
+  const handleReject = (order: Record<string, unknown>) => {
+    if (order.status === 'pending') {
+      setOrders((prev) =>
+        prev.map((o) =>
+          o.id === order.id
+            ? {
+                ...o,
+                status: 'rejected',
+                updatedAt: new Date().toISOString(),
+                history: [
+                  ...o.history,
+                  {
+                    status: 'rejected',
+                    changedAt: new Date().toISOString(),
+                    changedBy: 'admin',
+                  },
+                ],
+              }
+            : o
+        )
+      );
+      toast.error(`Order #${order.id} rejected!`);
+    }
+  };
 
-  // Approve/Reject handlers
-  const approveOrder = (id: string) => {
-    setOrders((prev) =>
-      prev.map((o) =>
-        o.id === id
-          ? {
-              ...o,
-              status: "approved",
-              updatedAt: new Date().toISOString(),
-              history: [
-                ...o.history,
-                {
-                  status: "approved",
-                  changedAt: new Date().toISOString(),
-                  changedBy: "admin",
-                },
-              ],
-            }
-          : o
-      )
-    );
-    setNotification(`Order #${id} approved.`);
-    setTimeout(() => setNotification(""), 3000);
-  };
-  const rejectOrder = (id: string) => {
-    setOrders((prev) =>
-      prev.map((o) =>
-        o.id === id
-          ? {
-              ...o,
-              status: "rejected",
-              updatedAt: new Date().toISOString(),
-              history: [
-                ...o.history,
-                {
-                  status: "rejected",
-                  changedAt: new Date().toISOString(),
-                  changedBy: "admin",
-                },
-              ],
-            }
-          : o
-      )
-    );
-    setNotification(`Order #${id} rejected.`);
-    setTimeout(() => setNotification(""), 3000);
-  };
+  // Define columns for the DataTable
+  const columns: Column[] = [
+    {
+      key: 'id',
+      label: 'Order ID',
+      render: (value) => (
+        <Link href={`/admin/orders/${value}`} className="text-blue-600 hover:underline">
+          {value as string}
+        </Link>
+      ),
+    },
+    { key: 'userName', label: 'User' },
+    { key: 'productName', label: 'Product' },
+    { key: 'quantity', label: 'Qty' },
+    { key: 'price', label: 'Price (B3TR)', render: (value) => `₿${value}` },
+    { key: 'total', label: 'Total (B3TR)', render: (value) => `₿${value}` },
+    {
+      key: 'status',
+      label: 'Status',
+      render: (value) => {
+        let variant: 'secondary' | 'success' | 'warning' | 'destructive' | 'info' = 'secondary';
+        let icon = null;
+        if (value === 'approved') { variant = 'success'; icon = <CheckCircle className="w-3 h-3 mr-1" />; }
+        else if (value === 'pending') { variant = 'warning'; icon = <Eye className="w-3 h-3 mr-1" />; }
+        else if (value === 'rejected') { variant = 'destructive'; icon = <XCircle className="w-3 h-3 mr-1" />; }
+        else if (value === 'delivered') { variant = 'info'; icon = <CheckCircle className="w-3 h-3 mr-1" />; }
+        return <Badge variant={variant} className="flex items-center">{icon}{String(value).charAt(0).toUpperCase() + String(value).slice(1)}</Badge>;
+      },
+    },
+    {
+      key: 'createdAt',
+      label: 'Created',
+      render: (value) => (
+        <span className="text-sm text-muted-foreground">
+          {new Date(value as string).toLocaleDateString()}
+        </span>
+      ),
+    },
+  ];
+
+  // Define actions for the DataTable
+  const actions: Action[] = [
+    {
+      label: 'View',
+      icon: <Eye className="h-4 w-4" />,
+      onClick: handleView,
+      variant: 'ghost',
+    },
+    {
+      label: 'Approve',
+      icon: <CheckCircle className="h-4 w-4" />,
+      onClick: handleApprove,
+      variant: 'default',
+      className: 'bg-green-600 hover:bg-green-700 text-white',
+    },
+    {
+      label: 'Reject',
+      icon: <XCircle className="h-4 w-4" />,
+      onClick: handleReject,
+      variant: 'destructive',
+      className: '',
+    },
+  ];
+
+  console.log("orders", orders)
 
   return (
-    <div className="relative min-h-screen bg-background overflow-hidden">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute -top-40 -right-40 w-80 h-80 gradient-aurora rounded-full blur-3xl opacity-20 animate-float" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 gradient-neon rounded-full blur-3xl opacity-20 animate-float" />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 gradient-cosmic rounded-full blur-3xl opacity-15 animate-float" />
-        <div
-          className="absolute w-16 h-16 border-2 border-green-400/30 rounded-full animate-spin"
-          style={{ top: "35%", left: "25%", animationDuration: "8s" }}
-        />
-        <div
-          className="absolute w-12 h-12 border-2 border-cyan-400/30 rounded-full animate-spin"
-          style={{
-            bottom: "40%",
-            right: "25%",
-            animationDuration: "12s",
-            animationDirection: "reverse",
-          }}
-        />
-        <div
-          className="absolute w-20 h-20 border-2 border-emerald-400/30 rounded-full animate-spin"
-          style={{ top: "65%", left: "15%", animationDuration: "15s" }}
-        />
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Orders</h1>
+          <p className="text-muted-foreground">Manage your order history and approve B3TR token purchases for eco-products.</p>
+        </div>
       </div>
-      <div className="relative z-10 p-6 space-y-6">
-        <h1
-          className="text-3xl md:text-4xl font-extrabold text-gradient-ev-green animate-fade-in drop-shadow-lg tracking-tight font-sans"
-          style={{
-            lineHeight: "1.2",
-            paddingTop: "0.25em",
-            paddingBottom: "0.25em",
-            overflow: "visible",
-          }}
-        >
-          Order Management
-        </h1>
-        <Card className="p-6 bg-white/90 backdrop-blur-md shadow-xl overflow-x-auto">
-          {/* Notification Banner */}
-          {notification && (
-            <div className="bg-green-100 border border-green-300 text-green-800 px-4 py-2 rounded mb-4 animate-fade-in">
-              {notification}
-            </div>
-          )}
-          {/* Filters/Search */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-            <input
-              type="text"
-              placeholder="Search by user or product..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="border border-primary/30 rounded-full px-5 py-3 w-full md:w-64 text-base font-medium shadow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary hover:ring-2 hover:ring-primary/30 hover:bg-primary/5 placeholder:text-muted-foreground"
-            />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="border border-primary/30 rounded-full px-5 py-3 w-full md:w-48 text-base font-medium shadow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary hover:ring-2 hover:ring-primary/30 hover:bg-primary/5"
-            >
-              <option value="">All Statuses</option>
-              {statusOptions.map((status) => (
-                <option key={status} value={status}>
-                  {status.charAt(0).toUpperCase() + status.slice(1)}
-                </option>
-              ))}
-            </select>
-          </div>
-          {/* <DataTable
-            columns={columns.map((col) => {
-              if (col.id === "actions") {
-                return {
-                  ...col,
-                  cell: ({ row }: { row: any }) => {
-                    const order: Order = row.original;
-                    return (
-                      <div className="flex gap-2 items-center">
-                        <Link
-                          href={`/admin/orders/${order.id}`}
-                          className="text-green-700 hover:underline font-semibold"
-                        >
-                          View
-                        </Link>
-                        {order.status === "pending" && (
-                          <>
-                            <Button
-                              size="sm"
-                              variant="default"
-                              className="px-2 py-1 bg-green-600 hover:bg-green-700 text-white"
-                              onClick={() => approveOrder(order.id)}
-                            >
-                              Approve
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              className="px-2 py-1"
-                              onClick={() => rejectOrder(order.id)}
-                            >
-                              Reject
-                            </Button>
-                          </>
-                        )}
-                      </div>
-                    );
-                  },
-                };
-              }
-              return col;
-            })}
-            data={filteredOrders}
-          /> */}
-        </Card>
-      </div>
+      <Card className="p-6 bg-white/90 backdrop-blur-md shadow-xl overflow-x-auto">
+        <DataTable
+          data={orders as unknown as Record<string, unknown>[]}
+          columns={columns}
+          actions={actions}
+          title="Order List"
+          searchable={true}
+          searchPlaceholder="Search orders by user, product, or status..."
+          searchInputClassName="border border-border bg-background text-foreground rounded-lg px-5 py-3 w-full md:w-64 text-base font-medium shadow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary hover:ring-2 hover:ring-primary/30 hover:bg-muted placeholder:text-muted-foreground"
+          searchKeys={['userName', 'productName', 'status']}
+          pagination={true}
+          itemsPerPageOptions={[5, 10, 20, 50]}
+          defaultItemsPerPage={10}
+          emptyMessage="No orders found"
+        />
+        <Toaster position="top-right" toastOptions={{
+          style: { background: 'var(--card)', color: 'var(--foreground)' },
+          className: 'shadow-lg rounded-lg',
+        }} />
+      </Card>
     </div>
   );
-}
+} 
