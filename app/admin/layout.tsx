@@ -58,8 +58,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   };
 
   const getActiveTab = () => {
-    const currentItem = sidebarItems.find(item => item.path === pathname);
-    return currentItem ? currentItem.id : 'overview';
+    if (pathname === '/admin' || pathname === '/admin/dashboard') return 'overview';
+    if (pathname.startsWith('/admin/users')) return 'users';
+    if (pathname.startsWith('/admin/rewards')) return 'rewards';
+    if (pathname.startsWith('/admin/settings')) return 'settings';
+    return '';
   };
 
   const handleNavigation = (path: string) => {
