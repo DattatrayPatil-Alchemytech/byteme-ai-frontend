@@ -9,6 +9,8 @@ import {
   getPaginationRowModel,
   SortingState,
   getSortedRowModel,
+  HeaderGroup,
+  Header,
 } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 
@@ -18,6 +20,7 @@ interface DataTableProps<TData, TValue> {
   search?: string;
   onSearchChange?: (value: string) => void;
   searchPlaceholder?: string;
+  isSuperAdmin?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -26,6 +29,7 @@ export function DataTable<TData, TValue>({
   search,
   onSearchChange,
   searchPlaceholder = "Search...",
+  isSuperAdmin = false,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState("");
@@ -60,12 +64,14 @@ export function DataTable<TData, TValue>({
           className="border rounded-full px-4 py-2 w-full sm:w-64 shadow focus:ring-2 focus:ring-primary outline-none"
         />
       )}
-      <div className="overflow-x-auto rounded-2xl shadow-lg bg-white/90 p-2">
+      <div className={
+        `overflow-x-auto${!isSuperAdmin ? ' rounded-2xl shadow-lg bg-white/90 p-2' : ''}`
+      }>
         <table className="min-w-full text-sm">
           <thead className="bg-muted text-foreground">
-            {table.getHeaderGroups().map(headerGroup => (
+            {table.getHeaderGroups().map((headerGroup: HeaderGroup<TData>) => (
               <tr key={headerGroup.id}>
-                {headerGroup.headers.map(header => (
+                {headerGroup.headers.map((header: Header<TData, unknown>) => (
                   <th
                     key={header.id}
                     className="px-5 py-3 text-left font-semibold text-base cursor-pointer select-none"
