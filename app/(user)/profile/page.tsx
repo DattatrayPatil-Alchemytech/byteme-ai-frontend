@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { User, Award, Star } from "lucide-react";
+import { User, Award, Star, Pencil } from "lucide-react";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { mockVehicles } from "./mockVehicles";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,9 @@ import { useSelector } from "react-redux";
 import { apiGet } from "@/lib/apiHelpers/apiMiddleware";
 import { getRequest } from "@/lib/api/apiRequests";
 import { RootState } from "@/redux/store";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
 
 // Mock data for profile, badges, tier, notifications, and vehicles
 const userProfile = {
@@ -34,6 +37,9 @@ export default function UserProfilePage() {
   const [editName, setEditName] = useState("");
   const [editError, setEditError] = useState("");
   const [fakeData, setFakeData] = useState<unknown>(null); // New state for fake API data
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [newVehicle, setNewVehicle] = useState({ name: '', type: '', numberPlate: '' });
+  const [addError, setAddError] = useState('');
   const router = useRouter();
 
   // Get user data from redux
@@ -68,6 +74,26 @@ export default function UserProfilePage() {
     setVehicles(vehicles.filter((v) => v.id !== id));
   };
 
+  const handleAddVehicle = () => {
+    if (!newVehicle.name.trim() || !newVehicle.type.trim() || !newVehicle.numberPlate.trim()) {
+      setAddError('All fields are required');
+      return;
+    }
+    setVehicles([
+      ...vehicles,
+      {
+        id: Date.now(),
+        name: newVehicle.name,
+        type: newVehicle.type,
+        reg: newVehicle.numberPlate,
+        numberPlate: newVehicle.numberPlate,
+      },
+    ]);
+    setAddDialogOpen(false);
+    setNewVehicle({ name: '', type: '', numberPlate: '' });
+    setAddError('');
+  };
+
   // DataTable columns
   const columns: Column[] = [
     {
@@ -95,11 +121,16 @@ export default function UserProfilePage() {
             )}
           </>
         ) : (
-          <span
-            onClick={() => handleEdit(vehicle.id, vehicle.name)}
-            className="cursor-pointer hover:underline text-foreground"
-          >
-            {vehicle.name}
+          <span className="flex flex-row items-center gap-1">
+            <span className="text-foreground leading-none">{vehicle.name}</span>
+            <button
+              className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-primary flex items-center justify-center"
+              title="Edit name"
+              onClick={() => handleEdit(vehicle.id, vehicle.name)}
+              aria-label="Edit name"
+            >
+              <Pencil className="w-4 h-4 align-middle" />
+            </button>
           </span>
         );
       },
@@ -144,16 +175,6 @@ export default function UserProfilePage() {
         const vehicle = row as { id: number; name: string };
         return (
           <div className="flex gap-2">
-            {editId !== vehicle.id && (
-              <Button
-                variant="link"
-                size="sm"
-                className="p-0 h-auto min-w-0"
-                onClick={() => handleEdit(vehicle.id, vehicle.name)}
-              >
-                Edit
-              </Button>
-            )}
             <Button
               variant="link"
               size="sm"
@@ -236,14 +257,61 @@ export default function UserProfilePage() {
 
       {/* List of registered vehicles with details */}
       <section className="bg-card/90 rounded-2xl border border-gray-300 p-8 mb-4">
-        <div className="font-bold text-xl text-foreground mb-6 text-left">
-          Registered Vehicles
+        <div className="font-bold text-xl text-foreground mb-6 text-left flex justify-between items-center">
+          <span>Registered Vehicles</span>
+          <Button
+            variant="default"
+            className="gradient-ev-green hover-glow"
+            onClick={() => setAddDialogOpen(true)}
+          >
+            Add Vehicle
+          </Button>
         </div>
         <DataTable
           columns={columns}
           data={vehicles as unknown as Record<string, unknown>[]}
         />
       </section>
+      <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+        <DialogContent className="bg-background text-foreground">
+          <DialogHeader>
+            <DialogTitle>Add Vehicle</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Input
+              placeholder="Name"
+              value={newVehicle.name}
+              onChange={e => setNewVehicle({ ...newVehicle, name: e.target.value })}
+              className="bg-background text-foreground border-border"
+            />
+            <Select
+              value={newVehicle.type}
+              onChange={e => setNewVehicle({ ...newVehicle, type: e.target.value })}
+              className="bg-background text-foreground border-border"
+            >
+              <option value="">Select Type</option>
+              <option value="2-Wheel">2-Wheel</option>
+              <option value="3-Wheel">3-Wheel</option>
+              <option value="4-Wheel">4-Wheel</option>
+            </Select>
+            <Input
+              placeholder="Number Plate"
+              value={newVehicle.numberPlate}
+              onChange={e => setNewVehicle({ ...newVehicle, numberPlate: e.target.value })}
+              className="bg-background text-foreground border-border"
+            />
+            {addError && <div className="text-red-500 text-sm">{addError}</div>}
+          </div>
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => setAddDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="default" onClick={handleAddVehicle}>
+              Add
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
