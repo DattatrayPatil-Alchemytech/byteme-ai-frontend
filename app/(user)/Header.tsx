@@ -69,7 +69,7 @@ export default function Header() {
             )}
             
             <Link
-              href="/dashboard/upload"
+              href="/uploads"
               className="text-muted-foreground hover:text-foreground transition-colors"
               title="Upload Odometer"
             >
