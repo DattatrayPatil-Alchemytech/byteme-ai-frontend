@@ -10,6 +10,7 @@ import Image from "next/image";
 import { useSelector } from "react-redux";
 import { apiGet } from "@/lib/apiHelpers/apiMiddleware";
 import { getRequest } from "@/lib/api/apiRequests";
+import { RootState } from "@/redux/store";
 
 // Mock data for profile, badges, tier, notifications, and vehicles
 const userProfile = {
@@ -32,12 +33,11 @@ export default function UserProfilePage() {
   const [editId, setEditId] = useState<number | null>(null);
   const [editName, setEditName] = useState("");
   const [editError, setEditError] = useState("");
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [fakeData, setFakeData] = useState<any>(null); // New state for fake API data
+  const [fakeData, setFakeData] = useState<unknown>(null); // New state for fake API data
   const router = useRouter();
 
   // Get user data from redux
-  const user = useSelector((state: any) => state.user.user);
+  const user = useSelector((state: RootState) => state.user.user);
 
   useEffect(() => {
     // Fake API call to /posts/1 using getRequest

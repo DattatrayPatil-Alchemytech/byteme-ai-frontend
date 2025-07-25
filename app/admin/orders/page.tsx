@@ -17,7 +17,7 @@ const columns = [
   {
     accessorKey: "id",
     header: "Order ID",
-    cell: ({ getValue }: any) => (
+    cell: ({ getValue }: { getValue: () => string }) => (
       <Link
         href={`/admin/orders/${getValue()}`}
         className="text-blue-600 hover:underline"
@@ -36,7 +36,7 @@ const columns = [
   {
     id: "actions",
     header: "Actions",
-    cell: ({ row, table }: { row: any; table: any }) => {
+    cell: ({ row, table }: { row: { original: Order }; table: { options: { meta: { approveOrder: (id: string) => void; rejectOrder: (id: string) => void } } } }) => {
       const order: Order = row.original;
       const approve = table.options.meta?.approveOrder;
       const reject = table.options.meta?.rejectOrder;

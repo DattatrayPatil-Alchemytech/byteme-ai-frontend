@@ -1,6 +1,6 @@
 import axios from "@/lib/api/axios";
 
-export function getRequestWithParams(url: string, queryParams: any) {
+export function getRequestWithParams(url: string, queryParams: unknown) {
   return axios.get(url, { params: queryParams });
 }
 
@@ -12,7 +12,7 @@ export function postRequest(url: string, payload = null, headers = {}) {
   return axios.post(url, payload, { headers });
 }
 
-export function patchRequest(url: string, payload: any, headers = {}) {
+export function patchRequest(url: string, payload: unknown, headers = {}) {
   return axios.patch(url, payload, { headers });
 }
 
@@ -20,6 +20,6 @@ export function deleteRequest(url: string) {
   return axios.delete(url);
 }
 
-export function deleteRequestWithParams(url: string, payload: any) {
+export function deleteRequestWithParams(url: string, payload: unknown) {
   return axios.delete(url, { data: payload });
 } 
