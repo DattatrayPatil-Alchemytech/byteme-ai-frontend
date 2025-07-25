@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import Image from 'next/image';
 import Badges from "@/components/dashboard/Badges";
 import Leaderboard from "@/components/dashboard/Leaderboard";
 import TokenStore from "@/components/dashboard/TokenStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 // Inline VehicleHistoryPage logic here for the History tab
-import { DataTable } from "@/components/ui/DataTable";
-import { ColumnDef } from "@tanstack/react-table";
+import { DataTable, Column } from "@/components/ui/DataTable";
 import { mockHistory } from "./mockHistory";
 import { useMemo } from "react";
 import { Select } from "@/components/ui/DropdownMenu";
@@ -15,26 +15,26 @@ import { Select } from "@/components/ui/DropdownMenu";
 function VehicleHistoryTab() {
   const [search, setSearch] = useState("");
   const [vehicleFilter, setVehicleFilter] = useState("");
-  const columns: ColumnDef<(typeof mockHistory)[number]>[] = [
+  const columns: Column[] = [
     {
-      accessorKey: "vehicle",
-      header: "Vehicle",
-      cell: (info) => (
-        <span className="font-medium">{info.getValue() as string}</span>
+      key: "vehicle",
+      label: "Vehicle",
+      render: (value) => (
+        <span className="font-medium">{value as string}</span>
       ),
     },
-    { accessorKey: "submissionCount", header: "Submission Count" },
-    { accessorKey: "milesDriven", header: "Miles Driven" },
-    { accessorKey: "carbonImpact", header: "Carbon Impact (tCO₂)" },
-    { accessorKey: "rewards", header: "Rewards (B3TR)" },
+    { key: "submissionCount", label: "Submission Count" },
+    { key: "milesDriven", label: "Miles Driven" },
+    { key: "carbonImpact", label: "Carbon Impact (tCO₂)" },
+    { key: "rewards", label: "Rewards (B3TR)" },
     {
-      accessorKey: "imageHash",
-      header: "Image Hash",
-      cell: (info) => (
-        <span className="font-mono text-xs">{info.getValue() as string}</span>
+      key: "imageHash",
+      label: "Image Hash",
+      render: (value) => (
+        <span className="font-mono text-xs">{value as string}</span>
       ),
     },
-    { accessorKey: "date", header: "Date" },
+    { key: "date", label: "Date" },
   ];
   const vehicleOptions = useMemo(() => {
     const names = mockHistory.map((row) => row.vehicle);
@@ -65,11 +65,12 @@ function VehicleHistoryTab() {
               className="flex-shrink-0 bg-white/90 border border-border rounded-2xl shadow-lg p-4 flex flex-col items-center min-w-[160px] max-w-[180px] w-full transition-transform transition-shadow duration-300 hover:scale-[1.03] hover:shadow-2xl"
             >
               <div className="w-24 h-24 flex items-center justify-center bg-gray-100 rounded-md mb-2 border border-muted">
-                <img
+                <Image
                   src={vehicle.image}
                   alt={vehicle.vehicle}
+                  width={96}
+                  height={96}
                   className="w-full h-full rounded-md"
-                  loading="lazy"
                 />
               </div>
               <div className="font-semibold text-center text-base truncate w-full text-foreground">
