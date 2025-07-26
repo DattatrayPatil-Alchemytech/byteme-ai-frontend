@@ -62,7 +62,6 @@ export default function UserProfilePage() {
     setVehiclesLoading(true);
     getUserVehicles()
       .then((data: VehicleData[]) => {
-        console.log("data", data);
         // Map API data to DataTable expected format
         const mapped = data.map((vehicle) => ({
           id: vehicle.id,
@@ -83,8 +82,6 @@ export default function UserProfilePage() {
         setVehiclesLoading(false);
       });
   }, []);
-
-  console.log("vehicles", vehicles);
 
   const handleEdit = (id: number, name: string) => {
     setEditId(id);
@@ -202,14 +199,14 @@ export default function UserProfilePage() {
         ) : (
           <span className="flex flex-row items-center gap-1">
             <span className="text-foreground leading-none">{vehicle.name}</span>
-            <button
+            {/* <button
               className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-primary flex items-center justify-center"
               title="Edit name"
               onClick={() => handleEdit(vehicle.id, vehicle.name)}
               aria-label="Edit name"
             >
               <Pencil className="w-4 h-4 align-middle" />
-            </button>
+            </button> */}
           </span>
         );
       },

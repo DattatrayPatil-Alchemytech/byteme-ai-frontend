@@ -56,7 +56,6 @@ export const getUserVehicles = (): Promise<VehicleData[]> => {
       Authorization: `Bearer ${currentToken}`,
     },
   }).then((response) => {
-    console.log("response", response);
     return response;
   });
 };
