@@ -8,10 +8,11 @@ import {
 } from "@/lib/scroll-animation";
 import { openModal } from "@/redux/modalSlice";
 import { motion } from "framer-motion";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 
 export default function HeroSection() {
+  const router = useRouter();
   const { ref: titleRef, isVisible: titleVisible } = useScrollAnimation();
   const { ref: subtitleRef, isVisible: subtitleVisible } =
     useScrollAnimationWithDelay(200);
@@ -75,27 +76,14 @@ export default function HeroSection() {
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
         >
-          <Link href="/uploads">
-            <Button
-              variant="default"
-              size="xl"
-              className="gradient-ev-green hover-lift hover-glow text-white rounded-full font-semibold px-8 py-4 text-lg"
-            >
-              Start Earning Today
-            </Button>
-          </Link>
-          <motion.button
-            className="px-8 py-4 bg-card/20 backdrop-blur-sm rounded-full text-foreground font-semibold hover:bg-card/30 transition-all duration-300 border border-border/30"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => {
-              dispatch(
-                openModal({ modalType: "LOGIN_MODAL", title: "Welcome" })
-              );
-            }}
+          <Button 
+            variant="default" 
+            size="xl"
+            className="gradient-ev-green hover-lift hover-glow text-white font-semibold px-8 py-4 text-lg"
+            onClick={() => router.push('/uploads')}
           >
-            Login / Sign UP
-          </motion.button>
+            Start Earning Today
+          </Button>
         </motion.div>
 
         {/* Enhanced Live Contract Stats with Odometer Display */}

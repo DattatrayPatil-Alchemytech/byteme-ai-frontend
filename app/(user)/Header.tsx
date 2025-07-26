@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { Bell } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useWallet } from "@vechain/dapp-kit-react";
@@ -20,13 +20,17 @@ const notifications = [
 
 export default function Header() {
   const router = useRouter();
+  const pathname = usePathname();
   const dispatch = useDispatch();
   const { disconnect } = useWallet();
-  const { user } = useSelector((state: RootState) => state.user);
+  const { user, isAuthenticated } = useSelector((state: RootState) => state.user);
   const [userName, setUserName] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const bellRef = useRef<HTMLButtonElement>(null);
+
+  // Check if we're on the uploads page
+  const isUploadsPage = pathname === "/uploads";
 
   useEffect(() => {
     // Use Redux user data instead of localStorage
@@ -58,6 +62,12 @@ export default function Header() {
 
   const handleLogout = async () => {
     if (isLoggingOut) return; // Prevent multiple logout attempts
+
+    // If user is not authenticated, just redirect to home page
+    if (!isAuthenticated) {
+      router.push("/");
+      return;
+    }
 
     setIsLoggingOut(true);
 
@@ -94,101 +104,112 @@ export default function Header() {
           </div>
 
           <div className="flex items-center space-x-4 relative">
-            {userName && (
-              <span className="text-sm text-muted-foreground hidden md:block">
-                Welcome, {userName}
-              </span>
-            )}
+            {/* Show welcome message and all icons only when authenticated and NOT on uploads page */}
+            {isAuthenticated && !isUploadsPage && (
+              <>
+                {userName && (
+                  <span className="text-sm text-muted-foreground hidden md:block">
+                    Welcome, {userName}
+                  </span>
+                )}
 
-            <ThemeToggle />
+                <ThemeToggle />
 
-            <Link
-              href="/uploads"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-              title="Upload Odometer"
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                />
-              </svg>
-            </Link>
+                <Link
+                  href="/uploads"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  title="Upload Odometer"
+                >
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                    />
+                  </svg>
+                </Link>
 
-            {/* Notification Bell */}
-            <button
-              ref={bellRef}
-              className="relative p-2 rounded-full hover:bg-primary/10 transition"
-              onClick={() => setShowNotifications((v) => !v)}
-              aria-label="Show notifications"
-            >
-              <Bell className="w-6 h-6 text-primary" />
-              {notifications.some((n) => !n.read) && (
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-ping" />
-              )}
-            </button>
-            {showNotifications && (
-              <div className="absolute right-0 top-12 w-80 bg-white rounded-xl shadow-xl border border-muted z-50 p-4 animate-fade-in">
-                <div className="font-bold text-lg mb-2 text-foreground">
-                  Notifications
-                </div>
-                <ul className="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
-                  {notifications.length === 0 ? (
-                    <li className="text-muted-foreground">No notifications</li>
-                  ) : (
-                    notifications.map((note) => (
-                      <li
-                        key={note.id}
-                        className={
-                          note.read
-                            ? "text-gray-400"
-                            : "font-medium text-foreground"
-                        }
-                      >
-                        {note.message}
-                      </li>
-                    ))
+                {/* Notification Bell */}
+                <button
+                  ref={bellRef}
+                  className="relative p-2 rounded-full hover:bg-primary/10 transition"
+                  onClick={() => setShowNotifications((v) => !v)}
+                  aria-label="Show notifications"
+                >
+                  <Bell className="w-6 h-6 text-primary" />
+                  {notifications.some((n) => !n.read) && (
+                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-ping" />
                   )}
-                </ul>
-              </div>
+                </button>
+                {showNotifications && (
+                  <div className="absolute right-0 top-12 w-80 bg-white rounded-xl shadow-xl border border-muted z-50 p-4 animate-fade-in">
+                    <div className="font-bold text-lg mb-2 text-foreground">
+                      Notifications
+                    </div>
+                    <ul className="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
+                      {notifications.length === 0 ? (
+                        <li className="text-muted-foreground">No notifications</li>
+                      ) : (
+                        notifications.map((note) => (
+                          <li
+                            key={note.id}
+                            className={
+                              note.read
+                                ? "text-gray-400"
+                                : "font-medium text-foreground"
+                            }
+                          >
+                            {note.message}
+                          </li>
+                        ))
+                      )}
+                    </ul>
+                  </div>
+                )}
+                {/* Profile Icon Link */}
+                <Link
+                  href="/profile"
+                  className="text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center"
+                  title="Profile"
+                >
+                  <svg
+                    className="w-7 h-7 rounded-full border border-border bg-card"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5.121 17.804A9 9 0 1112 21a9 9 0 01-6.879-3.196zM15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                </Link>
+              </>
             )}
-            {/* Profile Icon Link */}
-            <Link
-              href="/profile"
-              className="text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center"
-              title="Profile"
-            >
-              <svg
-                className="w-7 h-7 rounded-full border border-border bg-card"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5.121 17.804A9 9 0 1112 21a9 9 0 01-6.879-3.196zM15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
-            </Link>
 
             <button
               onClick={handleLogout}
               disabled={isLoggingOut}
               className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-              title={isLoggingOut ? "Logging out..." : "Logout"}
+              title={
+                isLoggingOut 
+                  ? "Logging out..." 
+                  : isAuthenticated 
+                    ? "Logout" 
+                    : "Go to Home"
+              }
             >
               {isLoggingOut ? (
                 <div className="w-6 h-6 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
-              ) : (
+              ) : isAuthenticated ? (
                 <svg
                   className="w-6 h-6"
                   fill="none"
@@ -200,6 +221,20 @@ export default function Header() {
                     strokeLinejoin="round"
                     strokeWidth={2}
                     d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
                   />
                 </svg>
               )}

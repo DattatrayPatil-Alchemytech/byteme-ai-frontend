@@ -4,8 +4,10 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useScrollAnimation } from '@/lib/scroll-animation';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 export default function CTASection() {
+  const router = useRouter();
   const { ref: ctaRef, isVisible: ctaVisible } = useScrollAnimation();
 
   return (
@@ -52,15 +54,14 @@ export default function CTASection() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Link href="/uploads">
-                <Button 
-                  variant="default" 
-                  size="xl" 
-                  className="gradient-aurora hover-glow text-white font-bold px-12 py-6 text-xl shadow-2xl"
-                >
-                  🚀 Get Started Now
-                </Button>
-              </Link>
+              <Button 
+                variant="default" 
+                size="xl" 
+                className="gradient-aurora hover-glow text-white font-bold px-12 py-6 text-xl shadow-2xl"
+                onClick={() => router.push('/uploads')}
+              >
+                🚀 Get Started Now
+              </Button>
             </motion.div>
             
             <motion.div
