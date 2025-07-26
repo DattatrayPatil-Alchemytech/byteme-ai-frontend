@@ -28,6 +28,8 @@ export function getBaseURL(): string {
 export const API_ENDPOINTS = {
   // Auth endpoints
   AUTH: {
+    VERIFY_SIGNATURE: "/auth/verify-signature",
+    DISCONNECT: "/auth/disconnect",
     LOGIN: "/auth/login",
     LOGOUT: "/auth/logout",
     VERIFY: "/auth/verify",
