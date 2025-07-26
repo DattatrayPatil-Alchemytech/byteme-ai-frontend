@@ -66,14 +66,71 @@ const Leaderboard: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="py-8 text-center text-muted-foreground">
-        Loading leaderboard...
+      <div className="space-y-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Leaderboard Skeleton */}
+          <Card className="hover-lift gradient-ev-green/10 border-primary/20 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-foreground flex items-center">
+                <span className="text-2xl mr-2">📈</span>
+                Weekly Leaderboard
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {[...Array(5)].map((_, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between p-3 rounded-lg bg-card/50 animate-pulse"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-gray-400 to-gray-600 opacity-40" />
+                      <div>
+                        <div className="h-4 w-24 bg-muted rounded mb-1" />
+                        <div className="h-3 w-32 bg-muted rounded" />
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="h-4 w-16 bg-muted rounded mb-1" />
+                      <div className="h-3 w-12 bg-muted rounded" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+          {/* Challenges Skeleton (optional, keep as is or add skeleton if needed) */}
+          <Card className="hover-lift gradient-ev-light/10 border-success/20 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-foreground flex items-center">
+                <span className="text-2xl mr-2">🎯</span>
+                Active Challenges
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {[...Array(2)].map((_, idx) => (
+                  <div key={idx} className="p-4 bg-card/50 rounded-lg border border-border/20 animate-pulse">
+                    <div className="flex items-center space-x-3 mb-3">
+                      <div className="w-8 h-8 rounded bg-muted" />
+                      <div>
+                        <div className="h-4 w-32 bg-muted rounded mb-1" />
+                        <div className="h-3 w-40 bg-muted rounded" />
+                      </div>
+                    </div>
+                    <div className="h-2 w-full bg-muted rounded mb-2" />
+                    <div className="h-2 w-1/2 bg-muted rounded mb-2" />
+                    <div className="h-3 w-24 bg-muted rounded" />
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
-  if (error) {
-    return <div className="py-8 text-center text-red-500">{error}</div>;
-  }
+  
   if (!data) {
     return (
       <div className="py-8 text-center text-red-500">
@@ -126,10 +183,10 @@ const Leaderboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             {data.entries.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12">
+              <div className="flex flex-col items-center justify-center py-12 w-full">
                 <span className="text-5xl mb-4">📉</span>
                 <p className="text-lg font-semibold text-muted-foreground mb-2">No leaderboard data yet</p>
-                <p className="text-sm text-muted-foreground">Be the first to participate and climb the leaderboard!</p>
+                <p className="text-sm text-muted-foreground mb-4">Be the first to participate and climb the leaderboard!</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -171,6 +228,23 @@ const Leaderboard: React.FC = () => {
                 ))}
               </div>
             )}
+            {/* Always show user rank and total participants cards below */}
+            {(data.userRank && data.userRank > 0) || (data.totalParticipants && data.totalParticipants > 0) ? (
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 items-center justify-center mt-8 w-full max-w-xs mx-auto">
+                {data.userRank && data.userRank > 0 && (
+                  <div className="bg-muted/60 rounded-lg px-4 py-2 text-center w-full">
+                    <span className="text-sm text-muted-foreground">Your Rank</span>
+                    <div className="text-xl font-bold text-primary">#{data.userRank}</div>
+                  </div>
+                )}
+                {data.totalParticipants && data.totalParticipants > 0 && (
+                  <div className="bg-muted/60 rounded-lg px-4 py-2 text-center w-full">
+                    <span className="text-sm text-muted-foreground">Total Participants</span>
+                    <div className="text-xl font-bold text-success">{data.totalParticipants}</div>
+                  </div>
+                )}
+              </div>
+            ) : null}
           </CardContent>
         </Card>
         {/* Challenges section remains unchanged or can be removed if not needed */}
