@@ -29,6 +29,7 @@ const userProfile = {
 
 export default function UserProfilePage() {
   const [vehicles, setVehicles] = useState<any[]>([]);
+  const [vehiclesLoading, setVehiclesLoading] = useState(true);
   const [editId, setEditId] = useState<number | null>(null);
   const [editName, setEditName] = useState("");
   const [editError, setEditError] = useState("");
@@ -50,11 +51,12 @@ export default function UserProfilePage() {
   const user = useSelector((state: RootState) => state.user.user);
 
   useEffect(() => {
+    setVehiclesLoading(true);
     getUserVehicles()
       .then((data: VehicleData[]) => {
         console.log("data", data);
         // Map API data to DataTable expected format
-        const mapped = data.map(vehicle => ({
+        const mapped = data.map((vehicle) => ({
           id: vehicle.id,
           name: `${vehicle.make} ${vehicle.model}`,
           type: vehicle.vehicleType,
@@ -65,6 +67,10 @@ export default function UserProfilePage() {
       })
       .catch((err) => {
         console.error("Failed to fetch vehicles", err);
+        setVehicles([]);
+      })
+      .finally(() => {
+        setVehiclesLoading(false);
       });
   }, []);
 
@@ -216,47 +222,47 @@ export default function UserProfilePage() {
           color: hsl(var(--foreground));
           border-color: hsl(var(--border));
         }
-        
+
         select option {
           background-color: hsl(var(--background));
           color: hsl(var(--foreground));
           padding: 8px 12px;
         }
-        
+
         select option:hover {
           background-color: hsl(var(--accent));
           color: hsl(var(--accent-foreground));
         }
-        
+
         select:focus {
           outline: none;
           border-color: hsl(var(--ring));
           box-shadow: 0 0 0 2px hsl(var(--ring) / 0.2);
         }
-        
+
         /* Fix dropdown overflow issues */
         .relative {
           position: relative;
           z-index: 10;
         }
-        
+
         /* Ensure dropdown options are visible */
         select {
           z-index: 20;
         }
-        
+
         /* Ensure dropdown can expand beyond modal boundaries */
         select:focus {
           z-index: 50;
         }
-        
+
         /* Custom dropdown container */
         .dropdown-container {
           position: relative;
           z-index: 30;
         }
       `}</style>
-      
+
       <div className="max-w-3xl mx-auto space-y-4 mt-10 mb-10">
         {/* Back Button */}
         <button
@@ -337,6 +343,7 @@ export default function UserProfilePage() {
           <DataTable
             columns={columns}
             data={vehicles as unknown as Record<string, unknown>[]}
+            loading={vehiclesLoading}
           />
         </section>
         <Modal
@@ -356,7 +363,9 @@ export default function UserProfilePage() {
                 className="bg-background text-foreground border-border focus:ring-2 focus:ring-primary"
               />
               {addFieldErrors.name && (
-                <div className="text-destructive text-sm mt-1">{addFieldErrors.name}</div>
+                <div className="text-destructive text-sm mt-1">
+                  {addFieldErrors.name}
+                </div>
               )}
             </div>
             <div>
@@ -368,14 +377,33 @@ export default function UserProfilePage() {
                   }
                   className="bg-background text-foreground border-border focus:ring-2 focus:ring-primary"
                 >
-                  <option value="" className="bg-background text-foreground">Select Type</option>
-                  <option value="2-Wheel" className="bg-background text-foreground">2-Wheel</option>
-                  <option value="3-Wheel" className="bg-background text-foreground">3-Wheel</option>
-                  <option value="4-Wheel" className="bg-background text-foreground">4-Wheel</option>
+                  <option value="" className="bg-background text-foreground">
+                    Select Type
+                  </option>
+                  <option
+                    value="2-Wheel"
+                    className="bg-background text-foreground"
+                  >
+                    2-Wheel
+                  </option>
+                  <option
+                    value="3-Wheel"
+                    className="bg-background text-foreground"
+                  >
+                    3-Wheel
+                  </option>
+                  <option
+                    value="4-Wheel"
+                    className="bg-background text-foreground"
+                  >
+                    4-Wheel
+                  </option>
                 </Select>
               </div>
               {addFieldErrors.type && (
-                <div className="text-destructive text-sm mt-1">{addFieldErrors.type}</div>
+                <div className="text-destructive text-sm mt-1">
+                  {addFieldErrors.type}
+                </div>
               )}
             </div>
             <div>
@@ -389,7 +417,10 @@ export default function UserProfilePage() {
               />
             </div>
             <div className="flex justify-end gap-2 mt-4">
-              <Button variant="secondary" onClick={() => setAddDialogOpen(false)}>
+              <Button
+                variant="secondary"
+                onClick={() => setAddDialogOpen(false)}
+              >
                 Cancel
               </Button>
               <Button variant="default" onClick={handleAddVehicle}>
