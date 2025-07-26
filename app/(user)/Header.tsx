@@ -8,7 +8,7 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useWallet } from "@vechain/dapp-kit-react";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/redux/userSlice";
-import { logoutUser } from "@/lib/apiHelpers/user";
+import { disconnectUser } from "@/lib/apiHelpers/user";
 import { RootState } from "@/redux/store";
 import toast from "react-hot-toast";
 
@@ -34,8 +34,8 @@ export default function Header() {
 
   useEffect(() => {
     // Use Redux user data instead of localStorage
-    if (user?.name) {
-      setUserName(user.name);
+    if (user?.username) {
+      setUserName(user.username);
     } else {
       // Fallback to localStorage for backward compatibility
       const storedUserName = localStorage.getItem("userName");
@@ -73,7 +73,7 @@ export default function Header() {
 
     try {
       // Call logout API to invalidate token on server
-      await logoutUser();
+      await disconnectUser();
     } catch (error) {
       console.error("Logout API error:", error);
     }

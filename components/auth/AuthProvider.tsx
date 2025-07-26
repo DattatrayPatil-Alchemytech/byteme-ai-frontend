@@ -1,11 +1,16 @@
 "use client";
-
+//Node Modules
 import { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
 import { useRouter, usePathname } from "next/navigation";
+import { useWallet } from "@vechain/dapp-kit-react";
+
+//Redux
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/store";
-import { loginSuccess, logout } from "@/redux/userSlice";
-import { refreshToken } from "@/lib/apiHelpers/user";
+import { logout, updateProfile } from "@/redux/userSlice";
+
+//Helpers
+import { getUserProfile } from "@/lib/apiHelpers/user";
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -23,6 +28,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   const pathname = usePathname();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [isAuthDone, setIsAuthDone] = useState(false);
+  const { disconnect } = useWallet();
 
   // Check if current route is protected
   const isProtectedRoute = PROTECTED_ROUTES.some((route) =>
@@ -35,16 +41,15 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     const checkAndRefreshAuth = async () => {
       try {
         // If we have a stored token, try to refresh it to verify it's still valid
-        if (accessToken && !isAuthenticated) {
-          console.log("Found stored token, attempting to refresh...");
-          const refreshResponse = await refreshToken();
-          dispatch(loginSuccess(refreshResponse));
-          console.log("Token refreshed successfully");
+        if (accessToken) {
+          const userData = await getUserProfile();
+          dispatch(updateProfile(userData));
         }
       } catch (error) {
         console.error("Token refresh failed:", error);
         // Clear invalid token
         dispatch(logout());
+        disconnect();
       } finally {
         setIsCheckingAuth(false);
       }
@@ -54,7 +59,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     if (isCheckingAuth) {
       checkAndRefreshAuth();
     }
-  }, [accessToken, isAuthenticated, dispatch, isCheckingAuth]);
+  }, [accessToken]);
 
   // Route protection logic
   useEffect(() => {
