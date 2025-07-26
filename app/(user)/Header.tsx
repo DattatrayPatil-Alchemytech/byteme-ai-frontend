@@ -100,7 +100,7 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <Link
-              href="/"
+              href={user?.id ? "/dashboard" : "/"}
               className="text-2xl font-bold text-gradient-ev-green"
             >
               ByteMe AI
