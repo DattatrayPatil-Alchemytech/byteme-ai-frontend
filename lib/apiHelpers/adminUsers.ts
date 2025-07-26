@@ -38,34 +38,39 @@ export const getUsersList = (
   }
   
   return apiGet<UsersListResponse>(`/admin/users?${params.toString()}`, {
-    requireAuth: false, // Requires admin authentication
+    requireAuth: true,
+    isAdmin: true, // Use admin token
   });
 };
 
 // Get single user details
 export const getUserDetails = (id: string): Promise<AdminUser> => {
   return apiGet<AdminUser>(`/admin/users/${id}`, {
-    requireAuth: false, // Requires admin authentication
+    requireAuth: true,
+    isAdmin: true, // Use admin token
   });
 };
 
 // Toggle user active/disabled status
 export const toggleUserStatus = (id: string): Promise<AdminUser> => {
   return apiPut<AdminUser>(`/admin/users/${id}/toggle-status`, undefined, {
-    requireAuth: false,
+    requireAuth: true,
+    isAdmin: true, // Use admin token
   });
 };
 
 // Get user vehicles
 export const getUserVehicles = (id: string): Promise<unknown> => {
   return apiGet<unknown>(`/admin/users/${id}/vehicles`, {
-    requireAuth: false,
+    requireAuth: true,
+    isAdmin: true, // Use admin token
   });
 };
 
 export const getUserUploads = (id: string): Promise<unknown> => {
   return apiGet<unknown>(`/admin/users/${id}/uploads`, {
-    requireAuth: false,
+    requireAuth: true,
+    isAdmin: true, // Use admin token
   });
 };
 
