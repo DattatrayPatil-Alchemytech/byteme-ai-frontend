@@ -2,55 +2,57 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/router";
+import { Badge } from "@/components/ui/badge";
+import { motion } from "framer-motion";
+import Link from "next/link";
+import { Upload, Wallet, Trophy, Leaf, Users, BarChart3, Shield, Zap, Globe } from "lucide-react";
 
 export default function DocumentationPage() {
-    const router = useRouter();
   
   const features = [
     {
-      icon: "🚗",
-      title: "Electric Vehicle Tracking",
+      icon: <Upload className="w-8 h-8" />,
+      title: "Odometer Upload System",
       description:
-        "Track your EV miles and earn rewards for sustainable driving",
+        "Upload your EV odometer photos to track mileage and earn rewards",
       details: [
-        "Automatic odometer reading uploads",
-        "Real-time mileage tracking",
-        "Carbon footprint calculation",
-        "Vehicle model recognition",
+        "AI-powered odometer reading verification",
+        "Photo upload with instant processing",
+        "Multiple vehicle support",
+        "Upload history and tracking",
       ],
     },
     {
-      icon: "⚡",
-      title: "B3TR Token System",
-      description: "Earn and spend B3TR tokens for sustainable actions",
+      icon: <Wallet className="w-8 h-8" />,
+      title: "VeChain Wallet Integration",
+      description: "Connect your VeChain wallet to receive B3TR tokens",
       details: [
-        "0.5 B3TR per mile driven",
-        "Bonus tokens for consistent driving",
-        "Token marketplace for eco-friendly products",
-        "Referral rewards system",
+        "Secure wallet connection",
+        "Automatic token distribution",
+        "Transaction history tracking",
+        "B3TR token balance management",
       ],
     },
     {
-      icon: "🏆",
-      title: "Achievement Badges",
-      description: "Unlock badges for milestones and achievements",
+      icon: <Trophy className="w-8 h-8" />,
+      title: "Rewards & Badges",
+      description: "Earn B3TR tokens and unlock achievement badges",
       details: [
-        "Eco Warrior - 100+ miles",
-        "Mile Master - 500+ miles",
-        "Early Adopter - First month user",
-        "Consistent Driver - 7-day streak",
+        "B3TR tokens for each upload",
+        "Achievement badges for milestones",
+        "Leaderboard rankings",
+        "Community challenges",
       ],
     },
     {
-      icon: "🌱",
-      title: "Carbon Offset Tracking",
+      icon: <Leaf className="w-8 h-8" />,
+      title: "Carbon Impact Tracking",
       description: "Monitor your environmental impact and contributions",
       details: [
-        "Real-time CO2 savings calculation",
-        "Monthly environmental reports",
-        "Carbon offset verification",
-        "Community impact metrics",
+        "Real-time carbon savings calculation",
+        "Environmental impact reports",
+        "Community contribution tracking",
+        "Sustainability metrics",
       ],
     },
   ];
@@ -58,101 +60,101 @@ export default function DocumentationPage() {
   const howItWorks = [
     {
       step: 1,
-      title: "Connect Your Vehicle",
+      title: "Connect Your Wallet",
       description:
-        "Link your electric vehicle to start tracking your sustainable miles",
-      icon: "🔗",
+        "Connect your VeChain wallet to start earning B3TR tokens",
+      icon: <Wallet className="w-6 h-6" />,
     },
     {
       step: 2,
-      title: "Drive & Upload",
-      description: "Drive your EV and upload odometer readings to earn tokens",
-      icon: "📱",
+      title: "Upload Odometer",
+      description: "Take a photo of your EV odometer and upload it",
+      icon: <Upload className="w-6 h-6" />,
     },
     {
       step: 3,
-      title: "Earn Rewards",
-      description: "Accumulate B3TR tokens and unlock achievement badges",
-      icon: "💰",
+      title: "Earn B3TR Tokens",
+      description: "Receive B3TR tokens automatically to your wallet",
+      icon: <Trophy className="w-6 h-6" />,
     },
     {
       step: 4,
-      title: "Redeem & Impact",
+      title: "Track Impact",
       description:
-        "Spend tokens on eco-friendly products and track your carbon offset",
-      icon: "🌍",
+        "Monitor your carbon savings and environmental contribution",
+      icon: <Leaf className="w-6 h-6" />,
     },
   ];
 
   const benefits = [
     {
+      category: "Easy Upload Process",
+      items: [
+        "Simple photo upload of your odometer",
+        "AI-powered automatic reading verification",
+        "Instant processing and confirmation",
+        "Upload history and progress tracking",
+      ],
+    },
+    {
+      category: "Secure Token Rewards",
+      items: [
+        "B3TR tokens sent directly to your VeChain wallet",
+        "Transparent blockchain-based distribution",
+        "Real-time transaction confirmation",
+        "Secure wallet integration",
+      ],
+    },
+    {
       category: "Environmental Impact",
       items: [
-        "Reduce carbon footprint through EV adoption",
-        "Track and verify environmental contributions",
-        "Support sustainable transportation initiatives",
-        "Join a community of eco-conscious drivers",
-      ],
-    },
-    {
-      category: "Financial Rewards",
-      items: [
-        "Earn B3TR tokens for every mile driven",
-        "Access exclusive eco-friendly product discounts",
-        "Participate in referral bonus programs",
-        "Unlock premium features and services",
-      ],
-    },
-    {
-      category: "Community & Social",
-      items: [
-        "Connect with fellow EV enthusiasts",
-        "Share achievements and milestones",
-        "Participate in community challenges",
+        "Track your carbon savings contribution",
+        "Monitor environmental impact metrics",
+        "Join the sustainable transportation movement",
         "Contribute to collective environmental goals",
       ],
     },
     {
-      category: "Data & Insights",
+      category: "Community Features",
       items: [
-        "Detailed driving analytics and reports",
-        "Carbon offset impact visualization",
-        "Personal sustainability metrics",
-        "Historical performance tracking",
+        "Achievement badges and milestones",
+        "Leaderboard rankings and challenges",
+        "Community of EV enthusiasts",
+        "Share your sustainability journey",
       ],
     },
   ];
 
   const faqs = [
     {
-      question: "How do I earn B3TR tokens?",
+      question: "How do I upload my odometer reading?",
       answer:
-        "You earn 0.5 B3TR tokens for every mile driven in your electric vehicle. Additional bonuses are available for consistent driving, referrals, and special achievements.",
+        "Navigate to the Uploads page, take a clear photo of your EV odometer showing the current mileage, and submit. Our AI will automatically verify the reading.",
     },
     {
-      question: "What can I do with my B3TR tokens?",
+      question: "How do I connect my VeChain wallet?",
       answer:
-        "B3TR tokens can be spent in our marketplace on eco-friendly products, donated to environmental causes, or used to unlock premium features and services.",
+        "Click the 'Connect Wallet' button in the header and follow the prompts to securely connect your VeChain wallet to receive B3TR tokens.",
     },
     {
-      question: "How is my carbon offset calculated?",
+      question: "When do I receive my B3TR tokens?",
       answer:
-        "We calculate carbon offset based on your EV miles compared to equivalent gasoline vehicle emissions, using industry-standard conversion factors.",
+        "B3TR tokens are automatically sent to your connected VeChain wallet after successful odometer verification, usually within 24 hours of upload.",
     },
     {
-      question: "Can I connect multiple vehicles?",
+      question: "What if my upload is rejected?",
       answer:
-        "Yes, you can connect multiple electric vehicles to your account and track miles for each vehicle separately.",
+        "If your upload is rejected, check the reason provided and ensure your photo is clear and shows the full odometer reading. You can re-upload anytime.",
     },
     {
-      question: "How often should I upload odometer readings?",
+      question: "How is my carbon impact calculated?",
       answer:
-        "We recommend uploading odometer readings weekly for optimal tracking and reward calculation.",
+        "We calculate your carbon savings based on your EV miles compared to equivalent gasoline vehicle emissions using industry-standard conversion factors.",
     },
     {
-      question: "Is my data secure?",
+      question: "Is my data and wallet connection secure?",
       answer:
-        "Yes, we use enterprise-grade encryption and follow strict data privacy protocols to protect your personal information and driving data.",
+        "Yes, we use enterprise-grade encryption and secure wallet integration. Your personal data and wallet connection are protected with strict security protocols.",
     },
   ];
 
@@ -197,7 +199,9 @@ export default function DocumentationPage() {
                 className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
               >
                 <CardHeader className="text-center">
-                  <div className="text-4xl mb-4">{feature.icon}</div>
+                  <div className="flex justify-center mb-4 text-green-600">
+                    {feature.icon}
+                  </div>
                   <CardTitle className="text-xl text-gray-900">
                     {feature.title}
                   </CardTitle>
@@ -235,7 +239,9 @@ export default function DocumentationPage() {
                 <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg text-center">
                   <CardHeader>
                     <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <span className="text-2xl">{step.icon}</span>
+                      <div className="text-white">
+                        {step.icon}
+                      </div>
                     </div>
                     <div className="absolute -top-3 -right-3 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
                       {step.step}
@@ -299,15 +305,14 @@ export default function DocumentationPage() {
           </div>
         </section>
 
-        {/* Technical Architecture */}
+        {/* User Guide */}
         <section className="mb-16">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Technical Architecture
+              Getting Started Guide
             </h2>
             <p className="text-lg text-gray-600">
-              Built with cutting-edge technology for security, scalability, and
-              performance
+              Follow these simple steps to start earning B3TR tokens
             </p>
           </div>
 
@@ -315,17 +320,17 @@ export default function DocumentationPage() {
             <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
               <CardHeader>
                 <CardTitle className="text-xl text-gray-900 flex items-center">
-                  <span className="text-2xl mr-3">🔐</span>
-                  Security & Privacy
+                  <Shield className="w-6 h-6 mr-3 text-green-600" />
+                  Step 1: Connect Wallet
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm text-gray-700">
-                  <li>• End-to-end encryption</li>
-                  <li>• GDPR compliance</li>
-                  <li>• Secure blockchain transactions</li>
-                  <li>• Multi-factor authentication</li>
-                  <li>• Regular security audits</li>
+                  <li>• Click &quot;Connect Wallet&quot; in header</li>
+                  <li>• Choose your VeChain wallet</li>
+                  <li>• Approve the connection</li>
+                  <li>• Verify wallet address</li>
+                  <li>• Ready to receive tokens</li>
                 </ul>
               </CardContent>
             </Card>
@@ -333,17 +338,17 @@ export default function DocumentationPage() {
             <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
               <CardHeader>
                 <CardTitle className="text-xl text-gray-900 flex items-center">
-                  <span className="text-2xl mr-3">⚡</span>
-                  Performance
+                  <Upload className="w-6 h-6 mr-3 text-blue-600" />
+                  Step 2: Upload Odometer
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm text-gray-700">
-                  <li>• Real-time data processing</li>
-                  <li>• 99.9% uptime guarantee</li>
-                  <li>• Global CDN distribution</li>
-                  <li>• Optimized mobile experience</li>
-                  <li>• Instant token transactions</li>
+                  <li>• Go to Uploads page</li>
+                  <li>• Take clear odometer photo</li>
+                  <li>• Ensure reading is visible</li>
+                  <li>• Submit for verification</li>
+                  <li>• Wait for AI processing</li>
                 </ul>
               </CardContent>
             </Card>
@@ -351,17 +356,17 @@ export default function DocumentationPage() {
             <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
               <CardHeader>
                 <CardTitle className="text-xl text-gray-900 flex items-center">
-                  <span className="text-2xl mr-3">🔗</span>
-                  Blockchain Integration
+                  <Trophy className="w-6 h-6 mr-3 text-yellow-600" />
+                  Step 3: Earn Rewards
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm text-gray-700">
-                  <li>• Ethereum-based smart contracts</li>
-                  <li>• Transparent token distribution</li>
-                  <li>• Immutable transaction history</li>
-                  <li>• Decentralized governance</li>
-                  <li>• Cross-chain compatibility</li>
+                  <li>• Receive B3TR tokens</li>
+                  <li>• Check wallet balance</li>
+                  <li>• View transaction history</li>
+                  <li>• Track carbon savings</li>
+                  <li>• Unlock achievements</li>
                 </ul>
               </CardContent>
             </Card>
@@ -410,21 +415,23 @@ export default function DocumentationPage() {
                 while making a positive environmental impact.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button
-                  size="lg"
-                  className="bg-white text-green-600 hover:bg-gray-100 px-8 py-3"
-                  onClick={() => router.push("/uploads")}
-                >
-                  Get Started Now
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="bg-white text-green-600 hover:bg-gray-100 px-8 py-3"
-                  onClick={() => (window.location.href = "/")}
-                >
-                  View Dashboard
-                </Button>
+                <Link href="/uploads">
+                  <Button
+                    size="lg"
+                    className="bg-white text-green-600 hover:bg-gray-100 px-8 py-3"
+                  >
+                    Get Started Now
+                  </Button>
+                </Link>
+                <Link href="/">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="bg-white text-green-600 hover:bg-gray-100 px-8 py-3"
+                  >
+                    View Dashboard
+                  </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>
