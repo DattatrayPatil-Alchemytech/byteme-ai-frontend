@@ -1,17 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import dynamic from 'next/dynamic';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getDashboardStats, getSystemAnalytics, type DashboardStats, type SystemAnalytics, type UserGrowthData, type VehicleTypeData, type UploadStatusData } from '@/lib/apiHelpers/adminDashboard';
-import { RootState } from '@/redux/store';
 
 // Dynamically import ApexCharts to avoid SSR issues
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 export default function AdminDashboardPage() {
-  const [adminUsername, setAdminUsername] = useState('');
   const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
   const [analyticsData, setAnalyticsData] = useState<SystemAnalytics | null>(null);
   const [isLoading, setIsLoading] = useState(true);
