@@ -340,10 +340,10 @@ export default function UserProfilePage() {
           </div>
           <div className="text-center">
             <div className="text-3xl font-bold text-foreground mb-1">
-              {user?.name || "Jane Doe"}
+              {"Jane Doe"}
             </div>
             <div className="text-base text-muted-foreground mb-2">
-              {user?.email || "jane.doe@email.com"}
+              {user?.email}
             </div>
             {/* <div className="inline-block px-5 py-1 rounded-full bg-primary/10 text-primary font-semibold text-sm mt-2">
               {user?.role === "admin" ? "Admin" : user?.role === "user" ? "Gold" : "Gold"} Tier

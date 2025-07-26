@@ -1,9 +1,4 @@
 import { apiPost, apiGet, apiDelete } from "./apiMiddleware";
-import {
-  type UserData,
-  type LoginResponse,
-  type SignatureVerificationData,
-} from "./utils";
 import { store } from "@/redux/store";
 
 export interface VehicleData {
@@ -103,6 +98,3 @@ export const deleteVehicle = (vehicleId: string): Promise<any> => {
     },
   });
 };
-
-// Export types for use in components
-export type { UserData, LoginResponse, SignatureVerificationData };
