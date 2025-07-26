@@ -67,7 +67,7 @@ export const addVehicle = (vehicle: { model: string; vehicleType: string; plateN
   }
 
   return apiPost(`/vehicles`, vehicle, {
-    requireAuth: false,
+    requireAuth: true,
     showToast: false,
     headers: {
       Authorization: `Bearer ${currentToken}`,
@@ -85,7 +85,7 @@ export const deleteVehicle = (vehicleId: string): Promise<any> => {
   }
 
   return apiDelete(`/vehicles/${vehicleId}`, {
-    requireAuth: false,
+    requireAuth: true,
     showToast: false,
     headers: {
       Authorization: `Bearer ${currentToken}`,
@@ -103,7 +103,7 @@ export const updateVehicle = (vehicleId: string, updates: Partial<VehicleData>):
   }
 
   return apiPut(`/vehicles/${vehicleId}`, updates, {
-    requireAuth: false,
+    requireAuth: true,
     showToast: false,
     headers: {
       Authorization: `Bearer ${currentToken}`,
@@ -121,7 +121,7 @@ export const getUserProfile = (): Promise<any> => {
   }
 
   return apiGet(`/user/profile`, {
-    requireAuth: false,
+    requireAuth: true,
     showToast: false,
     headers: {
       Authorization: `Bearer ${currentToken}`,
