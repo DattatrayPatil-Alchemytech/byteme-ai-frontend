@@ -14,6 +14,7 @@ import {
   VehicleData,
   addVehicle,
   deleteVehicle,
+  getUserProfile,
 } from "@/lib/apiHelpers/profile";
 import toast from "react-hot-toast";
 
@@ -53,10 +54,29 @@ export default function UserProfilePage() {
   }>({});
   const [addVehicleLoading, setAddVehicleLoading] = useState(false);
   const [deleteLoadingId, setDeleteLoadingId] = useState<string | null>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [userProfileLoading, setUserProfileLoading] = useState(true);
+  const [userProfileError, setUserProfileError] = useState("");
   const router = useRouter();
 
   // Get user data from redux
   const user = useSelector((state: RootState) => state.user.user);
+
+  useEffect(() => {
+    setVehiclesLoading(true);
+    getUserProfile()
+      .then((data) => {
+        setUserProfile(data);
+        setUserProfileError("");
+      })
+      .catch((err) => {
+        setUserProfileError(err?.message || "Failed to load profile");
+        setUserProfile(null);
+      })
+      .finally(() => {
+        setUserProfileLoading(false);
+      });
+  }, []);
 
   useEffect(() => {
     setVehiclesLoading(true);
@@ -336,25 +356,30 @@ export default function UserProfilePage() {
             <User className="w-20 h-20 text-primary" />
           </div>
           <div className="text-center">
-            <div className="text-3xl font-bold text-foreground mb-1">
-              {"Jane Doe"}
-            </div>
-            <div className="text-base text-muted-foreground mb-2">
-              {user?.email}
-            </div>
-            {/* <div className="inline-block px-5 py-1 rounded-full bg-primary/10 text-primary font-semibold text-sm mt-2">
-              {user?.role === "admin" ? "Admin" : user?.role === "user" ? "Gold" : "Gold"} Tier
-            </div> */}
+            {userProfileLoading ? (
+              <div className="text-base text-muted-foreground mb-2">Loading profile...</div>
+            ) : userProfileError ? (
+              <div className="text-base text-destructive mb-2">{userProfileError}</div>
+            ) : userProfile ? (
+              <>
+                <div className="text-3xl font-bold text-foreground mb-1">
+                  {userProfile.name || "Jane Doe"}
+                </div>
+                <div className="text-base text-muted-foreground mb-2">
+                  {userProfile.email}
+                </div>
+              </>
+            ) : null}
           </div>
         </section>
 
         {/* Badges/NFTs display */}
-        <section className="bg-card rounded-2xl border border-border p-8 mb-4 shadow-lg">
+        {/* <section className="bg-card rounded-2xl border border-border p-8 mb-4 shadow-lg">
           <div className="font-bold text-xl text-foreground mb-6 text-left">
             Badges
           </div>
           <div className="flex gap-8 justify-center">
-            {userProfile.badges.map((badge) => {
+            {userProfile.badges.map((badge: any) => {
               const Icon = badge.icon;
               return (
                 <div key={badge.id} className="flex flex-col items-center">
@@ -368,7 +393,7 @@ export default function UserProfilePage() {
               );
             })}
           </div>
-        </section>
+        </section> */}
 
         {/* Notifications panel removed */}
 
