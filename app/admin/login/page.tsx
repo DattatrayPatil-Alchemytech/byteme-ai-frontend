@@ -46,9 +46,9 @@ export default function AdminLoginPage() {
       localStorage.setItem('adminUsername', formData.username);
       setIsAuthenticated(true);
       router.push('/admin/dashboard');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Admin login error:', error);
-      setError(error.response?.data?.message || 'Login failed. Please check your credentials.');
+      setError('Login failed. Please check your credentials.');
     } finally {
       setIsLoading(false);
     }
