@@ -2,15 +2,14 @@
 import React, { useState, useEffect } from "react";
 import { User, Award, Star, Pencil } from "lucide-react";
 import { DataTable, Column } from "@/components/ui/DataTable";
-import { mockVehicles } from "./mockVehicles";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
-import { getRequest } from "@/lib/api/apiRequests";
 import { RootState } from "@/redux/store";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import Modal from "@/components/modals/Modal";
+import { getUserVehicles, VehicleData } from "@/lib/apiHelpers/profile";
 
 // Mock data for profile, badges, tier, notifications, and vehicles
 const userProfile = {
@@ -29,11 +28,10 @@ const userProfile = {
 };
 
 export default function UserProfilePage() {
-  const [vehicles, setVehicles] = useState(mockVehicles);
+  const [vehicles, setVehicles] = useState<any[]>([]);
   const [editId, setEditId] = useState<number | null>(null);
   const [editName, setEditName] = useState("");
   const [editError, setEditError] = useState("");
-  const [fakeData, setFakeData] = useState<unknown>(null); // New state for fake API data
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [newVehicle, setNewVehicle] = useState({
     name: "",
@@ -52,13 +50,25 @@ export default function UserProfilePage() {
   const user = useSelector((state: RootState) => state.user.user);
 
   useEffect(() => {
-    // Fake API call to /posts/1 using getRequest
-    getRequest("/posts/1")
-      .then((response) => setFakeData(response.data || response))
-      .catch((err) => setFakeData({ error: err.message }));
+    getUserVehicles()
+      .then((data: VehicleData[]) => {
+        console.log("data", data);
+        // Map API data to DataTable expected format
+        const mapped = data.map(vehicle => ({
+          id: vehicle.id,
+          name: `${vehicle.make} ${vehicle.model}`,
+          type: vehicle.vehicleType,
+          reg: vehicle.plateNumber,
+          numberPlate: vehicle.plateNumber,
+        }));
+        setVehicles(mapped);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch vehicles", err);
+      });
   }, []);
 
-  console.log(fakeData);
+  console.log("vehicles", vehicles);
 
   const handleEdit = (id: number, name: string) => {
     setEditId(id);
