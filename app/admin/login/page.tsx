@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { adminLogin, type AdminLoginCredentials } from '@/lib/apiHelpers/admin';
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -31,20 +32,26 @@ export default function AdminLoginPage() {
     setIsLoading(true);
     setError('');
 
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      const credentials: AdminLoginCredentials = {
+        username: formData.username,
+        password: formData.password
+      };
 
-    // Check credentials
-    if (formData.username === 'bytemeadmin' && formData.password === '12345') {
+      const response = await adminLogin(credentials);
+      
+      // Store admin token and login status
+      localStorage.setItem('adminToken', response.token);
       localStorage.setItem('adminLoggedIn', 'true');
       localStorage.setItem('adminUsername', formData.username);
       setIsAuthenticated(true);
       router.push('/admin/dashboard');
-    } else {
-      setError('Invalid credentials. Please try again.');
+    } catch (error: any) {
+      console.error('Admin login error:', error);
+      setError(error.response?.data?.message || 'Login failed. Please check your credentials.');
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -153,14 +160,7 @@ export default function AdminLoginPage() {
           </CardContent>
         </Card>
 
-        {/* Demo Credentials */}
-        <div className="mt-6 p-4 bg-muted/50 rounded-lg">
-          <p className="text-xs text-muted-foreground text-center">
-            <strong>Demo Credentials:</strong><br />
-            Username: bytemeadmin<br />
-            Password: 12345
-          </p>
-        </div>
+
       </div>
     </div>
   );

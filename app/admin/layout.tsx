@@ -44,6 +44,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     // Clear all admin-related data
     localStorage.removeItem('adminLoggedIn');
     localStorage.removeItem('adminUsername');
+    localStorage.removeItem('adminToken');
     localStorage.removeItem('adminWalletAddress');
     localStorage.removeItem('adminSession');
     
