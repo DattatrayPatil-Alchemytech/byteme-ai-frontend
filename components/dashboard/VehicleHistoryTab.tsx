@@ -27,7 +27,8 @@ const VehicleHistoryTab: React.FC = () => {
         const response: VehicleHistoryResponse = await getVehicleHistory(
           currentPage,
           limit,
-          search
+          search,
+          vehicleFilter
         );
         setHistoryData(response.history);
         setTotalItems(response.total);
@@ -41,7 +42,7 @@ const VehicleHistoryTab: React.FC = () => {
     };
 
     fetchHistory();
-  }, [currentPage, limit, search]);
+  }, [currentPage, limit, search, vehicleFilter]);
 
   const columns: Column[] = [
     {
@@ -122,16 +123,10 @@ const VehicleHistoryTab: React.FC = () => {
     }));
   }, [historyData]);
 
-  // Handle activity filter (client-side for now, can be moved to backend later)
+  // No need for client-side filtering since it's handled by backend
   const filteredHistory = useMemo(() => {
-    let filtered = historyData;
-
-    if (vehicleFilter) {
-      filtered = filtered.filter((row) => row.type === vehicleFilter);
-    }
-
-    return filtered;
-  }, [historyData, vehicleFilter]);
+    return historyData;
+  }, [historyData]);
 
   return (
     <div className="space-y-6">
@@ -153,13 +148,13 @@ const VehicleHistoryTab: React.FC = () => {
           onChange={(e) => setSearch(e.target.value)}
           className="border border-border bg-background text-foreground rounded-full px-5 py-3 w-full sm:w-64 text-base font-medium shadow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary hover:ring-2 hover:ring-primary/30 hover:bg-muted placeholder:text-muted-foreground"
         />
-        <Select
+        {/* <Select
           value={vehicleFilter}
           onChange={setVehicleFilter}
-          options={[...activityOptions]}
+          options={[{ value: "", label: "All Activities" }, ...activityOptions]}
           placeholder="All Activities"
           className="bg-background text-foreground border border-border"
-        />
+        /> */}
       </div>
 
       <div className="bg-card/90 rounded-2xl shadow-lg p-4 transition-transform transition-shadow duration-300 hover:scale-[1.01] hover:shadow-2xl">

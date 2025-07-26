@@ -117,7 +117,8 @@ export const getWeeklyLeaderboard = async (): Promise<LeaderboardResponse> => {
 export const getVehicleHistory = (
   page: number = 1,
   limit: number = 20,
-  search?: string
+  search?: string,
+  type?: string
 ): Promise<VehicleHistoryResponse> => {
   const params = new URLSearchParams({
     page: page.toString(),
@@ -126,6 +127,10 @@ export const getVehicleHistory = (
   
   if (search && search.trim()) {
     params.append('search', search.trim());
+  }
+  
+  if (type && type.trim()) {
+    params.append('type', type.trim());
   }
   
   return apiGet<VehicleHistoryResponse>(`/history?${params.toString()}`, {
