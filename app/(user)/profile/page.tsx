@@ -121,6 +121,8 @@ export default function UserProfilePage() {
       setVehiclesLoading(true);
       const data = await getUserVehicles();
       setVehicles(data);
+      setEditId(null);
+      setEditName("");
     } catch (err: any) {
       toast.error(err?.message || "Failed to update vehicle name");
       setEditError(err?.message || "Failed to update vehicle name");
