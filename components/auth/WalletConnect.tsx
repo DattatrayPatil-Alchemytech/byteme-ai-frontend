@@ -28,6 +28,7 @@ export function WalletConnect({ title = "Get Started" }) {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const handleLogin = async () => {
+    setIsLoggingIn(true);
     if (connectionCertificate && account && !user.isAuthenticated) {
       dispatch(loginStart());
 
@@ -60,7 +61,7 @@ export function WalletConnect({ title = "Get Started" }) {
         router.push("/dashboard");
 
         // Optional: Open profile completion modal for new users
-        if (loginResponse?.user) {
+        if (!loginResponse?.user?.email) {
           dispatch(
             openModal({
               modalType: "USER_MODAL",
