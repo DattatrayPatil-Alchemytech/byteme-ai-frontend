@@ -2,7 +2,11 @@
 import { useState, useMemo, useEffect } from "react";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { TableSkeleton } from "@/components/ui/TableSkeleton";
-import { getUsersList, type AdminUser, type UsersListResponse } from "@/lib/apiHelpers/adminUsers";
+import {
+  getUsersList,
+  type AdminUser,
+  type UsersListResponse,
+} from "@/lib/apiHelpers/adminUsers";
 import Link from "next/link";
 import { Eye } from "lucide-react";
 // import { Select } from "@/components/ui/DropdownMenu";
@@ -13,26 +17,35 @@ const columns: Column[] = [
     label: "Wallet Address",
     render: (value: unknown) => (
       <span className="font-mono text-sm">
-        {typeof value === 'string' ? `${value.slice(0, 6)}...${value.slice(-4)}` : String(value)}
+        {value && typeof value === "string"
+          ? `${value.slice(0, 6)}...${value.slice(-4)}`
+          : "N/A"}
       </span>
     ),
   },
   {
     key: "email",
     label: "Email",
+    render: (value: unknown) => (
+      <span>{value && typeof value === "string" ? value : "N/A"}</span>
+    ),
   },
   {
     key: "totalMileage",
     label: "Total Mileage",
     render: (value: unknown) => (
-      <span>{typeof value === 'number' ? value.toLocaleString() : String(value)}</span>
+      <span>
+        {value && typeof value === "number" ? value.toLocaleString() : "N/A"}
+      </span>
     ),
   },
   {
     key: "totalCarbonSaved",
     label: "Carbon Saved",
     render: (value: unknown) => (
-      <span>{typeof value === 'number' ? `${value.toFixed(1)} kg` : String(value)}</span>
+      <span>
+        {value && typeof value === "number" ? `${value.toFixed(1)} kg` : "N/A"}
+      </span>
     ),
   },
   {
@@ -40,7 +53,7 @@ const columns: Column[] = [
     label: "B3TR Balance",
     render: (value: unknown) => (
       <span className="font-semibold text-green-600">
-        {typeof value === 'number' ? value.toFixed(2) : String(value)}
+        {value && typeof value === "number" ? value.toFixed(2) : "N/A"}
       </span>
     ),
   },
@@ -48,13 +61,20 @@ const columns: Column[] = [
     key: "currentTier",
     label: "Tier",
     render: (value: unknown) => (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-        value === 'platinum' ? 'bg-purple-100 text-purple-800' :
-        value === 'gold' ? 'bg-yellow-100 text-yellow-800' :
-        value === 'silver' ? 'bg-gray-100 text-gray-800' :
-        'bg-orange-100 text-orange-800'
-      }`}>
-        {typeof value === 'string' ? value.charAt(0).toUpperCase() + value.slice(1) : String(value)}
+      <span
+        className={`px-2 py-1 rounded-full text-xs font-medium ${
+          value === "platinum"
+            ? "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200"
+            : value === "gold"
+            ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+            : value === "silver"
+            ? "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200"
+            : "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200"
+        }`}
+      >
+        {value && typeof value === "string"
+          ? value.charAt(0).toUpperCase() + value.slice(1)
+          : "N/A"}
       </span>
     ),
   },
@@ -62,10 +82,14 @@ const columns: Column[] = [
     key: "isActive",
     label: "Status",
     render: (value: unknown) => (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-        value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-      }`}>
-        {value ? 'Active' : 'Inactive'}
+      <span
+        className={`px-2 py-1 rounded-full text-xs font-medium ${
+          value
+            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+            : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+        }`}
+      >
+        {value ? "Active" : "Inactive"}
       </span>
     ),
   },
@@ -74,7 +98,9 @@ const columns: Column[] = [
     label: "Last Login",
     render: (value: unknown) => (
       <span className="text-sm text-muted-foreground">
-        {typeof value === 'string' ? new Date(value).toLocaleDateString() : String(value)}
+        {value && typeof value === "string"
+          ? new Date(value).toLocaleDateString()
+          : "N/A"}
       </span>
     ),
   },
@@ -84,12 +110,13 @@ const columns: Column[] = [
     render: (value: unknown, row: Record<string, unknown>) => {
       const user = row as { id: string };
       return (
-        <div className="flex gap-2 items-center justify-center">
+        <div className="flex items-center justify-center w-full">
           <Link
             href={`/admin/users/${user.id}`}
-            className="flex items-center gap-1 font-semibold text-foreground hover:underline cursor-pointer"
+            className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors duration-200 group"
+            title="View User Details"
           >
-            <Eye className="w-4 h-4" />
+            <Eye className="w-4 h-4 text-slate-600 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-slate-200 transition-colors" />
           </Link>
         </div>
       );
@@ -111,11 +138,15 @@ export default function UsersPage() {
     const fetchUsers = async () => {
       try {
         setIsLoading(true);
-        const response: UsersListResponse = await getUsersList(currentPage, limit, search);
+        const response: UsersListResponse = await getUsersList(
+          currentPage,
+          limit,
+          search
+        );
         setUsers(response.users);
         setTotalUsers(response.total);
       } catch (error) {
-        console.error('Failed to fetch users:', error);
+        console.error("Failed to fetch users:", error);
         setUsers([]);
         setTotalUsers(0);
       } finally {
@@ -167,7 +198,7 @@ export default function UsersPage() {
         <div className="flex flex-col md:flex-row md:items-center gap-4">
           <input
             type="text"
-            placeholder="Search users by email or wallet address..."
+            placeholder="Search users"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="border border-border bg-background text-foreground rounded-lg px-5 py-3 w-full md:w-64 text-base font-medium shadow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary hover:ring-2 hover:ring-primary/30 hover:bg-muted placeholder:text-muted-foreground"
@@ -235,12 +266,13 @@ export default function UsersPage() {
             </select>
             <span className="text-sm text-muted-foreground">entries</span>
           </div>
-          
+
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">
-              Showing {((currentPage - 1) * limit) + 1} to {Math.min(currentPage * limit, totalUsers)} of {totalUsers} users
+              Showing {(currentPage - 1) * limit + 1} to{" "}
+              {Math.min(currentPage * limit, totalUsers)} of {totalUsers} users
             </span>
-            
+
             <div className="flex gap-1">
               <button
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
