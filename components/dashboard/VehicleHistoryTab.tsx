@@ -3,6 +3,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { Select } from "@/components/ui/DropdownMenu";
+import { TableSkeleton } from "@/components/ui/TableSkeleton";
 import {
   getVehicleHistory,
   type VehicleHistoryResponse,
@@ -37,17 +38,6 @@ const VehicleHistoryTab: React.FC = () => {
 
     fetchHistory();
   }, [currentPage, limit, search]);
-
-  console.log("historyData ------------", historyData);
-
-  // Remove the debounce effect since we're now using backend search
-  // useEffect(() => {
-  //   const timeoutId = setTimeout(() => {
-  //     setCurrentPage(1); // Reset to first page when searching
-  //   }, 500);
-
-  //   return () => clearTimeout(timeoutId);
-  // }, [search]);
 
   const columns: Column[] = [
     {
@@ -122,28 +112,6 @@ const VehicleHistoryTab: React.FC = () => {
     return filtered;
   }, [historyData, vehicleFilter]);
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-foreground mb-2">
-            Your Activity History
-          </h2>
-          <p className="text-muted-foreground">
-            Track your rewards and activities
-          </p>
-        </div>
-        <div className="bg-card/90 rounded-2xl shadow-lg p-4">
-          <div className="animate-pulse space-y-4">
-            {[...Array(5)].map((_, idx) => (
-              <div key={idx} className="h-12 bg-muted rounded"></div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
       <div className="text-center mb-8">
@@ -174,7 +142,7 @@ const VehicleHistoryTab: React.FC = () => {
           <Select
             value={vehicleFilter}
             onChange={setVehicleFilter}
-            options={[{ value: "", label: "All Activities" }, ...activityOptions]}
+            options={[...activityOptions]}
             placeholder="All Activities"
             className="bg-background text-foreground border border-border"
           />
@@ -182,12 +150,16 @@ const VehicleHistoryTab: React.FC = () => {
       </div>
 
       <div className="bg-card/90 rounded-2xl shadow-lg p-4 transition-transform transition-shadow duration-300 hover:scale-[1.01] hover:shadow-2xl">
-        <DataTable
-          columns={columns}
-          data={filteredHistory as unknown as Record<string, unknown>[]}
-          emptyMessage="No vehicle history found"
-          pagination={false} // Disable built-in pagination since we're using backend pagination
-        />
+        {loading ? (
+          <TableSkeleton rows={10} columns={6} />
+        ) : (
+          <DataTable
+            columns={columns}
+            data={filteredHistory as unknown as Record<string, unknown>[]}
+            emptyMessage="No activity history found"
+            pagination={false} // Disable built-in pagination since we're using backend pagination
+          />
+        )}
       </div>
 
       {/* Backend Pagination Controls */}
