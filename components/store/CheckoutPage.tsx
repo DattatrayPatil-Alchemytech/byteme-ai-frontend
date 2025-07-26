@@ -41,6 +41,7 @@ interface CheckoutPageProps {
   userTokens: number;
   onBack: () => void;
   onPurchaseComplete: (orderId: string) => void;
+  onQuantityChange: (quantity: number) => void;
 }
 
 interface ShippingInfo {
@@ -60,7 +61,8 @@ export default function CheckoutPage({
   quantity, 
   userTokens, 
   onBack, 
-  onPurchaseComplete 
+  onPurchaseComplete,
+  onQuantityChange
 }: CheckoutPageProps) {
   const router = useRouter();
   const [step, setStep] = useState<"shipping" | "review" | "processing" | "success">("shipping");
@@ -80,6 +82,11 @@ export default function CheckoutPage({
   const subtotal = product.price * quantity;
   const shippingCost = 0; // Free shipping for B3TR purchases
   const total = subtotal + shippingCost;
+  const remainingTokens = userTokens - total;
+
+  const handleQuantityChange = (newQuantity: number) => {
+    onQuantityChange(newQuantity);
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -189,6 +196,78 @@ export default function CheckoutPage({
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
+                {/* Product Details and Quantity */}
+                <div className="border border-border rounded-lg p-4 bg-muted/20">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg flex items-center justify-center">
+                      <Package className="w-8 h-8 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-foreground">{product.name}</h3>
+                      <p className="text-sm text-muted-foreground">{product.description}</p>
+                      <div className="flex items-center space-x-4 mt-2">
+                        <span className="text-sm text-success">{product.ecoImpact}</span>
+                        <span className="text-sm text-muted-foreground">Stock: {product.stock}</span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-semibold text-primary">{product.price} B3TR</div>
+                      <div className="text-sm text-muted-foreground">per item</div>
+                    </div>
+                  </div>
+                  
+                  {/* Quantity Controls */}
+                  <div className="mt-4 pt-4 border-t border-border">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label className="text-foreground">Quantity</Label>
+                        <div className="flex items-center space-x-2 mt-1">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleQuantityChange(Math.max(1, quantity - 1))}
+                            disabled={quantity <= 1}
+                          >
+                            -
+                          </Button>
+                          <span className="w-12 text-center font-semibold">{quantity}</span>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleQuantityChange(quantity + 1)}
+                            disabled={quantity >= Math.min(Math.floor(userTokens / product.price), product.stock)}
+                          >
+                            +
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm text-muted-foreground">Subtotal</div>
+                        <div className="font-semibold text-primary">{subtotal} B3TR</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Token Information */}
+                  <div className="mt-3 pt-3 border-t border-border">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Your Tokens:</span>
+                      <span className="font-semibold text-green-600">{userTokens} B3TR</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Remaining after purchase:</span>
+                      <span className={`font-semibold ${remainingTokens >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {remainingTokens} B3TR
+                      </span>
+                    </div>
+                    {remainingTokens < 0 && (
+                      <div className="mt-2 text-xs text-red-600">
+                        Insufficient tokens. Please reduce quantity.
+                      </div>
+                    )}
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="fullName" className="text-foreground">Full Name *</Label>
@@ -300,6 +379,7 @@ export default function CheckoutPage({
                 <Button 
                   onClick={handleContinueToReview}
                   className="w-full gradient-ev-green hover:from-emerald-600 hover:to-green-700"
+                  disabled={remainingTokens < 0}
                 >
                   Continue to Review
                 </Button>
