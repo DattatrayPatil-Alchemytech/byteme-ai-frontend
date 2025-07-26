@@ -43,42 +43,7 @@ export default function CTASection() {
             <span className="text-gradient-primary font-semibold">B3TR tokens</span> for sustainable driving.
           </motion.p>
           
-          {/* Enhanced CTA Button */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={ctaVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-          >
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Button 
-                variant="default" 
-                size="xl" 
-                className="gradient-aurora hover-glow text-white font-bold px-12 py-6 text-xl shadow-2xl"
-                onClick={() => router.push('/uploads')}
-              >
-                🚀 Get Started Now
-              </Button>
-            </motion.div>
-            
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Link href="/demo">
-                <Button 
-                  variant="outline" 
-                  size="xl"
-                  className="hover-lift hover-scale border-2 border-primary/20 hover:border-primary/40 px-12 py-6 text-xl"
-                >
-                  🎬 Watch Demo
-                </Button>
-              </Link>
-            </motion.div>
-          </motion.div>
+          
           
           {/* Additional Features */}
           <motion.div
