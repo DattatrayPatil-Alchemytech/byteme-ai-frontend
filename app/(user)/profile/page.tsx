@@ -60,7 +60,7 @@ export default function UserProfilePage() {
         // Map API data to DataTable expected format
         const mapped = data.map((vehicle) => ({
           id: vehicle.id,
-          name: `${vehicle.make} ${vehicle.model}`,
+          name: [vehicle.make, vehicle.model].filter(v => v && v !== 'null' && v !== '').join(' '),
           type: vehicle.vehicleType,
           reg: vehicle.plateNumber,
           numberPlate: vehicle.plateNumber,
@@ -112,15 +112,12 @@ export default function UserProfilePage() {
         plateNumber: newVehicle.plateNumber,
       });
       toast.success("Vehicle added successfully!");
-      setAddDialogOpen(false);
-      setNewVehicle({ model: "", vehicleType: "", plateNumber: "" });
-      setAddError("");
-      setAddFieldErrors({});
+      handleCloseAddDialog();
       setVehiclesLoading(true);
       const data = await getUserVehicles();
       const mapped = data.map((vehicle: VehicleData) => ({
         id: vehicle.id,
-        name: `${vehicle.make} ${vehicle.model}`,
+        name: [vehicle.make, vehicle.model].filter(Boolean).join(' '),
         type: vehicle.vehicleType,
         reg: vehicle.plateNumber,
         numberPlate: vehicle.plateNumber,
@@ -133,6 +130,14 @@ export default function UserProfilePage() {
       setAddVehicleLoading(false);
       setVehiclesLoading(false);
     }
+  };
+
+  // Helper to close dialog and reset form
+  const handleCloseAddDialog = () => {
+    setAddDialogOpen(false);
+    setNewVehicle({ model: "", vehicleType: "", plateNumber: "" });
+    setAddError("");
+    setAddFieldErrors({});
   };
 
   // DataTable columns
@@ -184,18 +189,6 @@ export default function UserProfilePage() {
           {value as string}
         </span>
       ),
-    },
-    {
-      key: "reg",
-      label: "Registration",
-      render: (value) => {
-        const stringValue = value as string | undefined;
-        return stringValue ? (
-          <span className="font-mono text-success">{stringValue}</span>
-        ) : (
-          <span className="text-muted-foreground">N/A</span>
-        );
-      },
     },
     {
       key: "numberPlate",
@@ -368,7 +361,7 @@ export default function UserProfilePage() {
         </section>
         <Modal
           show={addDialogOpen}
-          handleClose={() => setAddDialogOpen(false)}
+          handleClose={handleCloseAddDialog}
           title="Add Vehicle"
           animate={false}
         >
@@ -428,7 +421,7 @@ export default function UserProfilePage() {
             <div className="flex justify-end gap-2 mt-4">
               <Button
                 variant="secondary"
-                onClick={() => setAddDialogOpen(false)}
+                onClick={handleCloseAddDialog}
               >
                 Cancel
               </Button>
