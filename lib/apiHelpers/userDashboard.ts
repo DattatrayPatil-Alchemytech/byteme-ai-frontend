@@ -1,4 +1,4 @@
-import { apiPut, apiPost, apiGet, apiDelete } from "./apiMiddleware";
+import { apiGet } from "./apiMiddleware";
 
 // Dashboard data interface based on the provided JSON structure
 export interface DashboardData {

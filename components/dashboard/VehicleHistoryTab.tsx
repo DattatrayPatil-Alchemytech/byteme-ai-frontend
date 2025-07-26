@@ -52,7 +52,7 @@ const VehicleHistoryTab: React.FC = () => {
         <div className="flex items-center gap-2">
           <span className="text-base">{value as string}</span>
           <span className="text-xs text-muted-foreground dark:text-slate-400 capitalize">
-            {(row as any).type?.replace("_", " ")}
+            {(row as unknown as VehicleHistoryItem).type?.replace("_", " ")}
           </span>
         </div>
       ),
@@ -86,7 +86,7 @@ const VehicleHistoryTab: React.FC = () => {
       render: (value, row) => (
         <span
           className={`text-sm font-semibold ${
-            (row as any).isPositiveChange ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
+            (row as unknown as VehicleHistoryItem).isPositiveChange ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
           }`}
         >
           {value as string}
@@ -99,7 +99,7 @@ const VehicleHistoryTab: React.FC = () => {
       render: (value, row) => (
         <span
           className={`text-xs ${
-            (row as any).isPositiveChange ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
+            (row as unknown as VehicleHistoryItem).isPositiveChange ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
           }`}
         >
           {value as string}
