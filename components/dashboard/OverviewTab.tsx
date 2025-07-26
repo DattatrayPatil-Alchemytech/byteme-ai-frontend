@@ -2,6 +2,31 @@ import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getDashboardData, type DashboardData } from "@/lib/apiHelpers/userDashboard";
 
+const defaultDashboard: DashboardData = {
+  walletBalance: 0,
+  totalRewards: 0,
+  totalCarbonSaved: 0,
+  totalEvMiles: 0,
+  currentTier: "",
+  totalPoints: 0,
+  vehicleCount: 0,
+  uploadCount: 0,
+  globalRank: 0,
+  weeklyStats: {
+    milesThisWeek: 0,
+    carbonSavedThisWeek: 0,
+    rewardsEarnedThisWeek: 0,
+    uploadsThisWeek: 0,
+  },
+  monthlyStats: {
+    milesThisMonth: 0,
+    carbonSavedThisMonth: 0,
+    rewardsEarnedThisMonth: 0,
+    uploadsThisMonth: 0,
+  },
+  recentActivity: [],
+};
+
 const OverviewTab = () => {
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -14,6 +39,7 @@ const OverviewTab = () => {
       })
       .catch((err) => {
         console.error("Failed to fetch dashboard data", err);
+        setDashboard(defaultDashboard);
       })
       .finally(() => setLoading(false));
   }, []);
