@@ -37,10 +37,9 @@ export interface SystemAnalytics {
   uploadStatus: UploadStatusData[];
 }
 
-// Get dashboard stats
 export const getDashboardStats = (): Promise<DashboardStats> => {
   return apiGet<DashboardStats>("/admin/dashboard/stats", {
-    requireAuth: true,
+    requireAuth: false,
     isAdmin: true, // Use admin token
   });
 };

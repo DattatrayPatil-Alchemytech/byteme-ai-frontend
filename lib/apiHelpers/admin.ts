@@ -1,8 +1,28 @@
 import { apiPost } from "./apiMiddleware";
 
+// Admin user data type
+export interface AdminUser {
+  id: string;
+  username: string;
+  email: string;
+  walletAddress: string;
+  isActive: boolean;
+  isVerified: boolean;
+  totalMileage: number;
+  totalCarbonSaved: number;
+  totalPoints: number;
+  currentTier: string;
+  b3trBalance: number;
+  profileImageUrl: string | null;
+}
+
 // Admin login response type
 export interface AdminLoginResponse {
-  token: string;
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+  refreshExpiresIn: number;
+  user: AdminUser;
   message: string;
 }
 

@@ -231,7 +231,7 @@ export default function Header() {
                   );
                 }}
               >
-                Login / Sign Up
+                Sign in / Sign up
               </Button>
             )}
           </div>

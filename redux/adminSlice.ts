@@ -3,17 +3,25 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 interface AdminData {
   id: string;
   username: string;
-  email?: string;
-  role: string;
-  permissions?: string[];
-  createdAt: string;
-  lastLogin: string;
+  email: string;
+  walletAddress: string;
+  isActive: boolean;
+  isVerified: boolean;
+  totalMileage: number;
+  totalCarbonSaved: number;
+  totalPoints: number;
+  currentTier: string;
+  b3trBalance: number;
+  profileImageUrl: string | null;
 }
 
 interface AdminLoginResponse {
-  token: string;
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+  refreshExpiresIn: number;
+  user: AdminData;
   message: string;
-  admin?: AdminData;
 }
 
 interface AdminState {
@@ -43,8 +51,8 @@ export const adminSlice = createSlice({
     adminLoginSuccess: (state, action: PayloadAction<AdminLoginResponse>) => {
       state.isLoading = false;
       state.isAuthenticated = true;
-      state.admin = action.payload.admin || null;
-      state.accessToken = action.payload.token;
+      state.admin = action.payload.user;
+      state.accessToken = action.payload.accessToken;
       state.error = null;
     },
     adminLoginFailure: (state, action: PayloadAction<string>) => {
@@ -66,7 +74,6 @@ export const adminSlice = createSlice({
         state.admin = {
           ...state.admin,
           ...action.payload,
-          lastLogin: new Date().toISOString(),
         };
       }
     },

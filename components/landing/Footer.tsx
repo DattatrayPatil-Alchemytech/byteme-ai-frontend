@@ -1,6 +1,7 @@
-'use client';
+"use client";
 
-import { Separator } from '@/components/ui/separator';
+import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
 
 export default function Footer() {
   return (
@@ -10,50 +11,83 @@ export default function Footer() {
           <div>
             <div className="flex items-center space-x-2 mb-4">
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">⚡</span>
+                <span className="text-primary-foreground font-bold text-sm">
+                  ⚡
+                </span>
               </div>
               <span className="text-foreground font-bold text-lg">
                 ByteMe AI
               </span>
             </div>
             <p className="text-muted-foreground text-sm">
-              Empowering sustainable driving with AI-powered rewards and blockchain technology.
+              Empowering sustainable driving with AI-powered rewards and
+              blockchain technology.
             </p>
           </div>
-          
+
           <div>
             <h3 className="text-foreground font-semibold mb-4">Platform</h3>
             <ul className="space-y-2 text-sm">
-              <li><a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">Features</a></li>
-              <li><a href="#how-it-works" className="text-muted-foreground hover:text-foreground transition-colors">How it Works</a></li>
-              <li><a href="#rewards" className="text-muted-foreground hover:text-foreground transition-colors">Rewards</a></li>
-              <li><a href="#faq" className="text-muted-foreground hover:text-foreground transition-colors">FAQ</a></li>
+              <li>
+                <a
+                  href="#features"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Features
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#how-it-works"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  How it Works
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#rewards"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Rewards
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#faq"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  FAQ
+                </a>
+              </li>
             </ul>
           </div>
-          
+
           <div>
             <h3 className="text-foreground font-semibold mb-4">Support</h3>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Documentation</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Contact Support</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Terms of Service</a></li>
-            </ul>
-          </div>
-          
-          <div>
-            <h3 className="text-foreground font-semibold mb-4">Connect</h3>
-            <ul className="space-y-2 text-sm">
-              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Twitter</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Discord</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Telegram</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">GitHub</a></li>
+              <li>
+                <Link
+                  href="/documentation"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Documentation
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/contact-support"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Contact Support
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
-        
+
         <Separator className="mb-8" />
-        
+
         <div className="flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground">
           <p>&copy; 2024 byteme ai. All rights reserved.</p>
           <p>Built on VeChain blockchain for sustainable driving rewards.</p>
@@ -61,4 +95,4 @@ export default function Footer() {
       </div>
     </footer>
   );
-} 
+}
