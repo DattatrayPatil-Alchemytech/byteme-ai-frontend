@@ -9,7 +9,8 @@ import { RootState } from "@/redux/store";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import Modal from "@/components/modals/Modal";
-import { getUserVehicles, VehicleData } from "@/lib/apiHelpers/profile";
+import { getUserVehicles, VehicleData, addVehicle } from "@/lib/apiHelpers/profile";
+import toast from "react-hot-toast";
 
 // Mock data for profile, badges, tier, notifications, and vehicles
 const userProfile = {
@@ -35,16 +36,17 @@ export default function UserProfilePage() {
   const [editError, setEditError] = useState("");
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [newVehicle, setNewVehicle] = useState({
-    name: "",
-    type: "",
-    numberPlate: "",
+    model: "",
+    vehicleType: "",
+    plateNumber: "",
   });
   const [addError, setAddError] = useState("");
   const [addFieldErrors, setAddFieldErrors] = useState<{
-    name?: string;
-    type?: string;
-    numberPlate?: string;
+    model?: string;
+    vehicleType?: string;
+    plateNumber?: string;
   }>({});
+  const [addVehicleLoading, setAddVehicleLoading] = useState(false);
   const router = useRouter();
 
   // Get user data from redux
@@ -96,26 +98,41 @@ export default function UserProfilePage() {
     setVehicles(vehicles.filter((v) => v.id !== id));
   };
 
-  const handleAddVehicle = () => {
-    const errors: { name?: string; type?: string; numberPlate?: string } = {};
-    if (!newVehicle.name.trim()) errors.name = "Name is required";
-    if (!newVehicle.type.trim()) errors.type = "Type is required";
+  const handleAddVehicle = async () => {
+    const errors: { model?: string; vehicleType?: string; plateNumber?: string } = {};
+    if (!newVehicle.model.trim()) errors.model = "Model is required";
+    if (!newVehicle.vehicleType.trim()) errors.vehicleType = "Type is required";
     setAddFieldErrors(errors);
     if (Object.keys(errors).length > 0) return;
-    setVehicles([
-      ...vehicles,
-      {
-        id: Date.now(),
-        name: newVehicle.name,
-        type: newVehicle.type,
-        reg: newVehicle.numberPlate,
-        numberPlate: newVehicle.numberPlate,
-      },
-    ]);
-    setAddDialogOpen(false);
-    setNewVehicle({ name: "", type: "", numberPlate: "" });
-    setAddError("");
-    setAddFieldErrors({});
+    setAddVehicleLoading(true);
+    try {
+      await addVehicle({
+        model: newVehicle.model,
+        vehicleType: newVehicle.vehicleType,
+        plateNumber: newVehicle.plateNumber,
+      });
+      toast.success("Vehicle added successfully!");
+      setAddDialogOpen(false);
+      setNewVehicle({ model: "", vehicleType: "", plateNumber: "" });
+      setAddError("");
+      setAddFieldErrors({});
+      setVehiclesLoading(true);
+      const data = await getUserVehicles();
+      const mapped = data.map((vehicle: VehicleData) => ({
+        id: vehicle.id,
+        name: `${vehicle.make} ${vehicle.model}`,
+        type: vehicle.vehicleType,
+        reg: vehicle.plateNumber,
+        numberPlate: vehicle.plateNumber,
+      }));
+      setVehicles(mapped);
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to add vehicle");
+      setAddError(err?.message || "Failed to add vehicle");
+    } finally {
+      setAddVehicleLoading(false);
+      setVehiclesLoading(false);
+    }
   };
 
   // DataTable columns
@@ -221,6 +238,8 @@ export default function UserProfilePage() {
           background-color: hsl(var(--background));
           color: hsl(var(--foreground));
           border-color: hsl(var(--border));
+          border-width: 1px;
+          border-style: solid;
         }
 
         select option {
@@ -344,6 +363,7 @@ export default function UserProfilePage() {
             columns={columns}
             data={vehicles as unknown as Record<string, unknown>[]}
             loading={vehiclesLoading}
+            emptyMessage="No vehicles found. Add your first vehicle!"
           />
         </section>
         <Modal
@@ -355,63 +375,52 @@ export default function UserProfilePage() {
           <div className="space-y-4 modal-content modal-container">
             <div>
               <Input
-                placeholder="Name"
-                value={newVehicle.name}
+                placeholder="Model"
+                value={newVehicle.model}
                 onChange={(e) =>
-                  setNewVehicle({ ...newVehicle, name: e.target.value })
+                  setNewVehicle({ ...newVehicle, model: e.target.value })
                 }
                 className="bg-background text-foreground border-border focus:ring-2 focus:ring-primary"
               />
-              {addFieldErrors.name && (
+              {addFieldErrors.model && (
                 <div className="text-destructive text-sm mt-1">
-                  {addFieldErrors.name}
+                  {addFieldErrors.model}
                 </div>
               )}
             </div>
             <div>
               <div className="dropdown-container">
                 <Select
-                  value={newVehicle.type}
+                  value={newVehicle.vehicleType}
                   onChange={(e) =>
-                    setNewVehicle({ ...newVehicle, type: e.target.value })
+                    setNewVehicle({ ...newVehicle, vehicleType: e.target.value })
                   }
                   className="bg-background text-foreground border-border focus:ring-2 focus:ring-primary"
                 >
                   <option value="" className="bg-background text-foreground">
                     Select Type
                   </option>
-                  <option
-                    value="2-Wheel"
-                    className="bg-background text-foreground"
-                  >
-                    2-Wheel
-                  </option>
-                  <option
-                    value="3-Wheel"
-                    className="bg-background text-foreground"
-                  >
-                    3-Wheel
-                  </option>
-                  <option
-                    value="4-Wheel"
-                    className="bg-background text-foreground"
-                  >
-                    4-Wheel
-                  </option>
+                  <option value="car" className="bg-background text-foreground">Car</option>
+                  <option value="suv" className="bg-background text-foreground">SUV</option>
+                  <option value="motorcycle" className="bg-background text-foreground">Motorcycle</option>
+                  <option value="scooter" className="bg-background text-foreground">Scooter</option>
+                  <option value="truck" className="bg-background text-foreground">Truck</option>
+                  <option value="van" className="bg-background text-foreground">Van</option>
+                  <option value="other" className="bg-background text-foreground">Other</option>
                 </Select>
               </div>
-              {addFieldErrors.type && (
+              {addFieldErrors.vehicleType && (
                 <div className="text-destructive text-sm mt-1">
-                  {addFieldErrors.type}
+                  {addFieldErrors.vehicleType}
                 </div>
               )}
             </div>
             <div>
               <Input
-                placeholder="Number Plate"
-                value={newVehicle.numberPlate}
+                placeholder="Plate Number"
+                value={newVehicle.plateNumber}
                 onChange={(e) =>
-                  setNewVehicle({ ...newVehicle, numberPlate: e.target.value })
+                  setNewVehicle({ ...newVehicle, plateNumber: e.target.value })
                 }
                 className="bg-background text-foreground border-border focus:ring-2 focus:ring-primary"
               />
@@ -423,8 +432,8 @@ export default function UserProfilePage() {
               >
                 Cancel
               </Button>
-              <Button variant="default" onClick={handleAddVehicle}>
-                Add
+              <Button variant="default" onClick={handleAddVehicle} disabled={addVehicleLoading}>
+                {addVehicleLoading ? "Adding..." : "Add"}
               </Button>
             </div>
           </div>
