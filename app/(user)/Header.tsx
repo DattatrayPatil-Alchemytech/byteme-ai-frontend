@@ -148,7 +148,7 @@ export default function Header() {
                   )}
                 </button>
                 {showNotifications && (
-                  <div className="absolute right-0 top-12 w-80 bg-white rounded-xl shadow-xl border border-muted z-50 p-4 animate-fade-in">
+                  <div className="absolute right-0 top-12 w-80 bg-card rounded-xl shadow-xl border border-border z-50 p-4 animate-fade-in">
                     <div className="font-bold text-lg mb-2 text-foreground">
                       Notifications
                     </div>
@@ -161,7 +161,7 @@ export default function Header() {
                             key={note.id}
                             className={
                               note.read
-                                ? "text-gray-400"
+                                ? "text-muted-foreground"
                                 : "font-medium text-foreground"
                             }
                           >
