@@ -26,6 +26,32 @@ export interface DashboardData {
   recentActivity: unknown[];
 }
 
+export interface LeaderboardEntry {
+  rank: number;
+  userId: string;
+  walletAddress: string;
+  username: string;
+  profileImageUrl: string;
+  totalMileage: number;
+  totalCarbonSaved: number;
+  totalRewards: number;
+  totalPoints: number;
+  uploadCount: number;
+  rankDisplay: string;
+}
+
+export interface LeaderboardResponse {
+  period: string;
+  periodStart: string;
+  periodEnd: string;
+  userRank: number;
+  totalParticipants: number;
+  entries: LeaderboardEntry[];
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 // Function to get user vehicles for dashboard
 export const getDashboardData = (): Promise<DashboardData> => {
   return apiGet<DashboardData>(`/user/dashboard`, {
@@ -33,5 +59,12 @@ export const getDashboardData = (): Promise<DashboardData> => {
     showToast: false,
   }).then((response) => {
     return response;
+  });
+};
+
+export const getWeeklyLeaderboard = async (): Promise<LeaderboardResponse> => {
+  return apiGet<LeaderboardResponse>(`/leaderboard?page=1&limit=5`, {
+    requireAuth: true,
+    showToast: false,
   });
 };

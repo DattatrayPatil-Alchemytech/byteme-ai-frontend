@@ -6,8 +6,6 @@ import Badges from "@/components/dashboard/Badges";
 import Leaderboard from "@/components/dashboard/Leaderboard";
 import TokenStore from "@/components/dashboard/TokenStore";
 import OverviewTab from "@/components/dashboard/OverviewTab";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-// Inline VehicleHistoryPage logic here for the History tab
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { mockHistory } from "./mockHistory";
 import { useMemo } from "react";
@@ -138,190 +136,6 @@ export default function DashboardPage() {
     { id: 4, type: "streak-7", earnedAt: "2024-01-30" },
   ]);
 
-  const [leaderboard] = useState({
-    weekly: [
-      {
-        id: 1,
-        name: "Sarah Johnson",
-        vehicleModel: "Tesla Model Y",
-        miles: 156,
-        b3trTokens: 78,
-      },
-      {
-        id: 2,
-        name: "Mike Chen",
-        vehicleModel: "Nissan Leaf",
-        miles: 142,
-        b3trTokens: 71,
-      },
-      {
-        id: 3,
-        name: "Emma Davis",
-        vehicleModel: "Tesla Model 3",
-        miles: 128,
-        b3trTokens: 64,
-      },
-      {
-        id: 4,
-        name: "Alex Rodriguez",
-        vehicleModel: "Chevrolet Bolt",
-        miles: 115,
-        b3trTokens: 58,
-      },
-      {
-        id: 5,
-        name: "John Doe",
-        vehicleModel: "Tesla Model 3",
-        miles: 89,
-        b3trTokens: 45,
-      },
-    ],
-    monthly: [
-      {
-        id: 1,
-        name: "Sarah Johnson",
-        vehicleModel: "Tesla Model Y",
-        miles: 1247,
-        b3trTokens: 623,
-      },
-      {
-        id: 2,
-        name: "Mike Chen",
-        vehicleModel: "Nissan Leaf",
-        miles: 1189,
-        b3trTokens: 595,
-      },
-      {
-        id: 3,
-        name: "Emma Davis",
-        vehicleModel: "Tesla Model 3",
-        miles: 1156,
-        b3trTokens: 578,
-      },
-      {
-        id: 4,
-        name: "Alex Rodriguez",
-        vehicleModel: "Chevrolet Bolt",
-        miles: 1089,
-        b3trTokens: 545,
-      },
-      {
-        id: 5,
-        name: "John Doe",
-        vehicleModel: "Tesla Model 3",
-        miles: 1023,
-        b3trTokens: 512,
-      },
-    ],
-  });
-
-  const [challenges] = useState([
-    {
-      id: 1,
-      icon: "🚗",
-      title: "Weekly Mileage Challenge",
-      description: "Drive the most miles this week",
-      status: "active",
-      participants: 45,
-      daysLeft: 3,
-      reward: 100,
-      duration: "7 days",
-      requirements: [
-        "Drive at least 50 miles",
-        "Use eco-driving mode",
-        "Complete 5 trips",
-      ],
-      isJoined: true,
-    },
-    {
-      id: 2,
-      icon: "🌱",
-      title: "Eco Warrior Challenge",
-      description: "Maintain 90%+ eco-driving score",
-      status: "active",
-      participants: 32,
-      daysLeft: 7,
-      reward: 75,
-      duration: "14 days",
-      requirements: [
-        "Maintain eco-driving score above 90%",
-        "Complete 10 trips",
-        "Use regenerative braking",
-      ],
-      isJoined: false,
-    },
-  ]);
-
-  const [storeProducts] = useState([
-    {
-      id: 1,
-      name: "Solar Phone Charger",
-      description: "Portable solar charger for your devices",
-      category: "electronics",
-      price: 50,
-      stock: 25,
-      ecoImpact: "Saves 2kg CO2/month",
-      features: [
-        "100% solar powered",
-        "Fast charging",
-        "Waterproof",
-        "Portable design",
-      ],
-    },
-    {
-      id: 2,
-      name: "Bamboo Water Bottle",
-      description: "Eco-friendly reusable water bottle",
-      category: "accessories",
-      price: 30,
-      stock: 50,
-      ecoImpact: "Saves 1kg CO2/month",
-      features: ["Bamboo material", "BPA free", "Insulated", "Leak proof"],
-    },
-    {
-      id: 3,
-      name: "Organic Cotton T-Shirt",
-      description: "Sustainable cotton t-shirt",
-      category: "clothing",
-      price: 40,
-      stock: 15,
-      ecoImpact: "Saves 3kg CO2 vs conventional cotton",
-      features: [
-        "100% organic cotton",
-        "Fair trade certified",
-        "Biodegradable",
-        "Comfortable fit",
-      ],
-    },
-  ]);
-
-  const [purchaseHistory] = useState([
-    {
-      id: 1,
-      product: { name: "Solar Phone Charger", category: "electronics" },
-      quantity: 1,
-      totalCost: 50,
-      date: "2024-01-28",
-    },
-    {
-      id: 2,
-      product: { name: "Bamboo Water Bottle", category: "accessories" },
-      quantity: 2,
-      totalCost: 60,
-      date: "2024-01-25",
-    },
-  ]);
-
-  const handleJoinChallenge = (challengeId: number) => {
-    // Handle challenge joining
-    console.log("Joining challenge:", challengeId);
-  };
-
-  const handlePurchase = async (productId: number, quantity: number) => {
-    // Handle token purchase
-    console.log("Purchasing product:", productId, "Quantity:", quantity);
-  };
-
   const handleBadgeShare = (message: string) => {
     // Handle badge sharing
     console.log("Badge shared:", message);
@@ -407,20 +221,13 @@ export default function DashboardPage() {
       )}
 
       {/* Leaderboard Tab */}
-      {activeTab === "leaderboard" && (
-        <Leaderboard
-          leaderboard={leaderboard}
-          challenges={challenges}
-          userRank={{ rank: user.currentRank, miles: user.weeklyMiles }}
-          onJoinChallenge={handleJoinChallenge}
-        />
-      )}
+      {activeTab === "leaderboard" && <Leaderboard />}
 
       {/* History Tab */}
       {activeTab === "history" && <VehicleHistoryTab />}
 
       {/* Store Tab */}
-      {activeTab === "store" && <TokenStore/>}
+      {activeTab === "store" && <TokenStore />}
 
       {/* Mobile Bottom Navigation Bar */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-xl border-t border-border shadow-lg z-50">
