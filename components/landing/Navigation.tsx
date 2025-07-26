@@ -1,17 +1,16 @@
 "use client";
 
+//Node Modules
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
+
+//Components
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { useDispatch, useSelector } from "react-redux";
-import { openModal } from "@/redux/modalSlice";
-import { RootState } from "@/redux/store";
+import WalletConnect from "../auth/WalletConnect";
 
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const dispatch = useDispatch();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,12 +28,6 @@ export default function Navigation() {
     { href: "#rewards", label: "Rewards" },
     { href: "#faq", label: "FAQ" },
   ];
-
-  const handleLogin = () => {
-    dispatch(openModal({ modalType: "LOGIN_MODAL", title: "Welcome" }));
-  };
-
-  const userLoading = useSelector((state: RootState) => state.user.isLoading);
 
   return (
     <nav
@@ -106,21 +99,7 @@ export default function Navigation() {
           >
             <ThemeToggle />
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button
-                onClick={handleLogin}
-                size="lg"
-                className="w-full gradient-ev-green hover-glow text-white font-semibold px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={userLoading}
-              >
-                {userLoading ? (
-                  <>
-                    <span className="inline-block animate-spin mr-2">⏳</span>
-                    Loading...
-                  </>
-                ) : (
-                  "Get Started"
-                )}
-              </Button>
+              <WalletConnect />
             </motion.div>
           </motion.div>
 

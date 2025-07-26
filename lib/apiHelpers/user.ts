@@ -1,123 +1,76 @@
-// import { apiPost, apiGet } from "./apiMiddleware"; // Commented out for mock implementation
-import { apiPost } from "./apiMiddleware";
-import {
-  mockVerifyLogin,
-  mockRefreshToken,
-  mockGetCurrentUser,
-  mockUpdateUserProfile,
-  mockLogoutUser,
-  type UserData,
-  type LoginResponse,
-  type SignatureVerificationData,
-} from "./utils";
-import { store } from "@/redux/store";
+import { apiPost, apiGet, apiPut } from "./apiMiddleware";
+import { API_ENDPOINTS } from "@/lib/api/config";
+import type { UserData, LoginResponse } from "@/redux/userSlice";
 
-// Verify login with signature data
-export const verifyLogin = (
-  signatureData: SignatureVerificationData
+interface SignatureVerificationPayload {
+  certificate: {
+    purpose: string;
+    payload: {
+      type: string;
+      content: string;
+    };
+    signature?: string; // Optional to match VeChain CertificateData
+    signer?: string; // Optional to match VeChain CertificateData
+    domain: string;
+    timestamp: number;
+  };
+}
+
+interface UserProfileUpdatePayload {
+  username: string;
+  email: string;
+  profileImageUrl?: string;
+}
+
+// Verify signature with wallet data
+export const verifySignature = (
+  signaturePayload: SignatureVerificationPayload
 ): Promise<LoginResponse> => {
-  // Using mock implementation
-  return mockVerifyLogin(signatureData);
-
-  // TODO: Uncomment below for actual API implementation
-  /*
-  return apiPost<LoginResponse>("/auth/verify-login", signatureData, {
-    requireAuth: false, // This is the login endpoint, no auth required
-    showToast: false, // Handle toast manually for better UX
-  });
-  */
+  return apiPost<LoginResponse>(
+    API_ENDPOINTS.AUTH.VERIFY_SIGNATURE,
+    signaturePayload,
+    {
+      requireAuth: false,
+      showToast: false,
+    }
+  );
 };
 
-// Refresh token API - returns updated user details
-export const refreshToken = (): Promise<LoginResponse> => {
-  // Get current token from Redux store
-  const state = store.getState();
-  const currentToken = state.user.accessToken;
-
-  if (!currentToken) {
-    throw new Error("No access token found");
-  }
-
-  // Using mock implementation
-  return mockRefreshToken(currentToken);
-
-  // TODO: Uncomment below for actual API implementation
-  /*
-  return apiPost<LoginResponse>("/auth/refresh-token", {}, {
-    requireAuth: true, // Requires existing token
-    showToast: false, // Handle toast manually
-  });
-  */
+// Disconnect user session (invalidate token on server)
+export const disconnectUser = (): Promise<{
+  success: boolean;
+  message: string;
+}> => {
+  return apiPost<{ success: boolean; message: string }>(
+    API_ENDPOINTS.AUTH.DISCONNECT,
+    {},
+    {
+      requireAuth: true,
+      showToast: false,
+    }
+  );
 };
 
 // Get current user profile
-export const getCurrentUser = (): Promise<UserData> => {
-  // Get current token from Redux store
-  const state = store.getState();
-  const currentToken = state.user.accessToken;
-
-  if (!currentToken) {
-    throw new Error("No access token found");
-  }
-
-  // Using mock implementation
-  return mockGetCurrentUser(currentToken);
-
-  // TODO: Uncomment below for actual API implementation
-  /*
-  return apiGet<{ user: UserData }>("/auth/me", {
+export const getUserProfile = (): Promise<UserData> => {
+  return apiGet<UserData>(API_ENDPOINTS.USER.PROFILE, {
     requireAuth: true,
-  }).then(response => response.user);
-  */
+  });
 };
 
 // Update user profile
 export const updateUserProfile = (
-  userData: Partial<UserData>
+  userData: UserProfileUpdatePayload
 ): Promise<UserData> => {
-  // Get current token from Redux store
-  const state = store.getState();
-  const currentToken = state.user.accessToken;
-
-  if (!currentToken) {
-    throw new Error("No access token found");
-  }
-
-  // Using mock implementation
-  return mockUpdateUserProfile(currentToken, userData);
-
-  // TODO: Uncomment below for actual API implementation
-  /*
-  return apiPost<{ user: UserData }>("/auth/update-profile", userData, {
+  return apiPut<UserData>(API_ENDPOINTS.USER.PROFILE, userData, {
     requireAuth: true,
-  }).then(response => response.user);
-  */
-};
-
-// Logout user (invalidate token on server)
-export const logoutUser = (): Promise<{
-  success: boolean;
-  message: string;
-}> => {
-  // Get current token from Redux store
-  const state = store.getState();
-  const currentToken = state.user.accessToken;
-
-  if (!currentToken) {
-    throw new Error("No access token found");
-  }
-
-  // Using mock implementation
-  return mockLogoutUser(currentToken);
-
-  // TODO: Uncomment below for actual API implementation
-  /*
-  return apiPost<{ success: boolean; message: string }>("/auth/logout", {}, {
-    requireAuth: true,
-    showToast: false, // Handle logout toast in component
   });
-  */
 };
 
 // Export types for use in components
-export type { UserData, LoginResponse, SignatureVerificationData };
+export type {
+  UserData,
+  LoginResponse,
+  SignatureVerificationPayload,
+  UserProfileUpdatePayload,
+};
