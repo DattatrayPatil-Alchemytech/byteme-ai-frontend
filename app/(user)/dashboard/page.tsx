@@ -630,14 +630,7 @@ export default function DashboardPage() {
       {activeTab === "history" && <VehicleHistoryTab />}
 
       {/* Store Tab */}
-      {activeTab === "store" && (
-        <TokenStore
-          products={storeProducts}
-          userTokens={user.b3trTokens}
-          onPurchase={handlePurchase}
-          purchaseHistory={purchaseHistory}
-        />
-      )}
+      {activeTab === "store" && <TokenStore/>}
 
       {/* Mobile Bottom Navigation Bar */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-xl border-t border-border shadow-lg z-50">

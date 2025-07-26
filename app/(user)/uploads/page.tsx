@@ -222,7 +222,7 @@ export default function UploadsPage() {
     inputRef.current?.click();
   };
 
-  return (
+    return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       {/* Upload Section */}
       <div className="border border-border rounded-xl p-6 bg-card">
@@ -230,11 +230,11 @@ export default function UploadsPage() {
         {!uploadResponse && !uploadDetails && (
           <>
             <div className="flex items-center gap-2 mb-4">
-              <Camera className="w-6 h-6 text-muted-foreground" />
+            <Camera className="w-6 h-6 text-muted-foreground" />
               <span className="font-bold text-lg text-foreground">
                 Upload Odometer Photo
               </span>
-            </div>
+          </div>
             <p className="text-muted-foreground mb-4 text-sm">
               Take a clear photo of your vehicle&apos;s odometer to verify your
               mileage
@@ -242,10 +242,10 @@ export default function UploadsPage() {
             {/* Image Upload Area */}
             <div
               className="border-2 border-dashed border-gray-300 rounded-lg p-8 flex flex-col items-center justify-center text-center cursor-pointer transition hover:border-green-400 mb-6"
-              onClick={handleClick}
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-            >
+            onClick={handleClick}
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+          >
               {uploadedImage ? (
                 <div className="space-y-4">
                   <div className="relative">
@@ -265,17 +265,17 @@ export default function UploadsPage() {
                 </div>
               ) : (
                 <>
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted">
-                    <Upload className="w-8 h-8 text-muted-foreground" />
-                  </div>
-                  <div className="space-y-1 mt-2">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted">
+              <Upload className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <div className="space-y-1 mt-2">
                     <p className="text-sm text-muted-foreground">
                       Click to upload or drag and drop your odometer photo
                     </p>
                     <p className="text-sm text-muted-foreground">
                       Supported formats: JPG, PNG, HEIC (Max 10MB)
                     </p>
-                  </div>
+        </div>
                   <Button
                     size="lg"
                     className="gradient-ev-green text-white mt-4"
@@ -293,7 +293,7 @@ export default function UploadsPage() {
                 accept="image/*"
               />
             </div>
-
+            
             {/* Vehicle Details Form */}
             {uploadedImage && (
               <div className="space-y-4">
@@ -410,8 +410,8 @@ export default function UploadsPage() {
           uploadDetails.status === "completed" && (
             <div className="text-center space-y-4">
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100">
-                <CheckCircle className="w-6 h-6 text-green-600" />
-              </div>
+            <CheckCircle className="w-6 h-6 text-green-600" />
+          </div>
               <h2 className="text-2xl font-bold">Odometer Reading Extracted</h2>
 
               <div className="text-4xl font-bold text-green-600">
@@ -419,11 +419,11 @@ export default function UploadsPage() {
                   uploadDetails.finalMileage?.toLocaleString() ||
                   "0"}{" "}
                 KM
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="text-muted-foreground">Confidence: </span>
+        </div>
+            
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <span className="text-muted-foreground">Confidence: </span>
                   <span
                     className={`font-medium ${
                       (uploadDetails.ocrConfidenceScore || 0) > 70
@@ -434,14 +434,14 @@ export default function UploadsPage() {
                     }`}
                   >
                     {uploadDetails.ocrConfidenceScore || 0}%
-                  </span>
-                </div>
-                <div>
+                </span>
+              </div>
+              <div>
                   <span className="text-muted-foreground">Vehicle: </span>
                   <span className="font-medium">{uploadDetails.vehicleId}</span>
                 </div>
-              </div>
-
+            </div>
+            
               {uploadDetails.carbonSaved && (
                 <div className="text-sm text-green-600">
                   Carbon Saved: {uploadDetails.carbonSaved} kg CO2
@@ -460,8 +460,8 @@ export default function UploadsPage() {
                   <RotateCcw className="w-4 h-4 mr-2" />
                   Upload New Image
                 </Button>
-              </div>
-            </div>
+          </div>
+        </div>
           )}
 
         {/* Failed/Rejected Status - Show when details are fetched and failed/rejected */}
@@ -515,7 +515,7 @@ export default function UploadsPage() {
             the numbers
           </li>
         </ul>
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }

@@ -11,6 +11,8 @@ import { logout } from "@/redux/userSlice";
 import { logoutUser } from "@/lib/apiHelpers/user";
 import { RootState } from "@/redux/store";
 import toast from "react-hot-toast";
+import { Button } from "../components/button";
+import { openModal } from "@/redux/modalSlice";
 
 // Mock notifications (replace with real data or context as needed)
 const notifications = [
@@ -105,7 +107,7 @@ export default function Header() {
 
           <div className="flex items-center space-x-4 relative">
             {/* Show welcome message and all icons only when authenticated and NOT on uploads page */}
-            {isAuthenticated && !isUploadsPage && (
+            {isAuthenticated && (
               <>
                 {userName && (
                   <span className="text-sm text-muted-foreground hidden md:block">
@@ -115,25 +117,27 @@ export default function Header() {
 
                 <ThemeToggle />
 
-                <Link
-                  href="/uploads"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                  title="Upload Odometer"
-                >
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                {!isUploadsPage && (
+                  <Link
+                    href="/uploads"
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                    title="Upload Odometer"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                    />
-                  </svg>
-                </Link>
+                    <svg
+                      className="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                      />
+                    </svg>
+                  </Link>
+              )}
 
                 {/* Notification Bell */}
                 <button
@@ -192,53 +196,44 @@ export default function Header() {
                     />
                   </svg>
                 </Link>
+                <button
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                  className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  title={isLoggingOut ? "Logging out..." : "Logout"}
+                  >
+                  {isLoggingOut ? (
+                    <div className="w-6 h-6 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
+                  ) : (
+                    <svg
+                      className="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                      />
+                    </svg>
+                    )}
+                </button>
               </>
             )}
-
-            <button
-              onClick={handleLogout}
-              disabled={isLoggingOut}
-              className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-              title={
-                isLoggingOut 
-                  ? "Logging out..." 
-                  : isAuthenticated 
-                    ? "Logout" 
-                    : "Go to Home"
-              }
-            >
-              {isLoggingOut ? (
-                <div className="w-6 h-6 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
-              ) : isAuthenticated ? (
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                  />
-                </svg>
-              )}
-            </button>
+            {!isAuthenticated && (
+              <Button
+                className="gradient-ev-green text-white"
+                onClick={() => {
+                  dispatch(
+                    openModal({ modalType: "LOGIN_MODAL", title: "Welcome" })
+                  );
+                }}
+              >
+                Login / Sign Up
+              </Button>
+            )}
           </div>
         </div>
       </div>
