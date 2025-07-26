@@ -349,7 +349,25 @@ export default function UserProfilePage() {
           align-items: stretch;
         }
 
+        .wallet-balance-container{
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
+          align-items: stretch;
+        }
+
+        @media (min-width: 640px) {
+          .wallet-balance-container {
+            grid-template-columns: 1fr 1fr;
+          }
+        }
+
         .profile-grid > * {
+          width: 100%;
+          min-height: 140px;
+        }
+      
+        .wallet-balance-container > * {
           width: 100%;
           min-height: 140px;
         }
@@ -414,7 +432,7 @@ export default function UserProfilePage() {
         </section>
 
         {userProfile && (
-          <>
+          <div className="wallet-balance-container">
             {/* Wallet Address */}
             <div className="bg-card rounded-xl border border-border p-6 shadow-lg">
               <div className="flex items-center gap-3 mb-4">
@@ -454,7 +472,7 @@ export default function UserProfilePage() {
                 {userProfile.b3trBalance || 0} B3TR
               </div>
             </div>
-          </>
+          </div>
         )}
 
         {/* Profile Stats Grid */}
