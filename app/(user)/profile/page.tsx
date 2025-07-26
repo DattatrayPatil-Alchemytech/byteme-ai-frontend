@@ -9,7 +9,12 @@ import { RootState } from "@/redux/store";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import Modal from "@/components/modals/Modal";
-import { getUserVehicles, VehicleData, addVehicle } from "@/lib/apiHelpers/profile";
+import {
+  getUserVehicles,
+  VehicleData,
+  addVehicle,
+  deleteVehicle,
+} from "@/lib/apiHelpers/profile";
 import toast from "react-hot-toast";
 
 // Mock data for profile, badges, tier, notifications, and vehicles
@@ -47,6 +52,7 @@ export default function UserProfilePage() {
     plateNumber?: string;
   }>({});
   const [addVehicleLoading, setAddVehicleLoading] = useState(false);
+  const [deleteLoadingId, setDeleteLoadingId] = useState<string | null>(null);
   const router = useRouter();
 
   // Get user data from redux
@@ -60,7 +66,9 @@ export default function UserProfilePage() {
         // Map API data to DataTable expected format
         const mapped = data.map((vehicle) => ({
           id: vehicle.id,
-          name: [vehicle.make, vehicle.model].filter(v => v && v !== 'null' && v !== '').join(' '),
+          name: [vehicle.model]
+            .filter((v) => v && v !== "null" && v !== "")
+            .join(" "),
           type: vehicle.vehicleType,
           reg: vehicle.plateNumber,
           numberPlate: vehicle.plateNumber,
@@ -94,12 +102,37 @@ export default function UserProfilePage() {
     setEditId(null);
     setEditError("");
   };
-  const handleRemove = (id: number) => {
-    setVehicles(vehicles.filter((v) => v.id !== id));
+  const handleRemove = async (id: string) => {
+    setDeleteLoadingId(id);
+    try {
+      await deleteVehicle(id);
+      toast.success("Vehicle deleted successfully!");
+      setVehiclesLoading(true);
+      const data = await getUserVehicles();
+      const mapped = data.map((vehicle: VehicleData) => ({
+        id: vehicle.id,
+        name: [vehicle.model]
+          .filter((v) => v && v !== "null" && v !== "")
+          .join(" "),
+        type: vehicle.vehicleType,
+        reg: vehicle.plateNumber,
+        numberPlate: vehicle.plateNumber,
+      }));
+      setVehicles(mapped);
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to delete vehicle");
+    } finally {
+      setDeleteLoadingId(null);
+      setVehiclesLoading(false);
+    }
   };
 
   const handleAddVehicle = async () => {
-    const errors: { model?: string; vehicleType?: string; plateNumber?: string } = {};
+    const errors: {
+      model?: string;
+      vehicleType?: string;
+      plateNumber?: string;
+    } = {};
     if (!newVehicle.model.trim()) errors.model = "Model is required";
     if (!newVehicle.vehicleType.trim()) errors.vehicleType = "Type is required";
     setAddFieldErrors(errors);
@@ -117,7 +150,7 @@ export default function UserProfilePage() {
       const data = await getUserVehicles();
       const mapped = data.map((vehicle: VehicleData) => ({
         id: vehicle.id,
-        name: [vehicle.make, vehicle.model].filter(Boolean).join(' '),
+        name: [vehicle.model].filter(Boolean).join(" "),
         type: vehicle.vehicleType,
         reg: vehicle.plateNumber,
         numberPlate: vehicle.plateNumber,
@@ -206,16 +239,19 @@ export default function UserProfilePage() {
       key: "edit",
       label: "",
       render: (value, row) => {
-        const vehicle = row as { id: number; name: string };
+        const vehicle = row as { id: string; name: string };
         return (
           <div className="flex gap-2">
             <Button
               variant="link"
               size="sm"
               className="p-0 h-auto min-w-0 text-destructive"
-              onClick={() => handleRemove(vehicle.id)}
+              onClick={() => handleRemove(String(vehicle.id))}
+              disabled={deleteLoadingId === String(vehicle.id)}
             >
-              Remove
+              {deleteLoadingId === String(vehicle.id)
+                ? "Removing..."
+                : "Remove"}
             </Button>
           </div>
         );
@@ -386,20 +422,49 @@ export default function UserProfilePage() {
                 <Select
                   value={newVehicle.vehicleType}
                   onChange={(e) =>
-                    setNewVehicle({ ...newVehicle, vehicleType: e.target.value })
+                    setNewVehicle({
+                      ...newVehicle,
+                      vehicleType: e.target.value,
+                    })
                   }
                   className="bg-background text-foreground border-border focus:ring-2 focus:ring-primary"
                 >
                   <option value="" className="bg-background text-foreground">
                     Select Type
                   </option>
-                  <option value="car" className="bg-background text-foreground">Car</option>
-                  <option value="suv" className="bg-background text-foreground">SUV</option>
-                  <option value="motorcycle" className="bg-background text-foreground">Motorcycle</option>
-                  <option value="scooter" className="bg-background text-foreground">Scooter</option>
-                  <option value="truck" className="bg-background text-foreground">Truck</option>
-                  <option value="van" className="bg-background text-foreground">Van</option>
-                  <option value="other" className="bg-background text-foreground">Other</option>
+                  <option value="car" className="bg-background text-foreground">
+                    Car
+                  </option>
+                  <option value="suv" className="bg-background text-foreground">
+                    SUV
+                  </option>
+                  <option
+                    value="motorcycle"
+                    className="bg-background text-foreground"
+                  >
+                    Motorcycle
+                  </option>
+                  <option
+                    value="scooter"
+                    className="bg-background text-foreground"
+                  >
+                    Scooter
+                  </option>
+                  <option
+                    value="truck"
+                    className="bg-background text-foreground"
+                  >
+                    Truck
+                  </option>
+                  <option value="van" className="bg-background text-foreground">
+                    Van
+                  </option>
+                  <option
+                    value="other"
+                    className="bg-background text-foreground"
+                  >
+                    Other
+                  </option>
                 </Select>
               </div>
               {addFieldErrors.vehicleType && (
@@ -419,13 +484,14 @@ export default function UserProfilePage() {
               />
             </div>
             <div className="flex justify-end gap-2 mt-4">
-              <Button
-                variant="secondary"
-                onClick={handleCloseAddDialog}
-              >
+              <Button variant="secondary" onClick={handleCloseAddDialog}>
                 Cancel
               </Button>
-              <Button variant="default" onClick={handleAddVehicle} disabled={addVehicleLoading}>
+              <Button
+                variant="default"
+                onClick={handleAddVehicle}
+                disabled={addVehicleLoading}
+              >
                 {addVehicleLoading ? "Adding..." : "Add"}
               </Button>
             </div>
