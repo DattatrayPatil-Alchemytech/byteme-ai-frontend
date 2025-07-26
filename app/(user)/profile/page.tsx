@@ -239,19 +239,18 @@ export default function UserProfilePage() {
       key: "edit",
       label: "",
       render: (value, row) => {
-        const vehicle = row as { id: string; name: string };
+        const vehicle = row as { id: string | number; name: string };
+        const idStr = String(vehicle.id);
         return (
           <div className="flex gap-2">
             <Button
               variant="link"
               size="sm"
               className="p-0 h-auto min-w-0 text-destructive"
-              onClick={() => handleRemove(String(vehicle.id))}
-              disabled={deleteLoadingId === String(vehicle.id)}
+              onClick={() => handleRemove(idStr)}
+              disabled={deleteLoadingId === idStr}
             >
-              {deleteLoadingId === String(vehicle.id)
-                ? "Removing..."
-                : "Remove"}
+              {deleteLoadingId === idStr ? 'Removing...' : 'Remove'}
             </Button>
           </div>
         );
