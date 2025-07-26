@@ -66,29 +66,15 @@ export default function Header() {
       await logoutUser();
     } catch (error) {
       console.error("Logout API error:", error);
-      // Continue with local logout even if API fails
     }
 
-    // Always perform local logout regardless of API success/failure
     try {
-      // Navigate to home page first
-      router.push("/");
-
-      // Clear Redux state first (this makes user unauthenticated)
       dispatch(logout());
+      disconnect();
+      router.push("/");
       toast.success("Logged out successfully");
-      setTimeout(() => {
-        disconnect();
-      }, 50);
     } catch (error) {
       console.error("Local logout error:", error);
-      // Clear Redux state and redirect even if other cleanup fails
-      dispatch(logout());
-      router.push("/");
-      // Still disconnect wallet in error case after delay
-      setTimeout(() => {
-        disconnect();
-      }, 50);
     } finally {
       setIsLoggingOut(false);
     }

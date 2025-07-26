@@ -64,10 +64,10 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     // Handle protected routes
     if (isProtectedRoute) {
       // Check authentication status
-      // if (!isAuthenticated || !accessToken) {
-      //   router.push("/");
-      //   return;
-      // }
+      if (!isAuthenticated || !accessToken) {
+        router.push("/");
+        return;
+      }
     }
 
     // Optional: Redirect authenticated users from landing page to dashboard
