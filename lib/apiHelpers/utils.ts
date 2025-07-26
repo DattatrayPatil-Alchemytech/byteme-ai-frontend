@@ -34,7 +34,7 @@ interface SignatureVerificationData {
 const MOCK_USERS: Record<string, UserData> = {
   "0x595c73ec5279a3833ba535753bfd762da6bbac1d": {
     id: "user_1",
-    email: "john.doe@vechain.com",
+    email: "",
     name: "John Doe",
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=john",
     role: "user",

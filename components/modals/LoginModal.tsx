@@ -5,6 +5,8 @@ import toast from "react-hot-toast";
 import Modal from "./Modal";
 import { Button } from "../ui/button";
 import WalletConnect from "../auth/WalletConnect";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 interface LoginModalProps {
   show: boolean;
@@ -21,6 +23,9 @@ export default function LoginModal({ show, onClose }: LoginModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [timer, setTimer] = useState(0);
   const [canResend, setCanResend] = useState(false);
+
+  // Get user loading state from Redux
+  const user = useSelector((state: RootState) => state.user);
 
   const emailInputRef = useRef<HTMLInputElement>(null);
   const otpInputRef = useRef<HTMLInputElement>(null);
@@ -145,15 +150,16 @@ export default function LoginModal({ show, onClose }: LoginModalProps) {
         position: "top-right",
       });
 
+      setTimeout(() => {
+        setStep("choice");
+        setShowEmailForm(false);
+        setEmail("");
+        setOtp("");
+        setTimer(0);
+      }, 200);
+
       // Close modal and potentially redirect or update auth state
       onClose();
-
-      // Reset form
-      setStep("choice");
-      setShowEmailForm(false);
-      setEmail("");
-      setOtp("");
-      setTimer(0);
     } catch (error) {
       toast.error("Invalid OTP. Please try again.");
       console.error("OTP submit error:", error);
@@ -224,7 +230,10 @@ export default function LoginModal({ show, onClose }: LoginModalProps) {
             {/* Connect Wallet - Primary Option */}
             <div className="space-y-3">
               <div className="w-full">
-                <WalletConnect title="Connect Wallet" />
+                <WalletConnect
+                  title="Connect Wallet"
+                  disabled={user.isLoading}
+                />
               </div>
               <p className="text-xs text-center text-muted-foreground">
                 Connect your wallet for a seamless Web3 experience
@@ -247,9 +256,17 @@ export default function LoginModal({ show, onClose }: LoginModalProps) {
                 type="button"
                 variant="outline"
                 onClick={handleShowEmailForm}
-                className="w-full py-3 border-2 hover:bg-accent hover:text-accent-foreground transition-all"
+                disabled={user.isLoading}
+                className="w-full py-3 border-2 hover:bg-accent hover:text-accent-foreground transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Login with Email
+                {user.isLoading ? (
+                  <>
+                    <span className="inline-block animate-spin mr-2">⏳</span>
+                    Connecting...
+                  </>
+                ) : (
+                  "Login with Email"
+                )}
               </Button>
             ) : (
               <form onSubmit={handleEmailSubmit} className="space-y-6">

@@ -4,8 +4,9 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { openModal } from "@/redux/modalSlice";
+import { RootState } from "@/redux/store";
 
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -32,6 +33,8 @@ export default function Navigation() {
   const handleLogin = () => {
     dispatch(openModal({ modalType: "LOGIN_MODAL", title: "Welcome" }));
   };
+
+  const userLoading = useSelector((state: RootState) => state.user.isLoading);
 
   return (
     <nav
@@ -107,8 +110,16 @@ export default function Navigation() {
                 onClick={handleLogin}
                 size="lg"
                 className="w-full gradient-ev-green hover-glow text-white font-semibold px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={userLoading}
               >
-                Get Started
+                {userLoading ? (
+                  <>
+                    <span className="inline-block animate-spin mr-2">⏳</span>
+                    Loading...
+                  </>
+                ) : (
+                  "Get Started"
+                )}
               </Button>
             </motion.div>
           </motion.div>
