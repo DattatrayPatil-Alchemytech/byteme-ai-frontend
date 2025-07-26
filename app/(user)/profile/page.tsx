@@ -23,6 +23,7 @@ import {
   addVehicle,
   deleteVehicle,
   getUserProfile,
+  updateVehicle,
 } from "@/lib/apiHelpers/profile";
 import toast from "react-hot-toast";
 
@@ -35,7 +36,7 @@ const mockBadges = [
 export default function UserProfilePage() {
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [vehiclesLoading, setVehiclesLoading] = useState(true);
-  const [editId, setEditId] = useState<number | null>(null);
+  const [editId, setEditId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editError, setEditError] = useState("");
   const [addDialogOpen, setAddDialogOpen] = useState(false);
@@ -52,10 +53,13 @@ export default function UserProfilePage() {
   }>({});
   const [addVehicleLoading, setAddVehicleLoading] = useState(false);
   const [deleteLoadingId, setDeleteLoadingId] = useState<string | null>(null);
+  const [editLoadingId, setEditLoadingId] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [userProfileLoading, setUserProfileLoading] = useState(true);
   const [userProfileError, setUserProfileError] = useState("");
   const router = useRouter();
+
+  console.log(vehicles);
 
   useEffect(() => {
     setUserProfileLoading(true);
@@ -77,17 +81,7 @@ export default function UserProfilePage() {
     setVehiclesLoading(true);
     getUserVehicles()
       .then((data: VehicleData[]) => {
-        // Map API data to DataTable expected format
-        const mapped = data.map((vehicle) => ({
-          id: vehicle.id,
-          name: [vehicle.model]
-            .filter((v) => v && v !== "null" && v !== "")
-            .join(" "),
-          type: vehicle.vehicleType,
-          reg: vehicle.plateNumber,
-          numberPlate: vehicle.plateNumber,
-        }));
-        setVehicles(mapped);
+        setVehicles(data);
       })
       .catch((err) => {
         console.error("Failed to fetch vehicles", err);
@@ -98,21 +92,42 @@ export default function UserProfilePage() {
       });
   }, []);
 
-  const handleEdit = (id: number, name: string) => {
-    setEditId(id);
-    setEditName(name);
+  const handleEdit = (row: any) => {
+    setEditId(row.id);
+    setEditName(row.customName || row.model || "");
     setEditError("");
   };
-  const handleSave = (id: number) => {
+  const handleSave = async (row: any) => {
     if (!editName.trim()) {
       setEditError("Name cannot be empty");
       return;
     }
-    setVehicles(
-      vehicles.map((v) => (v.id === id ? { ...v, name: editName } : v))
-    );
-    setEditId(null);
-    setEditError("");
+    setEditLoadingId(row.id);
+    try {
+      // Only send the required keys for update
+      const updateObj = {
+        vehicleType: row.vehicleType,
+        customName: editName.trim(),
+        make: row.make,
+        model: row.model,
+        year: row.year,
+        plateNumber: row.plateNumber,
+        emissionFactor: row.emissionFactor,
+        isPrimary: row.isPrimary,
+        isActive: row.isActive,
+      };
+      await updateVehicle(row.id, updateObj);
+      toast.success("Vehicle name updated successfully!");
+      setVehiclesLoading(true);
+      const data = await getUserVehicles();
+      setVehicles(data);
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to update vehicle name");
+      setEditError(err?.message || "Failed to update vehicle name");
+    } finally {
+      setEditLoadingId(null);
+      setVehiclesLoading(false);
+    }
   };
   const handleRemove = async (id: string) => {
     setDeleteLoadingId(id);
@@ -121,16 +136,7 @@ export default function UserProfilePage() {
       toast.success("Vehicle deleted successfully!");
       setVehiclesLoading(true);
       const data = await getUserVehicles();
-      const mapped = data.map((vehicle: VehicleData) => ({
-        id: vehicle.id,
-        name: [vehicle.model]
-          .filter((v) => v && v !== "null" && v !== "")
-          .join(" "),
-        type: vehicle.vehicleType,
-        reg: vehicle.plateNumber,
-        numberPlate: vehicle.plateNumber,
-      }));
-      setVehicles(mapped);
+      setVehicles(data);
     } catch (err: any) {
       toast.error(err?.message || "Failed to delete vehicle");
     } finally {
@@ -160,14 +166,7 @@ export default function UserProfilePage() {
       handleCloseAddDialog();
       setVehiclesLoading(true);
       const data = await getUserVehicles();
-      const mapped = data.map((vehicle: VehicleData) => ({
-        id: vehicle.id,
-        name: [vehicle.model].filter(Boolean).join(" "),
-        type: vehicle.vehicleType,
-        reg: vehicle.plateNumber,
-        numberPlate: vehicle.plateNumber,
-      }));
-      setVehicles(mapped);
+      setVehicles(data);
     } catch (err: any) {
       toast.error(err?.message || "Failed to add vehicle");
       setAddError(err?.message || "Failed to add vehicle");
@@ -216,10 +215,10 @@ export default function UserProfilePage() {
   // DataTable columns
   const columns: Column[] = [
     {
-      key: "name",
+      key: "customName",
       label: "Name",
       render: (value, row) => {
-        const vehicle = row as { id: number; name: string };
+        const vehicle = row as any;
         return editId === vehicle.id ? (
           <>
             <input
@@ -229,9 +228,9 @@ export default function UserProfilePage() {
                 setEditName(e.target.value);
                 if (editError) setEditError("");
               }}
-              onBlur={() => handleSave(vehicle.id)}
+              onBlur={() => handleSave(vehicle)}
               onKeyDown={(e) => {
-                if (e.key === "Enter") handleSave(vehicle.id);
+                if (e.key === "Enter") handleSave(vehicle);
               }}
               autoFocus
             />
@@ -241,22 +240,35 @@ export default function UserProfilePage() {
           </>
         ) : (
           <span className="flex flex-row items-center gap-1">
-            <span className="text-foreground leading-none">{vehicle.name}</span>
+            <span className="text-foreground leading-none">
+              {vehicle.customName || vehicle.model || "Unnamed Vehicle"}
+            </span>
+            <button
+              className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-primary flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Edit name"
+              onClick={() => handleEdit(vehicle)}
+              aria-label="Edit name"
+              disabled={editLoadingId === vehicle.id}
+            >
+              {editLoadingId === vehicle.id ? (
+                <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Pencil className="w-4 h-4 align-middle" />
+              )}
+            </button>
           </span>
         );
       },
     },
     {
-      key: "type",
+      key: "vehicleType",
       label: "Type",
       render: (value) => (
-        <span className="capitalize text-muted-foreground">
-          {value as string}
-        </span>
+        <span className="capitalize text-muted-foreground">{value as string}</span>
       ),
     },
     {
-      key: "numberPlate",
+      key: "plateNumber",
       label: "Number Plate",
       render: (value) => {
         const stringValue = value as string | undefined;
@@ -271,7 +283,7 @@ export default function UserProfilePage() {
       key: "edit",
       label: "",
       render: (value, row) => {
-        const vehicle = row as { id: string | number; name: string };
+        const vehicle = row as { id: string | number };
         const idStr = String(vehicle.id);
         return (
           <div className="flex gap-2">
@@ -539,7 +551,7 @@ export default function UserProfilePage() {
         )}
 
         {/* Badges Section */}
-        <section className="bg-card rounded-2xl border border-border p-8 shadow-lg">
+        {/* <section className="bg-card rounded-2xl border border-border p-8 shadow-lg">
           <div className="font-bold text-xl text-foreground mb-6 text-left">
             Badges & Achievements
           </div>
@@ -558,7 +570,7 @@ export default function UserProfilePage() {
               );
             })}
           </div>
-        </section>
+        </section> */}
 
         {/* Vehicles Section */}
         <section className="bg-card rounded-2xl border border-border p-8 shadow-lg">
