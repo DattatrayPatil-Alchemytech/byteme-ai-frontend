@@ -11,7 +11,7 @@ import { Button } from "../ui/button";
 import toast from "react-hot-toast";
 
 //redux
-import { openModal } from "@/redux/modalSlice";
+import { closeModal, openModal } from "@/redux/modalSlice";
 import { loginSuccess, loginStart, loginFailure } from "@/redux/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -19,7 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { verifyLogin } from "@/lib/apiHelpers/user";
 import { RootState } from "@/redux/store";
 
-export function WalletConnect() {
+export function WalletConnect({ title = "Get Started" }) {
   const { account, connectionCertificate } = useWallet();
   const { open } = useWalletModal();
   const router = useRouter();
@@ -60,7 +60,7 @@ export function WalletConnect() {
         router.push("/dashboard");
 
         // Optional: Open profile completion modal for new users
-        if (loginResponse?.user?.isNew) {
+        if (loginResponse?.user) {
           dispatch(
             openModal({
               modalType: "USER_MODAL",
@@ -90,16 +90,23 @@ export function WalletConnect() {
     handleLogin();
   }, [connectionCertificate, account, dispatch, router]);
 
+  const handleWalletConnect = () => {
+    dispatch(closeModal());
+    open();
+  };
+
   return account ? (
-    <WalletButton />
+    <div className="w-full">
+      <WalletButton />
+    </div>
   ) : (
     <Button
-      onClick={open}
+      onClick={handleWalletConnect}
       disabled={isLoggingIn}
       size="lg"
-      className="gradient-ev-green hover-glow text-white font-semibold px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+      className="w-full gradient-ev-green hover-glow text-white font-semibold px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
     >
-      {isLoggingIn ? "Connecting..." : "Get Started"}
+      {isLoggingIn ? "Connecting..." : title}
     </Button>
   );
 }

@@ -14,7 +14,7 @@ export interface ModalData {
   [key: string]: any;
 }
 
-export type ModalType = "USER_MODAL" | null;
+export type ModalType = "USER_MODAL" | "LOGIN_MODAL" | null;
 
 interface ModalState {
   modalType: ModalType;

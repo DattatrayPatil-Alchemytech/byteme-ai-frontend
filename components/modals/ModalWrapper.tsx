@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/store";
 import { closeModal, ModalType } from "@/redux/modalSlice";
 import UserModal from "./UserModal";
+import LoginModal from "./LoginModal";
 import Modal from "./Modal";
 import { Button } from "../ui/button";
 
@@ -27,6 +28,12 @@ export default function ModalWrapper() {
     switch (modalType) {
       case "USER_MODAL":
         return <UserModal show={true} onClose={handleCloseModal} />;
+
+      case "LOGIN_MODAL":
+        return <LoginModal show={true} onClose={handleCloseModal} />;
+
+      default:
+        // Generic confirmation modal (if needed in the future)
         return (
           <Modal
             show={true}
@@ -34,19 +41,19 @@ export default function ModalWrapper() {
             handleClose={handleCloseModal}
           >
             <div className="text-center">
-              <p className="mb-6">
+              <p className="mb-6 text-muted-foreground">
                 {modalData.message || "Are you sure you want to proceed?"}
               </p>
               <div className="flex space-x-3">
                 <Button
                   variant="outline"
-                  className="flex-1 hover-lift border-2 border-primary/20 hover:border-primary/40"
+                  className="flex-1 hover-lift border-border hover:border-ring hover:bg-accent hover:text-accent-foreground transition-colors"
                   onClick={handleCloseModal}
                 >
                   Cancel
                 </Button>
                 <Button
-                  className="flex-1 gradient-aurora hover-glow text-white font-bold"
+                  className="flex-1 gradient-ev-green hover-glow text-primary-foreground font-bold transition-all"
                   onClick={() => {
                     if (modalData.onConfirm) {
                       modalData.onConfirm();
@@ -60,9 +67,6 @@ export default function ModalWrapper() {
             </div>
           </Modal>
         );
-
-      default:
-        return null;
     }
   };
 
