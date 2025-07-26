@@ -213,9 +213,16 @@ const Leaderboard: React.FC = () => {
                           <p className="text-foreground dark:text-white font-semibold text-base">
                             {entry.username}
                           </p>
-                          <p className="text-xs text-muted-foreground dark:text-slate-400 font-mono">
-                            {entry.walletAddress}
-                          </p>
+                          <div className="flex items-center space-x-4 mt-1">
+                            <div className="flex items-center space-x-1">
+                              <span className="text-muted-foreground dark:text-slate-400">📊</span>
+                              <span className="text-xs text-muted-foreground dark:text-slate-400">{entry.totalPoints} pts</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <span className="text-muted-foreground dark:text-slate-400">🌱</span>
+                              <span className="text-xs text-muted-foreground dark:text-slate-400">{entry.totalCarbonSaved} CO₂</span>
+                            </div>
+                          </div>
                         </div>
                       </div>
                       <div className="text-right">
