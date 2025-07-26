@@ -1,213 +1,66 @@
-'use client';
-import React, { useRef, useState } from 'react';
-import Image from 'next/image';
-import { Upload, Camera, CheckCircle, Loader2, Award, AlertCircle, RotateCcw, Eye } from 'lucide-react';
-import { Button } from '@/app/components/button';
-import { Alert } from '@/app/components/alert';
-import { AlertDescription } from '@/app/components/alertDescription';
-import Tesseract from 'tesseract.js';
+"use client";
+import React, { useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import Image from "next/image";
+import {
+  Upload,
+  Camera,
+  CheckCircle,
+  Loader2,
+  AlertCircle,
+  RotateCcw,
+  Eye,
+} from "lucide-react";
+import { Button } from "@/app/components/button";
+import { RootState, AppDispatch } from "@/redux/store";
+import {
+  setVehicleDetails,
+  setUploadedImage,
+  setUploadedFile,
+  setUploading,
+  setUploadResponse,
+  setFetchingDetails,
+  setUploadDetails,
+  setFetchError,
+  resetOdometer,
+} from "@/redux/odometerSlice";
+import {
+  uploadOdometerImage,
+  fetchUploadDetails,
+} from "@/lib/apiHelpers/odometer";
+import toast from "react-hot-toast";
 
-// Enhanced image preprocessing with multiple techniques
-function preprocessImage(imageDataUrl: string, options = { enhance: true, crop: null }): Promise<string> {
-  return new Promise((resolve) => {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const img = new window.Image();
-    
-    img.src = imageDataUrl;
-    img.onload = () => {
-      // Set canvas size
-      canvas.width = img.width;
-      canvas.height = img.height;
-      
-      // Draw original image
-      ctx?.drawImage(img, 0, 0);
-      
-      if (options.enhance && ctx) {
-        // Get image data for processing
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const data = imageData.data;
-        
-        // Enhanced preprocessing pipeline
-        for (let i = 0; i < data.length; i += 4) {
-          const r = data[i];
-          const g = data[i + 1];
-          const b = data[i + 2];
-          
-          // Convert to grayscale using luminance formula
-          const gray = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
-          
-          // Apply contrast enhancement
-          const contrast = 1.5;
-          const enhanced = Math.min(255, Math.max(0, (gray - 128) * contrast + 128));
-          
-          // Apply adaptive thresholding for binarization
-          const threshold = 140;
-          const binary = enhanced > threshold ? 255 : 0;
-          
-          // Set pixel values
-          data[i] = binary;     // R
-          data[i + 1] = binary; // G
-          data[i + 2] = binary; // B
-          // Alpha channel remains unchanged
-        }
-        
-        // Put processed image data back
-        ctx.putImageData(imageData, 0, 0);
-      }
-      
-      resolve(canvas.toDataURL('image/png'));
-    };
-    
-    img.onerror = () => {
-      resolve(imageDataUrl); // Return original if preprocessing fails
-    };
-  });
-}
-
-// Enhanced text extraction with multiple pattern matching
-function extractOdometerReading(text: string): { value: number; confidence: string; matchType: string } {
-  console.log('Extracted text:', text);
-  
-  const cleanText = text.replace(/[^\d\s\.km]/gi, ' ').trim();
-  console.log('Cleaned text:', cleanText);
-  
-  // Pattern 1: Direct km/kms patterns (highest priority)
-  const kmPatterns = [
-    /(\d{3,})\s*(?:km|kms|kilometers?)\b/gi,
-    /(?:total|odometer|distance)?\s*:?\s*(\d{3,})\s*(?:km|kms)/gi,
-    /(\d{1,3}(?:[,\s]\d{3})*)\s*(?:km|kms)/gi
-  ];
-  
-  for (const pattern of kmPatterns) {
-    const matches = Array.from(text.matchAll(pattern));
-    if (matches.length > 0) {
-      const value = parseInt(matches[0][1].replace(/[,\s]/g, ''), 10);
-      if (value >= 0 && value <= 999999) {
-        return { value, confidence: 'high', matchType: 'km_pattern' };
-      }
-    }
-  }
-  
-  // Pattern 2: Look for largest number (fallback)
-  const numberPattern = /\b(\d{3,})\b/g;
-  const numbers = Array.from(text.matchAll(numberPattern))
-    .map(match => parseInt(match[1], 10))
-    .filter(num => num >= 0 && num <= 999999)
-    .sort((a, b) => b - a);
-  
-  if (numbers.length > 0) {
-    return { value: numbers[0], confidence: 'medium', matchType: 'largest_number' };
-  }
-  
-  // Pattern 3: Look for any multi-digit number
-  const anyNumberPattern = /\b(\d{2,})\b/g;
-  const anyNumbers = Array.from(text.matchAll(anyNumberPattern))
-    .map(match => parseInt(match[1], 10))
-    .filter(num => num >= 10 && num <= 999999)
-    .sort((a, b) => b - a);
-  
-  if (anyNumbers.length > 0) {
-    return { value: anyNumbers[0], confidence: 'low', matchType: 'any_number' };
-  }
-  
-  return { value: 0, confidence: 'none', matchType: 'no_match' };
-}
-
-// Image quality assessment
-function assessImageQuality(imageDataUrl: string): Promise<{ quality: string; issues: string[] }> {
-  return new Promise((resolve) => {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const img = new window.Image();
-    
-    img.src = imageDataUrl;
-    img.onload = () => {
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx?.drawImage(img, 0, 0);
-      
-      const issues: string[] = [];
-      let quality = 'good';
-      
-      // Check image size
-      if (img.width < 300 || img.height < 200) {
-        issues.push('Image resolution is too low');
-        quality = 'poor';
-      }
-      
-      // Check if image is too dark or too bright
-      if (ctx) {
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const data = imageData.data;
-        let brightness = 0;
-        let pixelCount = 0;
-        
-        for (let i = 0; i < data.length; i += 4) {
-          brightness += (data[i] + data[i + 1] + data[i + 2]) / 3;
-          pixelCount++;
-        }
-        
-        const avgBrightness = brightness / pixelCount;
-        
-        if (avgBrightness < 50) {
-          issues.push('Image is too dark - increase lighting');
-          quality = quality === 'good' ? 'fair' : 'poor';
-        } else if (avgBrightness > 220) {
-          issues.push('Image is too bright or has glare - reduce lighting/glare');
-          quality = quality === 'good' ? 'fair' : 'poor';
-        }
-      }
-      
-      resolve({ quality, issues });
-    };
-    
-    img.onerror = () => {
-      resolve({ quality: 'poor', issues: ['Unable to process image'] });
-    };
-  });
-}
+// Vehicle type options
+const vehicleTypes = [
+  { value: "two-wheeler-bike", label: "Two Wheeler / Bike" },
+  { value: "two-wheeler-scooter", label: "Two Wheeler / Scooter" },
+  { value: "three-wheeler", label: "Three Wheeler" },
+  { value: "four-wheeler", label: "Four Wheeler" },
+];
 
 export default function UploadsPage() {
-  const [uploadState, setUploadState] = useState('initial');
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-  const [processedImage, setProcessedImage] = useState<string | null>(null);
-  const [progress, setProgress] = useState(0);
-  const [ocrResults, setOcrResults] = useState({
-    milesDriven: 0,
-    confidence: 'none',
-    matchType: '',
-    rawText: ''
-  });
-  const [ocrError, setOcrError] = useState<string | null>(null);
-  const [imageQuality, setImageQuality] = useState<{ quality: string; issues: string[] } | null>(null);
-  const [showProcessedImage, setShowProcessedImage] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
+  const {
+    vehicleDetails,
+    uploadedImage,
+    uploadedFile,
+    isUploading,
+    isFetchingDetails,
+    uploadDetails,
+    uploadResponse,
+  } = useSelector((state: RootState) => state.odometer);
+
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleClick = () => {
-    inputRef.current?.click();
+  // Handle file upload
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      validateAndReadImage(file);
+    }
   };
 
-  function validateAndReadImage(file: File) {
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/heic', 'image/heif', 'image/jpg'];
-    if (!allowedTypes.includes(file.type)) {
-      setOcrError('Invalid image format. Only JPG, PNG, or HEIC images are allowed.');
-      return;
-    }
-    if (file.size > 10 * 1024 * 1024) {
-      setOcrError('Image file is too large. Maximum size allowed is 10MB.');
-      return;
-    }
-    
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const imageData = e.target?.result as string;
-      setUploadedImage(imageData);
-      startAnalysis(imageData);
-    };
-    reader.readAsDataURL(file);
-  }
-
+  // Handle drag and drop
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
@@ -220,345 +73,449 @@ export default function UploadsPage() {
     e.preventDefault();
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files && event.target.files[0];
-    if (file) {
-      validateAndReadImage(file);
+  // Validate and read image
+  const validateAndReadImage = (file: File) => {
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/heic",
+      "image/heif",
+      "image/jpg",
+    ];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error(
+        "Invalid image format. Only JPG, PNG, or HEIC images are allowed."
+      );
+      return;
     }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Image file is too large. Maximum size allowed is 10MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const imageData = e.target?.result as string;
+      dispatch(setUploadedImage(imageData));
+      dispatch(setUploadedFile(file));
+    };
+    reader.readAsDataURL(file);
   };
 
-  const startAnalysis = async (imageData: string) => {
-    setUploadState('uploading');
-    setProgress(0);
-    setOcrError(null);
-    setImageQuality(null);
-    
-    // Assess image quality first
-    const quality = await assessImageQuality(imageData);
-    setImageQuality(quality);
-    
-    // Simulate upload progress
-    const uploadInterval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(uploadInterval);
-          setUploadState('analyzing');
-          runOcr(imageData);
-          return 100;
-        }
-        return prev + 10;
-      });
-    }, 200);
+  // Handle vehicle details change
+  const handleVehicleDetailsChange = (
+    field: keyof typeof vehicleDetails,
+    value: string
+  ) => {
+    dispatch(setVehicleDetails({ [field]: value }));
   };
 
-  const runOcr = async (imageData: string) => {
+  // Upload image and extract details
+  const handleExtractDetails = async () => {
+    if (!uploadedImage || !uploadedFile) {
+      toast.error("Please upload an image first.");
+      return;
+    }
+
+    if (
+      !vehicleDetails.numberPlate.trim() ||
+      !vehicleDetails.vehicleName.trim()
+    ) {
+      toast.error("Please fill in all vehicle details.");
+      return;
+    }
+
+    console.log(vehicleDetails, uploadedFile);
+
+    toast("Uploading image and extracting details...");
+    dispatch(setUploading(true));
+
     try {
-      // Preprocess image for better OCR
-      const processedImageData = await preprocessImage(imageData, { enhance: true, crop: null });
-      setProcessedImage(processedImageData);
-      
-      // Run OCR with enhanced settings
-      const { data: { text, confidence } } = await Tesseract.recognize(processedImageData, 'eng');
-      
-      console.log('OCR Text:', text);
-      console.log('OCR Confidence:', confidence);
-      
-      const extraction = extractOdometerReading(text);
-      
-      if (extraction.confidence === 'none' || extraction.value === 0) {
-        // If no reading found, try with original image
-        const { data: { text: originalText } } = await Tesseract.recognize(imageData, 'eng', {
-          logger: m => console.log(m),
-        });
-        
-        const originalExtraction = extractOdometerReading(originalText);
-        if (originalExtraction.confidence !== 'none' && originalExtraction.value > 0) {
-          setOcrResults({
-            milesDriven: originalExtraction.value,
-            confidence: originalExtraction.confidence,
-            matchType: originalExtraction.matchType,
-            rawText: originalText
-          });
-          setUploadState('completed');
-          return;
+      // Upload image and get upload ID
+      const response = await uploadOdometerImage(uploadedFile, vehicleDetails);
+
+      dispatch(
+        setUploadResponse({
+          uploadId: response.uploadId,
+          status: response.status,
+          processingTime: response.processingTime,
+        })
+      );
+
+      toast.success("Upload successful! Fetching details...");
+
+      // Wait 2 seconds then fetch details
+      setTimeout(async () => {
+        if (response.uploadId) {
+          dispatch(setFetchingDetails(true));
+
+          try {
+            const detailsResponse = await fetchUploadDetails(response.uploadId);
+
+            dispatch(setUploadDetails(detailsResponse));
+
+            // Handle different statuses and show appropriate messages
+            if (
+              detailsResponse.status === "completed" &&
+              detailsResponse.isApproved
+            ) {
+              toast.success(
+                "Odometer reading successfully extracted and approved!"
+              );
+            } else if (detailsResponse.status === "failed") {
+              const errorMsg =
+                detailsResponse.validationNotes || "Upload processing failed";
+              toast.error(errorMsg);
+              dispatch(setFetchError(errorMsg));
+            } else if (detailsResponse.validationStatus === "rejected") {
+              const rejectMsg =
+                detailsResponse.validationNotes || "Upload was rejected";
+              toast.error(rejectMsg);
+              dispatch(setFetchError(rejectMsg));
+            } else if (detailsResponse.status === "processing") {
+              toast.success("Upload is still being processed. Please wait...");
+            } else {
+              toast.success("Upload details fetched successfully!");
+            }
+          } catch (error) {
+            const errorMessage =
+              error instanceof Error
+                ? error.message
+                : "Failed to fetch details";
+            dispatch(setFetchError(errorMessage));
+            toast.error(errorMessage);
+          } finally {
+            dispatch(setFetchingDetails(false));
+          }
         }
-        
-        throw new Error('Unable to detect odometer reading from the image');
-      }
-      
-      setOcrResults({
-        milesDriven: extraction.value,
-        confidence: extraction.confidence,
-        matchType: extraction.matchType,
-        rawText: text
-      });
-      setUploadState('completed');
-      
+      }, 2000);
     } catch (error) {
-      console.error('OCR Error:', error);
-      let errorMessage = 'Failed to extract odometer reading. ';
-      
-      if (imageQuality?.quality === 'poor') {
-        errorMessage += 'Image quality issues detected: ' + imageQuality.issues.join(', ');
-      } else {
-        errorMessage += 'Please try with a clearer image showing the odometer display more prominently.';
-      }
-      
-      setOcrError(errorMessage);
-      setUploadState('initial');
-      setUploadedImage(null);
-      setProcessedImage(null);
-      setProgress(0);
+      const errorMessage =
+        error instanceof Error ? error.message : "Upload failed";
+      dispatch(
+        setUploadResponse({
+          uploadId: "",
+          status: "failed",
+          processingTime: 0,
+        })
+      );
+      toast.error(errorMessage);
+    } finally {
+      dispatch(setUploading(false));
     }
   };
 
-  const resetUpload = () => {
-    setUploadState('initial');
-    setUploadedImage(null);
-    setProcessedImage(null);
-    setProgress(0);
-    setOcrError(null);
-    setImageQuality(null);
-    setShowProcessedImage(false);
+  // Reset form
+  const handleReset = () => {
+    dispatch(resetOdometer());
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
+    // Clear any existing file input
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
   };
 
-  if (uploadState === 'initial') {
-    return (
-      <div className="max-w-2xl mx-auto p-6 space-y-6">
-        {ocrError && (
-          <Alert className="border-red-200 bg-red-50">
-            <AlertCircle className="h-4 w-4 text-red-600" />
-            <AlertDescription className="text-red-800">
-              {ocrError}
-            </AlertDescription>
-          </Alert>
-        )}
-        
-        <div className="border border-gray-200 rounded-xl p-6 bg-white max-w-2xl w-full mx-auto mb-8">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 mb-1">
-              <Camera className="w-6 h-6 text-gray-500" />
-              <span className="font-bold text-lg">Upload Odometer Photo</span>
+  // Handle click on upload area
+  const handleClick = () => {
+    inputRef.current?.click();
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto p-6 space-y-6">
+      {/* Upload Section */}
+      <div className="border border-border rounded-xl p-6 bg-card">
+        {/* Initial Upload Form - Show when no processing or results */}
+        {!uploadResponse && !uploadDetails && (
+          <>
+            <div className="flex items-center gap-2 mb-4">
+              <Camera className="w-6 h-6 text-muted-foreground" />
+              <span className="font-bold text-lg text-foreground">
+                Upload Odometer Photo
+              </span>
             </div>
-            <p className="text-gray-500 mb-4 text-sm">Take a clear photo of your EV&apos;s odometer to verify your mileage and earn B3TR tokens</p>
-          </div>
-
-          <div
-            className="border-2 border-dashed border-gray-300 rounded-lg p-8 flex flex-col items-center justify-center text-center cursor-pointer transition hover:border-green-400"
-            onClick={handleClick}
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-          >
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted">
-              <Upload className="w-8 h-8 text-muted-foreground" />
-            </div>
-            <div className="space-y-1 mt-2">
-              <p className="text-sm text-muted-foreground">Click to upload or drag and drop your odometer photo</p>
-              <p className="text-sm text-muted-foreground">Supported formats: JPG, PNG, HEIC (Max 10MB)</p>
-            </div>
-            <Button size="lg" className="gradient-ev-green text-white mt-4">
-              <Camera className="w-4 h-4 mr-2" />
-              Choose Photo
-            </Button>
-            <input type="file" className="hidden" ref={inputRef} onChange={handleFileUpload} accept="image/*" />
-          </div>
-        </div>
-
-        <div className="border border-gray-200 rounded-xl p-6 bg-white max-w-2xl w-full mx-auto">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="font-bold text-lg">📋 Upload Tips for Best Results</span>
-          </div>
-          <p className="text-gray-500 mb-4 text-sm">Follow these guidelines for accurate odometer reading</p>
-          <ul className="list-disc list-inside space-y-1 text-gray-700 text-sm">
-            <li>Ensure the odometer digits are clearly visible and well-lit</li>
-            <li>Take the photo straight-on to avoid distortion</li>
-            <li>Make sure there&apos;s no glare or reflection on the display</li>
-            <li>Focus on the odometer area - crop out unnecessary parts</li>
-            <li>Use good lighting conditions and avoid shadows</li>
-            <li>Ensure the numbers are sharp and not blurry</li>
-            <li>Try to capture the &quot;km&quot; or &quot;KM&quot; text along with the numbers</li>
-          </ul>
-        </div>
-      </div>
-    );
-  }
-
-  if (uploadState === 'uploading' || uploadState === 'analyzing') {
-    return (
-      <div className="max-w-2xl mx-auto p-6 space-y-6">
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 mb-1">
-            <Camera className="w-6 h-6 text-gray-500" />
-            <span className="font-bold text-lg">Upload Odometer Photo</span>
-          </div>
-          <p className="text-gray-500 mb-4 text-sm">Processing your odometer image with AI enhancement</p>
-        </div>
-
-        <div className="border border-gray-200 rounded-xl p-6 bg-white max-w-2xl w-full mx-auto mb-8">
-          <div className="flex flex-col items-center space-y-6">
-            {/* Image Display */}
-            <div className="flex justify-center w-full">
-              <div className="relative">
-                <Image
-                  src={showProcessedImage && processedImage ? processedImage : uploadedImage || "/api/placeholder/280/160"}
-                  alt="Uploaded odometer"
-                  width={280}
-                  height={160}
-                  className="rounded-md max-w-xs border"
-                  style={{ objectFit: 'cover' }}
-                />
-                {processedImage && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="absolute top-2 right-2 bg-white/80 hover:bg-white"
-                    onClick={() => setShowProcessedImage(!showProcessedImage)}
-                  >
-                    <Eye className="w-4 h-4" />
+            <p className="text-muted-foreground mb-4 text-sm">
+              Take a clear photo of your vehicle&apos;s odometer to verify your
+              mileage
+            </p>
+            {/* Image Upload Area */}
+            <div
+              className="border-2 border-dashed border-gray-300 rounded-lg p-8 flex flex-col items-center justify-center text-center cursor-pointer transition hover:border-green-400 mb-6"
+              onClick={handleClick}
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+            >
+              {uploadedImage ? (
+                <div className="space-y-4">
+                  <div className="relative">
+                    <Image
+                      src={uploadedImage}
+                      alt="Uploaded odometer"
+                      width={300}
+                      height={200}
+                      className="rounded-lg max-w-xs mx-auto"
+                      style={{ objectFit: "cover" }}
+                    />
+                  </div>
+                  <Button variant="outline" onClick={handleClick}>
+                    <Upload className="w-4 h-4 mr-2" />
+                    Change Image
                   </Button>
-                )}
-              </div>
+                </div>
+              ) : (
+                <>
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted">
+                    <Upload className="w-8 h-8 text-muted-foreground" />
+                  </div>
+                  <div className="space-y-1 mt-2">
+                    <p className="text-sm text-muted-foreground">
+                      Click to upload or drag and drop your odometer photo
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Supported formats: JPG, PNG, HEIC (Max 10MB)
+                    </p>
+                  </div>
+                  <Button
+                    size="lg"
+                    className="gradient-ev-green text-white mt-4"
+                  >
+                    <Camera className="w-4 h-4 mr-2" />
+                    Choose Photo
+                  </Button>
+                </>
+              )}
+              <input
+                type="file"
+                className="hidden"
+                ref={inputRef}
+                onChange={handleFileUpload}
+                accept="image/*"
+              />
             </div>
-            
-            {/* Image Quality Assessment */}
-            {imageQuality && (
-              <div className={`text-center p-3 rounded-lg ${
-                imageQuality.quality === 'good' ? 'bg-green-50 text-green-800' :
-                imageQuality.quality === 'fair' ? 'bg-yellow-50 text-yellow-800' :
-                'bg-red-50 text-red-800'
-              }`}>
-                <p className="font-medium">Image Quality: {imageQuality.quality.toUpperCase()}</p>
-                {imageQuality.issues.length > 0 && (
-                  <ul className="text-sm mt-1">
-                    {imageQuality.issues.map((issue, index) => (
-                      <li key={index}>• {issue}</li>
-                    ))}
-                  </ul>
-                )}
+
+            {/* Vehicle Details Form */}
+            {uploadedImage && (
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg">Vehicle Details</h3>
+
+                {/* Vehicle Type */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Vehicle Type
+                  </label>
+                  <select
+                    value={vehicleDetails.vehicleType}
+                    onChange={(e) =>
+                      handleVehicleDetailsChange("vehicleType", e.target.value)
+                    }
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    {vehicleTypes.map((type) => {
+                      return (
+                        <option key={type.value} value={type.value}>
+                          {type.label}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+
+                {/* Number Plate */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Number Plate
+                  </label>
+                  <input
+                    type="text"
+                    value={vehicleDetails.numberPlate}
+                    onChange={(e) =>
+                      handleVehicleDetailsChange("numberPlate", e.target.value)
+                    }
+                    placeholder="Enter vehicle number plate"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* Vehicle Name */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Vehicle Name
+                  </label>
+                  <input
+                    type="text"
+                    value={vehicleDetails.vehicleName}
+                    onChange={(e) =>
+                      handleVehicleDetailsChange("vehicleName", e.target.value)
+                    }
+                    placeholder="Enter vehicle name/model"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* Extract Details Button */}
+                <Button
+                  onClick={handleExtractDetails}
+                  disabled={
+                    isUploading ||
+                    isFetchingDetails ||
+                    !uploadedImage ||
+                    !vehicleDetails.numberPlate.trim() ||
+                    !vehicleDetails.vehicleName.trim()
+                  }
+                  className="w-full gradient-ev-green text-white"
+                  size="lg"
+                >
+                  {isUploading || isFetchingDetails ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      {isUploading ? "Uploading..." : "Fetching Details..."}
+                    </>
+                  ) : (
+                    <>
+                      <Eye className="w-5 h-5 mr-2" />
+                      Extract Details
+                    </>
+                  )}
+                </Button>
               </div>
             )}
-            
-            {/* Progress Section */}
-            <div className="space-y-4 max-w-sm mx-auto">
-              <div className="flex items-center justify-center space-x-3">
-                <Loader2 className="w-5 h-5 animate-spin" />
-                <div className="text-left">
-                  <p className="font-medium">
-                    {uploadState === 'uploading' ? 'Processing image...' : 'Extracting odometer reading...'}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {uploadState === 'uploading' ? 'Enhancing image quality for better OCR' : 'Using AI to detect km/miles values'}
-                  </p>
-                </div>
-              </div>
-              <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
-                <div
-                  className="h-3 rounded-full transition-all duration-700 bg-green-500"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-            </div>
-            
-            <Button variant="ghost" size="sm" onClick={resetUpload} className="text-green-700 hover:bg-green-50">
-              <RotateCcw className="w-4 h-4 mr-2" />
-              Upload different photo
-            </Button>
-          </div>
-        </div>
-
-        <Alert>
-          <AlertDescription>
-            💡 Our AI is analyzing your image with advanced preprocessing to extract the most accurate odometer reading
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
-
-  if (uploadState === 'completed') {
-    const confidenceColor = 
-      ocrResults.confidence === 'high' ? 'text-green-600' :
-      ocrResults.confidence === 'medium' ? 'text-yellow-600' : 'text-red-600';
-    
-    return (
-      <div className="max-w-2xl mx-auto p-6 space-y-6">
-        <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 mb-4">
-            <CheckCircle className="w-6 h-6 text-green-600" />
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight">Odometer Reading Extracted</h1>
-          <p className="text-muted-foreground">
-            Your sustainable driving has earned you B3TR tokens!
-          </p>
-        </div>
-
-        {/* Results Card */}
-        <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-          <div className="p-6 text-center">
-            <div className="text-4xl font-bold mb-2">{ocrResults.milesDriven.toLocaleString()}</div>
-            <div className="text-sm font-medium text-muted-foreground mb-4">Kilometers Driven</div>
-            
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="text-muted-foreground">Confidence: </span>
-                <span className={`font-medium ${confidenceColor}`}>
-                  {ocrResults.confidence.toUpperCase()}
-                </span>
-              </div>
-              <div>
-                <span className="text-muted-foreground">Detection: </span>
-                <span className="font-medium">{ocrResults.matchType.replace('_', ' ')}</span>
-              </div>
-            </div>
-            
-            {ocrResults.rawText && (
-              <details className="mt-4 text-left">
-                <summary className="cursor-pointer text-sm text-muted-foreground hover:text-foreground">
-                  View extracted text
-                </summary>
-                <div className="mt-2 p-2 bg-muted rounded text-xs font-mono">
-                  {ocrResults.rawText}
-                </div>
-              </details>
-            )}
-          </div>
-        </div>
-
-        {/* Confidence Alert */}
-        {ocrResults.confidence === 'low' && (
-          <Alert className="border-yellow-200 bg-yellow-50">
-            <AlertCircle className="h-4 w-4 text-yellow-600" />
-            <AlertDescription className="text-yellow-800">
-              <strong>Low Confidence Detection</strong><br />
-              The reading was extracted but with low confidence. Consider uploading a clearer image for more accurate results.
-            </AlertDescription>
-          </Alert>
+          </>
         )}
 
-        {/* Success Alert */}
-        {ocrResults.confidence === 'high' && (
-          <Alert className="border-green-200 bg-green-50">
-            <Award className="h-4 w-4 text-green-600" />
-            <AlertDescription className="text-green-800">
-              <strong>Perfect Reading! 🎉</strong><br />
-              High confidence odometer reading detected: {ocrResults.milesDriven.toLocaleString()} km
-            </AlertDescription>
-          </Alert>
-        )}
-        
-        {/* Action Buttons */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Button size="lg" className="w-full gradient-ev-green text-white">
-            <CheckCircle className="w-5 h-5 mr-2" />
-            Confirm & Claim B3TR Tokens
-          </Button>
-          <Button variant="outline" size="lg" className="w-full border-green-600 text-green-700 hover:bg-green-50" onClick={resetUpload}>
-            Upload New Reading
-          </Button>
-        </div>
-      </div>
-    );
-  }
+        {/* Processing Status - Show when uploading and no details fetched yet */}
+        {uploadResponse &&
+          uploadResponse.status === "processing" &&
+          !uploadDetails && (
+            <div className="text-center space-y-4">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100">
+                <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
+              </div>
+              <h2 className="text-2xl font-bold">Processing Upload</h2>
+              <p className="text-muted-foreground">
+                Your image is being processed. This may take a few moments.
+              </p>
+              <div className="text-sm text-muted-foreground">
+                Processing Time: {uploadResponse.processingTime}ms
+              </div>
+              <div className="text-sm text-muted-foreground">
+                Upload ID: {uploadResponse.uploadId}
+              </div>
+            </div>
+          )}
 
-  return null;
+        {/* Success Results - Show when details are fetched and approved */}
+        {uploadDetails &&
+          uploadDetails.isApproved &&
+          uploadDetails.status === "completed" && (
+            <div className="text-center space-y-4">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100">
+                <CheckCircle className="w-6 h-6 text-green-600" />
+              </div>
+              <h2 className="text-2xl font-bold">Odometer Reading Extracted</h2>
+
+              <div className="text-4xl font-bold text-green-600">
+                {uploadDetails.extractedMileage?.toLocaleString() ||
+                  uploadDetails.finalMileage?.toLocaleString() ||
+                  "0"}{" "}
+                KM
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-muted-foreground">Confidence: </span>
+                  <span
+                    className={`font-medium ${
+                      (uploadDetails.ocrConfidenceScore || 0) > 70
+                        ? "text-green-600"
+                        : (uploadDetails.ocrConfidenceScore || 0) > 40
+                        ? "text-yellow-600"
+                        : "text-red-600"
+                    }`}
+                  >
+                    {uploadDetails.ocrConfidenceScore || 0}%
+                  </span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Vehicle: </span>
+                  <span className="font-medium">{uploadDetails.vehicleId}</span>
+                </div>
+              </div>
+
+              {uploadDetails.carbonSaved && (
+                <div className="text-sm text-green-600">
+                  Carbon Saved: {uploadDetails.carbonSaved} kg CO2
+                </div>
+              )}
+
+              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                <h4 className="font-semibold mb-2">API Response Details</h4>
+                <pre className="text-xs text-gray-600 overflow-auto">
+                  {JSON.stringify(uploadDetails, null, 2)}
+                </pre>
+              </div>
+
+              <div className="flex gap-4">
+                <Button onClick={handleReset} variant="outline">
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  Upload New Image
+                </Button>
+              </div>
+            </div>
+          )}
+
+        {/* Failed/Rejected Status - Show when details are fetched and failed/rejected */}
+        {uploadDetails &&
+          (uploadDetails.status === "failed" ||
+            uploadDetails.validationStatus === "rejected") && (
+            <div className="text-center space-y-4">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-100">
+                <AlertCircle className="w-6 h-6 text-red-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-red-600">
+                {uploadDetails.status === "failed"
+                  ? "Upload Failed"
+                  : "Upload Rejected"}
+              </h2>
+              <p className="text-red-600">
+                {uploadDetails.validationNotes || "Upload processing failed"}
+              </p>
+              <div className="text-sm text-muted-foreground">
+                Upload ID: {uploadDetails.id}
+              </div>
+              <div className="flex justify-center">
+                <Button onClick={handleReset} variant="outline">
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                    Upload New Vehicle and Try Again
+                </Button>
+              </div>
+            </div>
+          )}
+      </div>
+
+      {/* Upload Tips */}
+      <div className="border border-border rounded-xl p-6 bg-card">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="font-bold text-lg text-foreground">
+            📋 Upload Tips for Best Results
+          </span>
+        </div>
+        <p className="text-muted-foreground mb-4 text-sm">
+          Follow these guidelines for accurate odometer reading
+        </p>
+        <ul className="list-disc list-inside space-y-1 text-muted-foreground text-sm">
+          <li>Ensure the odometer digits are clearly visible and well-lit</li>
+          <li>Take the photo straight-on to avoid distortion</li>
+          <li>Make sure there&apos;s no glare or reflection on the display</li>
+          <li>Focus on the odometer area - crop out unnecessary parts</li>
+          <li>Use good lighting conditions and avoid shadows</li>
+          <li>Ensure the numbers are sharp and not blurry</li>
+          <li>
+            Try to capture the &quot;km&quot; or &quot;KM&quot; text along with
+            the numbers
+          </li>
+        </ul>
+      </div>
+    </div>
+  );
 }

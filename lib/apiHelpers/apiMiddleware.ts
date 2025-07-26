@@ -6,7 +6,7 @@ import { logout } from "@/redux/userSlice";
 
 // API Configuration
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL;
+  process.env.NEXT_PUBLIC_API_BASE_URL || 'http://byteme-ai-prod.ca-central-1.elasticbeanstalk.com';
 
 // HTTP Methods type
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
@@ -69,9 +69,13 @@ export const apiRequest = async <T = unknown>(
 
     // Prepare headers
     const requestHeaders: Record<string, string> = {
-      "Content-Type": "application/json",
       ...headers,
     };
+
+    // Only set Content-Type to application/json if body is not FormData
+    if (!(body instanceof FormData)) {
+      requestHeaders["Content-Type"] = "application/json";
+    }
 
     // Add authorization header if token exists and auth is required
     if (requireAuth && accessToken) {
@@ -86,7 +90,12 @@ export const apiRequest = async <T = unknown>(
 
     // Add body for methods that support it
     if (body && !["GET", "HEAD"].includes(method)) {
-      fetchOptions.body = JSON.stringify(body);
+      // Don't JSON.stringify if body is FormData
+      if (body instanceof FormData) {
+        fetchOptions.body = body;
+      } else {
+        fetchOptions.body = JSON.stringify(body);
+      }
     }
 
     // Make the API request

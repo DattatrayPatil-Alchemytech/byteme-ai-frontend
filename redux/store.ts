@@ -4,6 +4,7 @@ import storage from "redux-persist/lib/storage";
 import userReducer from "./userSlice";
 import modalReducer from "./modalSlice";
 import checkoutReducer from "./checkoutSlice";
+import odometerReducer from "./odometerSlice";
 
 // Persist configuration
 const persistConfig = {
@@ -17,6 +18,7 @@ const rootReducer = combineReducers({
   user: userReducer,
   modal: modalReducer,
   checkout: checkoutReducer,
+  odometer: odometerReducer,
 });
 
 // Create persisted reducer
