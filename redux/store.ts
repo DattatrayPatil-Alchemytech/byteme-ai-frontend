@@ -2,6 +2,7 @@ import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import userReducer from "./userSlice";
+import adminReducer from "./adminSlice";
 import modalReducer from "./modalSlice";
 import checkoutReducer from "./checkoutSlice";
 import odometerReducer from "./odometerSlice";
@@ -10,12 +11,13 @@ import odometerReducer from "./odometerSlice";
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["user"], // Only persist the user slice
+  whitelist: ["user", "admin"], // Persist both user and admin slices
 };
 
 // Combine reducers
 const rootReducer = combineReducers({
   user: userReducer,
+  admin: adminReducer,
   modal: modalReducer,
   checkout: checkoutReducer,
   odometer: odometerReducer,
