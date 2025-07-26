@@ -1,4 +1,4 @@
-import { apiPost, apiGet, apiDelete } from "./apiMiddleware";
+import {apiPut, apiPost, apiGet, apiDelete } from "./apiMiddleware";
 import { store } from "@/redux/store";
 
 export interface VehicleData {
@@ -7,6 +7,7 @@ export interface VehicleData {
   vehicleType: string;
   make: string;
   model: string;
+  customName: string | null;
   year: number | null;
   plateNumber: string;
   emissionFactor: string;
@@ -43,7 +44,7 @@ export const getUserVehicles = (): Promise<VehicleData[]> => {
   // after update auth token arrive, update the token in the store
   // const currentToken = state.user.accessToken;
   const currentToken =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZGE3Y2ExYi1iZWQ4LTRmY2QtYjA1MS05ZmI0MWU0NzgzM2UiLCJ3YWxsZXRBZGRyZXNzIjoiMHhkYTQwYzViZWRiMmRiZjk0ZTBkY2Q2OTE0OTc2MDEwNjQyMmNiZjExIiwiZW1haWwiOiJkaGFyYUBhbGNoZW15dGVjaC5jYSIsImlhdCI6MTc1MzUxMTAzMiwiZXhwIjoxNzUzNTk3NDMyfQ.9b4NetYOp685mztsEOx7nuZk7YRpVUvIESpb3GNeFM0";
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZGE3Y2ExYi1iZWQ4LTRmY2QtYjA1MS05ZmI0MWU0NzgzM2UiLCJ3YWxsZXRBZGRyZXNzIjoiMHhkYTQwYzViZWRiMmRiZjk0ZTBkY2Q2OTE0OTc2MDEwNjQyMmNiZjExIiwiaXNBY3RpdmUiOnRydWUsImlzVmVyaWZpZWQiOnRydWUsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NTM1MzA4MjMsImV4cCI6MTc1NDEzNTYyM30.H1GKksGB5lxNAj3iQki_fO1UBeDvr60c2NvMlmc_rC8";
 
   if (!currentToken) {
     throw new Error("No access token found");
@@ -64,7 +65,7 @@ export const getUserVehicles = (): Promise<VehicleData[]> => {
 export const addVehicle = (vehicle: { model: string; vehicleType: string; plateNumber: string }): Promise<any> => {
   const state = store.getState();
   const currentToken =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZGE3Y2ExYi1iZWQ4LTRmY2QtYjA1MS05ZmI0MWU0NzgzM2UiLCJ3YWxsZXRBZGRyZXNzIjoiMHhkYTQwYzViZWRiMmRiZjk0ZTBkY2Q2OTE0OTc2MDEwNjQyMmNiZjExIiwiZW1haWwiOiJkaGFyYUBhbGNoZW15dGVjaC5jYSIsImlhdCI6MTc1MzUxMTAzMiwiZXhwIjoxNzUzNTk3NDMyfQ.9b4NetYOp685mztsEOx7nuZk7YRpVUvIESpb3GNeFM0";
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZGE3Y2ExYi1iZWQ4LTRmY2QtYjA1MS05ZmI0MWU0NzgzM2UiLCJ3YWxsZXRBZGRyZXNzIjoiMHhkYTQwYzViZWRiMmRiZjk0ZTBkY2Q2OTE0OTc2MDEwNjQyMmNiZjExIiwiaXNBY3RpdmUiOnRydWUsImlzVmVyaWZpZWQiOnRydWUsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NTM1MzA4MjMsImV4cCI6MTc1NDEzNTYyM30.H1GKksGB5lxNAj3iQki_fO1UBeDvr60c2NvMlmc_rC8";
 
   if (!currentToken) {
     throw new Error("No access token found");
@@ -83,13 +84,51 @@ export const addVehicle = (vehicle: { model: string; vehicleType: string; plateN
 export const deleteVehicle = (vehicleId: string): Promise<any> => {
   const state = store.getState();
   const currentToken =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZGE3Y2ExYi1iZWQ4LTRmY2QtYjA1MS05ZmI0MWU0NzgzM2UiLCJ3YWxsZXRBZGRyZXNzIjoiMHhkYTQwYzViZWRiMmRiZjk0ZTBkY2Q2OTE0OTc2MDEwNjQyMmNiZjExIiwiZW1haWwiOiJkaGFyYUBhbGNoZW15dGVjaC5jYSIsImlhdCI6MTc1MzUxMTAzMiwiZXhwIjoxNzUzNTk3NDMyfQ.9b4NetYOp685mztsEOx7nuZk7YRpVUvIESpb3GNeFM0";
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZGE3Y2ExYi1iZWQ4LTRmY2QtYjA1MS05ZmI0MWU0NzgzM2UiLCJ3YWxsZXRBZGRyZXNzIjoiMHhkYTQwYzViZWRiMmRiZjk0ZTBkY2Q2OTE0OTc2MDEwNjQyMmNiZjExIiwiaXNBY3RpdmUiOnRydWUsImlzVmVyaWZpZWQiOnRydWUsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NTM1MzA4MjMsImV4cCI6MTc1NDEzNTYyM30.H1GKksGB5lxNAj3iQki_fO1UBeDvr60c2NvMlmc_rC8";
 
   if (!currentToken) {
     throw new Error("No access token found");
   }
 
   return apiDelete(`/vehicles/${vehicleId}`, {
+    requireAuth: false,
+    showToast: false,
+    headers: {
+      Authorization: `Bearer ${currentToken}`,
+    },
+  });
+};
+
+// Update Vehicle
+export const updateVehicle = (vehicleId: string, updates: Partial<VehicleData>): Promise<any> => {
+  const state = store.getState();
+  const currentToken =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZGE3Y2ExYi1iZWQ4LTRmY2QtYjA1MS05ZmI0MWU0NzgzM2UiLCJ3YWxsZXRBZGRyZXNzIjoiMHhkYTQwYzViZWRiMmRiZjk0ZTBkY2Q2OTE0OTc2MDEwNjQyMmNiZjExIiwiaXNBY3RpdmUiOnRydWUsImlzVmVyaWZpZWQiOnRydWUsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NTM1MzA4MjMsImV4cCI6MTc1NDEzNTYyM30.H1GKksGB5lxNAj3iQki_fO1UBeDvr60c2NvMlmc_rC8";
+
+  if (!currentToken) {
+    throw new Error("No access token found");
+  }
+
+  return apiPut(`/vehicles/${vehicleId}`, updates, {
+    requireAuth: false,
+    showToast: false,
+    headers: {
+      Authorization: `Bearer ${currentToken}`,
+    },
+  });
+};
+
+// Get User Profile
+export const getUserProfile = (): Promise<any> => {
+  const state = store.getState();
+  const currentToken =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZGE3Y2ExYi1iZWQ4LTRmY2QtYjA1MS05ZmI0MWU0NzgzM2UiLCJ3YWxsZXRBZGRyZXNzIjoiMHhkYTQwYzViZWRiMmRiZjk0ZTBkY2Q2OTE0OTc2MDEwNjQyMmNiZjExIiwiaXNBY3RpdmUiOnRydWUsImlzVmVyaWZpZWQiOnRydWUsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NTM1MzA4MjMsImV4cCI6MTc1NDEzNTYyM30.H1GKksGB5lxNAj3iQki_fO1UBeDvr60c2NvMlmc_rC8";
+
+  if (!currentToken) {
+    throw new Error("No access token found");
+  }
+
+  return apiGet(`/user/profile`, {
     requireAuth: false,
     showToast: false,
     headers: {
