@@ -40,18 +40,14 @@ export interface VehicleData {
 export const getUserVehicles = (): Promise<VehicleData[]> => {
   // Get current token from Redux store
   const state = store.getState();
-
-  // after update auth token arrive, update the token in the store
-  // const currentToken = state.user.accessToken;
-  const currentToken =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZGE3Y2ExYi1iZWQ4LTRmY2QtYjA1MS05ZmI0MWU0NzgzM2UiLCJ3YWxsZXRBZGRyZXNzIjoiMHhkYTQwYzViZWRiMmRiZjk0ZTBkY2Q2OTE0OTc2MDEwNjQyMmNiZjExIiwiaXNBY3RpdmUiOnRydWUsImlzVmVyaWZpZWQiOnRydWUsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NTM1MzA4MjMsImV4cCI6MTc1NDEzNTYyM30.H1GKksGB5lxNAj3iQki_fO1UBeDvr60c2NvMlmc_rC8";
+  const currentToken = state.user.accessToken;
 
   if (!currentToken) {
     throw new Error("No access token found");
   }
 
   return apiGet<VehicleData[]>(`/vehicles`, {
-    requireAuth: false,
+    requireAuth: true,
     showToast: false,
     headers: {
       Authorization: `Bearer ${currentToken}`,
@@ -64,8 +60,7 @@ export const getUserVehicles = (): Promise<VehicleData[]> => {
 // Add Vehicle
 export const addVehicle = (vehicle: { model: string; vehicleType: string; plateNumber: string }): Promise<any> => {
   const state = store.getState();
-  const currentToken =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZGE3Y2ExYi1iZWQ4LTRmY2QtYjA1MS05ZmI0MWU0NzgzM2UiLCJ3YWxsZXRBZGRyZXNzIjoiMHhkYTQwYzViZWRiMmRiZjk0ZTBkY2Q2OTE0OTc2MDEwNjQyMmNiZjExIiwiaXNBY3RpdmUiOnRydWUsImlzVmVyaWZpZWQiOnRydWUsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NTM1MzA4MjMsImV4cCI6MTc1NDEzNTYyM30.H1GKksGB5lxNAj3iQki_fO1UBeDvr60c2NvMlmc_rC8";
+  const currentToken = state.user.accessToken;
 
   if (!currentToken) {
     throw new Error("No access token found");
@@ -83,8 +78,7 @@ export const addVehicle = (vehicle: { model: string; vehicleType: string; plateN
 // Delete Vehicle
 export const deleteVehicle = (vehicleId: string): Promise<any> => {
   const state = store.getState();
-  const currentToken =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZGE3Y2ExYi1iZWQ4LTRmY2QtYjA1MS05ZmI0MWU0NzgzM2UiLCJ3YWxsZXRBZGRyZXNzIjoiMHhkYTQwYzViZWRiMmRiZjk0ZTBkY2Q2OTE0OTc2MDEwNjQyMmNiZjExIiwiaXNBY3RpdmUiOnRydWUsImlzVmVyaWZpZWQiOnRydWUsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NTM1MzA4MjMsImV4cCI6MTc1NDEzNTYyM30.H1GKksGB5lxNAj3iQki_fO1UBeDvr60c2NvMlmc_rC8";
+  const currentToken = state.user.accessToken;
 
   if (!currentToken) {
     throw new Error("No access token found");
@@ -102,8 +96,7 @@ export const deleteVehicle = (vehicleId: string): Promise<any> => {
 // Update Vehicle
 export const updateVehicle = (vehicleId: string, updates: Partial<VehicleData>): Promise<any> => {
   const state = store.getState();
-  const currentToken =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZGE3Y2ExYi1iZWQ4LTRmY2QtYjA1MS05ZmI0MWU0NzgzM2UiLCJ3YWxsZXRBZGRyZXNzIjoiMHhkYTQwYzViZWRiMmRiZjk0ZTBkY2Q2OTE0OTc2MDEwNjQyMmNiZjExIiwiaXNBY3RpdmUiOnRydWUsImlzVmVyaWZpZWQiOnRydWUsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NTM1MzA4MjMsImV4cCI6MTc1NDEzNTYyM30.H1GKksGB5lxNAj3iQki_fO1UBeDvr60c2NvMlmc_rC8";
+  const currentToken = state.user.accessToken;
 
   if (!currentToken) {
     throw new Error("No access token found");
@@ -121,8 +114,7 @@ export const updateVehicle = (vehicleId: string, updates: Partial<VehicleData>):
 // Get User Profile
 export const getUserProfile = (): Promise<any> => {
   const state = store.getState();
-  const currentToken =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZGE3Y2ExYi1iZWQ4LTRmY2QtYjA1MS05ZmI0MWU0NzgzM2UiLCJ3YWxsZXRBZGRyZXNzIjoiMHhkYTQwYzViZWRiMmRiZjk0ZTBkY2Q2OTE0OTc2MDEwNjQyMmNiZjExIiwiaXNBY3RpdmUiOnRydWUsImlzVmVyaWZpZWQiOnRydWUsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NTM1MzA4MjMsImV4cCI6MTc1NDEzNTYyM30.H1GKksGB5lxNAj3iQki_fO1UBeDvr60c2NvMlmc_rC8";
+  const currentToken = state.user.accessToken;
 
   if (!currentToken) {
     throw new Error("No access token found");
