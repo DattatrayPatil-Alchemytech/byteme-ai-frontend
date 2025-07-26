@@ -44,6 +44,8 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         if (accessToken) {
           const userData = await getUserProfile();
           dispatch(updateProfile(userData));
+        } else {
+          disconnect();
         }
       } catch (error) {
         console.error("Token refresh failed:", error);

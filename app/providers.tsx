@@ -39,7 +39,7 @@ function ProvidersInner({ children }: { children: React.ReactNode }) {
           payload: {
             type: "text",
             content:
-              process.env.NEXT_PUBLIC_CONNECTION_CERTIFICATE_CONTENT || "",
+              process.env.NEXT_PUBLIC_CONNECTION_CERTIFICATE_CONTENT || 'Sign this message to authenticate with Drive & Earn',
           },
         },
       }}
