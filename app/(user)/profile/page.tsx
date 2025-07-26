@@ -59,8 +59,6 @@ export default function UserProfilePage() {
   const [userProfileError, setUserProfileError] = useState("");
   const router = useRouter();
 
-  console.log(vehicles);
-
   useEffect(() => {
     setUserProfileLoading(true);
     getUserProfile()
