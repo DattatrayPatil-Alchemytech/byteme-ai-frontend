@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import dynamic from 'next/dynamic';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getDashboardStats, getSystemAnalytics, type DashboardStats, type SystemAnalytics, type UserGrowthData, type VehicleTypeData, type UploadStatusData } from '@/lib/apiHelpers/adminDashboard';
+import { RootState } from '@/redux/store';
 
 // Dynamically import ApexCharts to avoid SSR issues
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
@@ -273,12 +275,6 @@ export default function AdminDashboardPage() {
   };
 
   useEffect(() => {
-    // Get admin username from localStorage
-    const username = localStorage.getItem('adminUsername');
-    if (username) {
-      setAdminUsername(username);
-    }
-
     // Fetch dashboard data
     const fetchDashboardData = async () => {
               try {
@@ -308,6 +304,7 @@ export default function AdminDashboardPage() {
           try {
             const analytics = await getSystemAnalytics();
             setAnalyticsData(analytics);
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           } catch (analyticsError) {
             setAnalyticsData({
               userGrowth: [],
@@ -315,7 +312,8 @@ export default function AdminDashboardPage() {
               uploadStatus: []
             });
           }
-      } catch (err: any) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (err: unknown) {
         // Instead of showing error, set default values with 0
         setDashboardStats({
           totalUsers: 0,
@@ -352,7 +350,7 @@ export default function AdminDashboardPage() {
       {/* Welcome */}
       <div>
         <h1 className="text-4xl font-bold text-foreground mb-2">
-          Welcome back, {adminUsername}! 👋
+                      Welcome back,  Admin! 👋
         </h1>
         <p className="text-muted-foreground text-lg">
           Here&apos;s your comprehensive overview of ByteMe AI platform performance.

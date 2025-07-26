@@ -3,6 +3,7 @@
 import toast from "react-hot-toast";
 import { store } from "@/redux/store";
 import { logout } from "@/redux/userSlice";
+import { adminLogout } from "@/redux/adminSlice";
 
 // API Configuration
 const API_BASE_URL =
@@ -18,6 +19,7 @@ interface ApiOptions {
   headers?: Record<string, string>;
   requireAuth?: boolean;
   showToast?: boolean;
+  isAdmin?: boolean;
 }
 
 // API Response wrapper
@@ -50,12 +52,17 @@ export const apiRequest = async <T = unknown>(
     headers = {},
     requireAuth = true,
     showToast = true,
+    isAdmin = false,
   } = options;
 
   try {
-    // Get access token from Redux store
+    // Get access tokens from Redux store
     const state = store.getState();
-    const accessToken = state.user.accessToken;
+    const userAccessToken = state.user.accessToken;
+    const adminAccessToken = state.admin.accessToken;
+    
+    // Use admin token if isAdmin flag is set, otherwise use user token
+    const accessToken = isAdmin ? adminAccessToken : userAccessToken;
 
     // Check if auth is required but token is missing
     if (requireAuth && !accessToken) {
@@ -63,7 +70,12 @@ export const apiRequest = async <T = unknown>(
       if (showToast) {
         toast.error(errorMessage);
       }
-      store.dispatch(logout());
+      // Logout based on the type of authentication being used
+      if (isAdmin) {
+        store.dispatch(adminLogout());
+      } else {
+        store.dispatch(logout());
+      }
       throw new ApiError(401, errorMessage);
     }
 
@@ -116,12 +128,17 @@ export const apiRequest = async <T = unknown>(
         errorMessage = response.statusText || errorMessage;
       }
 
-      // Handle 401 Unauthorized - logout user
+      // Handle 401 Unauthorized - logout user or admin
       if (response.status === 401) {
         if (showToast) {
           toast.error("Session expired. Please login again.");
         }
-        store.dispatch(logout());
+        // Logout based on the type of authentication being used
+        if (isAdmin) {
+          store.dispatch(adminLogout());
+        } else {
+          store.dispatch(logout());
+        }
         throw new ApiError(401, "Unauthorized", errorData);
       }
 

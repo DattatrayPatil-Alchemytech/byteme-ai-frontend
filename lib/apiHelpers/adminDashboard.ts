@@ -40,14 +40,16 @@ export interface SystemAnalytics {
 // Get dashboard stats
 export const getDashboardStats = (): Promise<DashboardStats> => {
   return apiGet<DashboardStats>("/admin/dashboard/stats", {
-    requireAuth: false, // Requires admin authentication
+    requireAuth: true,
+    isAdmin: true, // Use admin token
   });
 };
 
 // Get system analytics
 export const getSystemAnalytics = (): Promise<SystemAnalytics> => {
   return apiGet<SystemAnalytics>("/admin/analytics/system", {
-    requireAuth: false, // Requires admin authentication
+    requireAuth: true,
+    isAdmin: true, // Use admin token
   });
 };
 

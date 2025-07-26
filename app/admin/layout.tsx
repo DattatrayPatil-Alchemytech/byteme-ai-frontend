@@ -2,14 +2,18 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { useDispatch, useSelector } from 'react-redux';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { adminLogout } from '@/redux/adminSlice';
+import { RootState } from '@/redux/store';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const dispatch = useDispatch();
+  const { isAuthenticated, admin } = useSelector((state: RootState) => state.admin);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [adminUsername, setAdminUsername] = useState('');
 
   const sidebarItems = [
     { id: 'overview', label: 'Overview', icon: '📊', path: '/admin/dashboard' },
@@ -25,39 +29,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     // Only check login status if not on login page
-    if (!isLoginPage) {
-      const isAdminLoggedIn = localStorage.getItem('adminLoggedIn');
-      const username = localStorage.getItem('adminUsername');
-      
-      if (isAdminLoggedIn !== 'true') {
-        router.push('/admin/login');
-        return;
-      }
-      
-      if (username) {
-        setAdminUsername(username);
-      }
+    if (!isLoginPage && !isAuthenticated) {
+      router.push('/admin/login');
     }
-  }, [router, isLoginPage]);
+  }, [router, isLoginPage, isAuthenticated]);
 
   const handleLogout = () => {
-    // Clear all admin-related data
-    localStorage.removeItem('adminLoggedIn');
-    localStorage.removeItem('adminUsername');
-    localStorage.removeItem('adminToken');
-    localStorage.removeItem('adminWalletAddress');
-    localStorage.removeItem('adminSession');
-    
-    // Clear any other potential admin data
-    const keysToRemove = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('admin')) {
-        keysToRemove.push(key);
-      }
-    }
-    keysToRemove.forEach(key => localStorage.removeItem(key));
-    
+    // Clear admin data from Redux
+    dispatch(adminLogout());
     router.push('/admin/login');
   };
 
@@ -118,7 +97,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <span className="text-white text-sm font-bold">A</span>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-foreground">{adminUsername}</p>
+                    <p className="text-sm font-medium text-foreground">{admin?.username || 'Admin'}</p>
                     <p className="text-xs text-muted-foreground">Administrator</p>
                   </div>
                 </div>

@@ -2,35 +2,34 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useDispatch, useSelector } from 'react-redux';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { adminLogin, type AdminLoginCredentials } from '@/lib/apiHelpers/admin';
+import { adminLoginStart, adminLoginSuccess, adminLoginFailure } from '@/redux/adminSlice';
+import { RootState } from '@/redux/store';
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const dispatch = useDispatch();
+  const { isAuthenticated, isLoading, error } = useSelector((state: RootState) => state.admin);
   const [formData, setFormData] = useState({
     username: '',
     password: ''
   });
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Check if admin is already logged in
-    const isAdminLoggedIn = localStorage.getItem('adminLoggedIn');
-    if (isAdminLoggedIn === 'true') {
-      setIsAuthenticated(true);
+    // Check if admin is already authenticated in Redux
+    if (isAuthenticated) {
       router.push('/admin/dashboard');
     }
-  }, [router]);
+  }, [isAuthenticated, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError('');
+    dispatch(adminLoginStart());
 
     try {
       const credentials: AdminLoginCredentials = {
@@ -40,17 +39,12 @@ export default function AdminLoginPage() {
 
       const response = await adminLogin(credentials);
       
-      // Store admin token and login status
-      localStorage.setItem('adminToken', response.token);
-      localStorage.setItem('adminLoggedIn', 'true');
-      localStorage.setItem('adminUsername', formData.username);
-      setIsAuthenticated(true);
+      // Store admin data in Redux
+      dispatch(adminLoginSuccess(response));
       router.push('/admin/dashboard');
     } catch (error) {
       console.error('Admin login error:', error);
-      setError('Login failed. Please check your credentials.');
-    } finally {
-      setIsLoading(false);
+      dispatch(adminLoginFailure('Login failed. Please check your credentials.'));
     }
   };
 
