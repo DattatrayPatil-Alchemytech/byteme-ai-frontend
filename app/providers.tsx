@@ -26,9 +26,11 @@ const ModalWrapper = dynamic(() => import("@/components/modals/ModalWrapper"), {
 
 // Inner component to access Redux dispatch
 function ProvidersInner({ children }: { children: React.ReactNode }) {
+  const nodeURL =
+    process.env.NEXT_PUBLIC_VECHAIN_NODE_URL || "https://testnet.vechain.org/";
   return (
     <DAppKitProvider
-      node="https://testnet.vechain.org/"
+      node={nodeURL}
       usePersistence
       requireCertificate
       connectionCertificate={{

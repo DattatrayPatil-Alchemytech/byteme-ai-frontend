@@ -13,7 +13,10 @@ import { loginSuccess, loginStart, loginFailure } from "@/redux/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 //api
-import { verifyLogin } from "@/lib/apiHelpers/user";
+import {
+  verifySignature,
+  type SignatureVerificationPayload,
+} from "@/lib/apiHelpers/user";
 import { RootState } from "@/redux/store";
 
 interface WalletConnectProps {
@@ -25,43 +28,34 @@ export function WalletConnect({
   title = "Get Started",
   disabled = false,
 }: WalletConnectProps) {
-  const { account, connectionCertificate } = useWallet();
+  const { account, connectionCertificate: certificate } = useWallet();
   const { open } = useWalletModal();
   const router = useRouter();
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user);
 
   const handleLogin = async () => {
-    if (connectionCertificate && account && !user.isAuthenticated) {
+    if (certificate && account && !user.isAuthenticated) {
       dispatch(loginStart());
 
       try {
         // Validate required fields
-        if (!connectionCertificate.signature) {
+        if (!certificate.signature) {
           throw new Error("No signature available in connection certificate");
         }
-
-        // Convert VeChain connection certificate to our signature format
-        const signatureData = {
-          purpose: connectionCertificate.purpose,
-          payload: connectionCertificate.payload,
-          signature: connectionCertificate.signature,
-          signer: account, // wallet address
-          domain: connectionCertificate.domain,
-          timestamp: connectionCertificate.timestamp,
+        // Create signature verification payload according to required structure
+        const signaturePayload: SignatureVerificationPayload = {
+          certificate,
         };
+        // Call our signature verification API
+        const loginResponse = await verifySignature(signaturePayload);
 
-        // Call our login API
-        const loginResponse = await verifyLogin(signatureData);
-
-        // Update Redux with user data and token
         dispatch(loginSuccess(loginResponse));
-
-        // Show success message
-        toast.success(`Welcome back, ${loginResponse.user.name}!`);
-
-        // Optional: Open profile completion modal for new users after navigation
-        if (!loginResponse?.user?.email) {
+        const message = loginResponse?.user?.username
+          ? `👋 Welcome back, ${loginResponse.user.username}!`
+          : " 🎉 Welcome to Drive & Earn!";
+        toast.success(message);
+        if (!loginResponse?.user?.email || !loginResponse?.user?.username) {
           setTimeout(() => {
             dispatch(
               openModal({
@@ -90,7 +84,7 @@ export function WalletConnect({
   // Handle wallet connection and login
   useEffect(() => {
     handleLogin();
-  }, [connectionCertificate, account, dispatch, router]);
+  }, [certificate]);
 
   const handleCopyAddress = () => {
     navigator.clipboard.writeText(account || "");

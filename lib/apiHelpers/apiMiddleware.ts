@@ -178,6 +178,9 @@ export const apiRequest = async <T = unknown>(
       responseData = await response.text();
     }
 
+    console.log('Response data:', responseData);
+    console.log('Response data type:', typeof responseData);
+
     // Return the data
     return responseData as T;
   } catch (error) {
