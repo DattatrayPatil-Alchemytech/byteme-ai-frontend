@@ -151,7 +151,7 @@ const VehicleHistoryTab: React.FC = () => {
           placeholder="Search activities..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="border border-border bg-background text-foreground rounded-lg px-5 py-3 w-full md:w-64 text-base font-medium shadow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary hover:ring-2 hover:ring-primary/30 hover:bg-muted placeholder:text-muted-foreground"
+          className="border border-border bg-background text-foreground rounded-xl px-5 py-3 w-full md:w-64 text-base font-medium shadow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary hover:ring-2 hover:ring-primary/30 hover:bg-muted placeholder:text-muted-foreground"
         />
         <Select
           value={vehicleFilter}
