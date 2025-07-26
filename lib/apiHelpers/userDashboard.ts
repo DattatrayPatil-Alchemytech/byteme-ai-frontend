@@ -54,13 +54,39 @@ export interface LeaderboardResponse {
 
 export interface VehicleHistoryItem {
   id: string;
-  vehicle: string;
-  submissionCount: number;
-  milesDriven: number;
-  carbonImpact: number;
-  rewards: number;
-  imageHash: string;
-  date: string;
+  userId: string;
+  type: string;
+  category: string;
+  title: string;
+  description: string;
+  data: {
+    activity: string;
+    timestamp: string;
+    userId: string;
+    value: number;
+    previousValue: number;
+  };
+  value: string;
+  previousValue: string;
+  isVisible: boolean;
+  isDeleted: boolean;
+  deletedAt: string | null;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+  isRecent: boolean;
+  isToday: boolean;
+  isThisWeek: boolean;
+  isThisMonth: boolean;
+  formattedValue: string;
+  valueChange: number;
+  formattedValueChange: string;
+  isPositiveChange: boolean;
+  categoryIcon: string;
+  typeIcon: string;
+  formattedCreatedAt: string;
+  canBeDeleted: boolean;
+  actionButtonText: string;
 }
 
 export interface VehicleHistoryResponse {
@@ -90,12 +116,17 @@ export const getWeeklyLeaderboard = async (): Promise<LeaderboardResponse> => {
 // Get vehicle history with pagination
 export const getVehicleHistory = (
   page: number = 1,
-  limit: number = 20
+  limit: number = 20,
+  search?: string
 ): Promise<VehicleHistoryResponse> => {
   const params = new URLSearchParams({
     page: page.toString(),
     limit: limit.toString(),
   });
+  
+  if (search && search.trim()) {
+    params.append('search', search.trim());
+  }
   
   return apiGet<VehicleHistoryResponse>(`/history?${params.toString()}`, {
     requireAuth: true,
