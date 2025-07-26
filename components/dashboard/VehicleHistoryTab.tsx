@@ -50,8 +50,8 @@ const VehicleHistoryTab: React.FC = () => {
       label: "Type",
       render: (value, row) => (
         <div className="flex items-center gap-2">
-          <span className="text-lg">{value as string}</span>
-          <span className="text-xs text-muted-foreground capitalize">
+          <span className="text-base">{value as string}</span>
+          <span className="text-xs text-muted-foreground dark:text-slate-400 capitalize">
             {(row as any).type?.replace("_", " ")}
           </span>
         </div>
@@ -61,7 +61,7 @@ const VehicleHistoryTab: React.FC = () => {
       key: "category",
       label: "Category",
       render: (value) => (
-        <span className="text-sm font-medium text-muted-foreground capitalize">
+        <span className="text-xs font-medium text-muted-foreground dark:text-slate-400 capitalize">
           {value as string}
         </span>
       ),
@@ -69,13 +69,13 @@ const VehicleHistoryTab: React.FC = () => {
     {
       key: "title",
       label: "Activity",
-      render: (value) => <span className="font-medium">{value as string}</span>,
+      render: (value) => <span className="text-sm font-medium text-foreground dark:text-white">{value as string}</span>,
     },
     // {
     //   key: "description",
     //   label: "Description",
     //   render: (value) => (
-    //     <span className="text-sm text-muted-foreground max-w-xs truncate">
+    //     <span className="text-xs text-muted-foreground dark:text-slate-400 max-w-xs truncate">
     //       {value as string}
     //     </span>
     //   ),
@@ -85,8 +85,8 @@ const VehicleHistoryTab: React.FC = () => {
       label: "Value",
       render: (value, row) => (
         <span
-          className={`font-semibold ${
-            (row as any).isPositiveChange ? "text-green-600" : "text-red-600"
+          className={`text-sm font-semibold ${
+            (row as any).isPositiveChange ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
           }`}
         >
           {value as string}
@@ -98,8 +98,8 @@ const VehicleHistoryTab: React.FC = () => {
       label: "Change",
       render: (value, row) => (
         <span
-          className={`text-sm ${
-            (row as any).isPositiveChange ? "text-green-600" : "text-red-600"
+          className={`text-xs ${
+            (row as any).isPositiveChange ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
           }`}
         >
           {value as string}
@@ -110,7 +110,7 @@ const VehicleHistoryTab: React.FC = () => {
       key: "formattedCreatedAt",
       label: "Date",
       render: (value) => (
-        <span className="text-sm text-muted-foreground">{value as string}</span>
+        <span className="text-xs text-muted-foreground dark:text-slate-400">{value as string}</span>
       ),
     },
   ];
@@ -129,22 +129,22 @@ const VehicleHistoryTab: React.FC = () => {
   }, [historyData]);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
-      <div className="">
+    <div className="min-h-screen bg-background dark:bg-slate-900">
+      <div className="p-1">
         {/* Page Header */}
-        <div className="mb-8">
+        <div className="mb-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-2xl font-bold text-foreground dark:text-white">
                 Activity History
               </h1>
-              <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+              <p className="mt-1 text-xs text-muted-foreground dark:text-slate-400">
                 Monitor your rewards, uploads, and achievements
               </p>
             </div>
             <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-2 px-3 py-1 bg-green-100 dark:bg-green-900/30 rounded-full">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <div className="flex items-center space-x-2 px-2 py-1 bg-green-100 dark:bg-green-900/30 rounded-full">
+                <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
                 <span className="text-xs font-medium text-green-700 dark:text-green-400">Live</span>
               </div>
             </div>
@@ -152,15 +152,15 @@ const VehicleHistoryTab: React.FC = () => {
         </div>
 
         {/* Search and Controls */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-6 mb-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div className="bg-card/50 dark:bg-slate-800/50 rounded-lg shadow-sm border border-border/50 dark:border-slate-700/50 p-4 mb-4">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
             <div className="flex-1 max-w-md">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-xs font-medium text-foreground dark:text-slate-300 mb-1">
                 Search Activities
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+                  <svg className="h-4 w-4 text-muted-foreground dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
@@ -169,13 +169,13 @@ const VehicleHistoryTab: React.FC = () => {
                   placeholder="Search by activity or description..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="block w-full pl-8 pr-3 py-2 border border-border/50 dark:border-slate-600/50 rounded-md bg-background dark:bg-slate-700/50 text-foreground dark:text-white placeholder-muted-foreground dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-colors text-sm"
                 />
               </div>
             </div>
             
-            <div className="lg:w-64">
-              {/* <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <div className="lg:w-48">
+              {/* <label className="block text-xs font-medium text-foreground dark:text-slate-300 mb-1">
                 Filter by Type
               </label> */}
               {/* <Select
@@ -189,20 +189,15 @@ const VehicleHistoryTab: React.FC = () => {
           </div>
         </div>
 
-
-
         {/* Data Table */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700">
+        <div className="bg-card/50 dark:bg-slate-800/50 rounded-lg shadow-sm border border-border/50 dark:border-slate-700/50 overflow-hidden">
+          <div className="px-4 py-3 border-b border-border/30 dark:border-slate-700/30">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Activity Records</h2>
-              <div className="text-sm text-gray-500 dark:text-gray-400">
-                {loading ? 'Loading...' : `Showing ${filteredHistory.length} of ${totalItems} records`}
-              </div>
+              <h2 className="text-sm font-semibold text-foreground dark:text-white">Activity Records</h2>
             </div>
           </div>
           
-          <div className="p-6">
+          <div className="p-4">
             {loading ? (
               <TableSkeleton rows={10} columns={6} />
             ) : (
@@ -218,62 +213,62 @@ const VehicleHistoryTab: React.FC = () => {
 
         {/* Pagination */}
         {loading ? (
-          <div className="mt-6 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div className="flex items-center space-x-4">
-                <div className="h-4 w-20 bg-gray-200 dark:bg-slate-600 rounded animate-pulse"></div>
-                <div className="h-8 w-24 bg-gray-200 dark:bg-slate-600 rounded animate-pulse"></div>
-                <div className="h-4 w-16 bg-gray-200 dark:bg-slate-600 rounded animate-pulse"></div>
+          <div className="mt-4 bg-card/50 dark:bg-slate-800/50 rounded-lg shadow-sm border border-border/50 dark:border-slate-700/50 p-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex items-center space-x-3">
+                <div className="h-3 w-16 bg-muted dark:bg-slate-600 rounded animate-pulse"></div>
+                <div className="h-6 w-20 bg-muted dark:bg-slate-600 rounded animate-pulse"></div>
+                <div className="h-3 w-12 bg-muted dark:bg-slate-600 rounded animate-pulse"></div>
               </div>
-              <div className="flex items-center space-x-4">
-                <div className="h-4 w-48 bg-gray-200 dark:bg-slate-600 rounded animate-pulse"></div>
+              <div className="flex items-center space-x-3">
+                <div className="h-3 w-40 bg-muted dark:bg-slate-600 rounded animate-pulse"></div>
                 <div className="flex space-x-2">
-                  <div className="h-8 w-20 bg-gray-200 dark:bg-slate-600 rounded animate-pulse"></div>
-                  <div className="h-8 w-16 bg-gray-200 dark:bg-slate-600 rounded animate-pulse"></div>
+                  <div className="h-6 w-16 bg-muted dark:bg-slate-600 rounded animate-pulse"></div>
+                  <div className="h-6 w-12 bg-muted dark:bg-slate-600 rounded animate-pulse"></div>
                 </div>
               </div>
             </div>
           </div>
         ) : totalItems > 0 ? (
-          <div className="mt-6 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-700 dark:text-gray-300">Show</span>
+          <div className="mt-4 bg-card/50 dark:bg-slate-800/50 rounded-lg shadow-sm border border-border/50 dark:border-slate-700/50 p-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex items-center space-x-3">
+                <span className="text-xs text-muted-foreground dark:text-slate-400">Show</span>
                 <select
                   value={limit}
                   onChange={(e) => {
                     setLimit(Number(e.target.value));
                     setCurrentPage(1);
                   }}
-                  className="border border-gray-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="border border-border/50 dark:border-slate-600/50 rounded-md px-2 py-1 text-xs bg-background dark:bg-slate-700/50 text-foreground dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50"
                 >
                   <option value={10}>10</option>
                   <option value={20}>20</option>
                   <option value={50}>50</option>
                   <option value={100}>100</option>
                 </select>
-                <span className="text-sm text-gray-700 dark:text-gray-300">entries per page</span>
+                <span className="text-xs text-muted-foreground dark:text-slate-400">entries per page</span>
               </div>
               
-              <div className="flex items-center space-x-6">
-                <span className="text-sm text-gray-700 dark:text-gray-300">
-                  Showing <span className="font-medium text-gray-900 dark:text-white">{(currentPage - 1) * limit + 1}</span> to{" "}
-                  <span className="font-medium text-gray-900 dark:text-white">{Math.min(currentPage * limit, totalItems)}</span> of{" "}
-                  <span className="font-medium text-gray-900 dark:text-white">{totalItems}</span> records
+              <div className="flex items-center space-x-4">
+                <span className="text-xs text-muted-foreground dark:text-slate-400">
+                  Showing <span className="font-medium text-foreground dark:text-white">{(currentPage - 1) * limit + 1}</span> to{" "}
+                  <span className="font-medium text-foreground dark:text-white">{Math.min(currentPage * limit, totalItems)}</span> of{" "}
+                  <span className="font-medium text-foreground dark:text-white">{totalItems}</span> records
                 </span>
                 
                 <div className="flex space-x-2">
                   <button
                     onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                     disabled={currentPage === 1}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="px-3 py-1 text-xs font-medium text-muted-foreground dark:text-slate-400 bg-background dark:bg-slate-700/50 border border-border/50 dark:border-slate-600/50 rounded-md hover:bg-muted dark:hover:bg-slate-600/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     Previous
                   </button>
                   <button
                     onClick={() => setCurrentPage(currentPage + 1)}
                     disabled={currentPage >= Math.ceil(totalItems / limit)}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="px-3 py-1 text-xs font-medium text-muted-foreground dark:text-slate-400 bg-background dark:bg-slate-700/50 border border-border/50 dark:border-slate-600/50 rounded-md hover:bg-muted dark:hover:bg-slate-600/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     Next
                   </button>
