@@ -174,125 +174,132 @@ const Leaderboard: React.FC = () => {
     <div className="space-y-8">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Leaderboard */}
-        <Card className="hover-lift gradient-ev-green/10 border-primary/20 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-foreground flex items-center">
-              <span className="text-2xl mr-2">📈</span>
+        <Card className="bg-card/50 border-border/50 backdrop-blur-sm dark:bg-slate-800/50 dark:border-slate-700/50">
+          <CardHeader className="border-b border-border/30 dark:border-slate-700/30">
+            <CardTitle className="text-foreground dark:text-white flex items-center text-xl">
+              <span className="text-2xl mr-3">📈</span>
               Weekly Leaderboard
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            {data.entries.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 w-full">
-                <span className="text-5xl mb-4">📉</span>
-                <p className="text-lg font-semibold text-muted-foreground mb-2">No leaderboard data yet</p>
-                <p className="text-sm text-muted-foreground mb-4">Be the first to participate and climb the leaderboard!</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {data.entries.map((entry, index) => (
-                  <div
-                    key={entry.userId}
-                    className={`flex items-center justify-between p-3 rounded-lg transition-all ${
-                      entry.rank === data.userRank
-                        ? "gradient-ev-green/20 border border-primary/30"
-                        : "bg-card/50 hover:bg-card/70"
-                    }`}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div
-                        className={`w-8 h-8 rounded-full bg-gradient-to-r ${getRankColor(
-                          entry.rank
-                        )} flex items-center justify-center text-sm font-bold text-white`}
-                      >
-                        {getRankIcon(entry.rank)}
+          <CardContent className="p-0">
+            {/* Main Leaderboard List */}
+            <div className="p-6">
+              {data.entries.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <span className="text-5xl mb-4">📉</span>
+                  <p className="text-lg font-semibold text-muted-foreground dark:text-slate-300 mb-2">No leaderboard data yet</p>
+                  <p className="text-sm text-muted-foreground dark:text-slate-400 text-center">Be the first to participate and climb the leaderboard!</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {data.entries.map((entry, index) => (
+                    <div
+                      key={entry.userId}
+                      className={`flex items-center justify-between p-4 rounded-xl transition-all duration-200 ${
+                        entry.rank === data.userRank
+                          ? "bg-primary/10 border border-primary/30 dark:bg-slate-700/50 dark:border-slate-600/50"
+                          : "bg-muted/30 hover:bg-muted/50 dark:bg-slate-700/30 dark:hover:bg-slate-700/50"
+                      }`}
+                    >
+                      <div className="flex items-center space-x-4">
+                        <div
+                          className={`w-10 h-10 rounded-full bg-gradient-to-r ${getRankColor(
+                            entry.rank
+                          )} flex items-center justify-center text-sm font-bold text-white shadow-lg`}
+                        >
+                          {getRankIcon(entry.rank)}
+                        </div>
+                        <div>
+                          <p className="text-foreground dark:text-white font-semibold text-base">
+                            {entry.username}
+                          </p>
+                          <p className="text-xs text-muted-foreground dark:text-slate-400 font-mono">
+                            {entry.walletAddress}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-foreground font-medium">
-                          {entry.username}
+                      <div className="text-right">
+                        <p className="text-foreground dark:text-white font-bold text-base">
+                          {entry.totalMileage} miles
                         </p>
-                        <p className="text-xs text-muted-foreground">
-                          {entry.walletAddress}
+                        <p className="text-sm text-green-600 dark:text-green-400 font-medium">
+                          +{entry.totalRewards} B3TR
                         </p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-foreground font-semibold">
-                        {entry.totalMileage} miles
-                      </p>
-                      <p className="text-xs text-primary">
-                        +{entry.totalRewards} B3TR
-                      </p>
-                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Summary Cards Section */}
+            <div className="border-t border-border/30 dark:border-slate-700/30 p-6">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                {/* Your Rank Card */}
+                <div className="bg-muted/50 dark:bg-slate-700/50 rounded-xl p-4 text-center min-w-[140px] border border-border/30 dark:border-slate-600/30">
+                  <p className="text-sm text-muted-foreground dark:text-slate-400 mb-2">Your Rank</p>
+                  <div className="text-2xl font-bold text-primary dark:text-green-400">
+                    {data.userRank && data.userRank > 0 ? `#${data.userRank}` : '#'}
                   </div>
-                ))}
+                </div>
+
+                {/* Total Participants Card */}
+                <div className="bg-muted/50 dark:bg-slate-700/50 rounded-xl p-4 text-center min-w-[140px] border border-border/30 dark:border-slate-600/30">
+                  <p className="text-sm text-muted-foreground dark:text-slate-400 mb-2">Total Participants</p>
+                  <div className="text-2xl font-bold text-foreground dark:text-white">
+                    {data.totalParticipants || 0}
+                  </div>
+                </div>
               </div>
-            )}
-            {/* Always show user rank and total participants cards below */}
-            {(data.userRank && data.userRank > 0) || (data.totalParticipants && data.totalParticipants > 0) ? (
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 items-center justify-center mt-8 w-full max-w-xs mx-auto">
-                {data.userRank && data.userRank > 0 && (
-                  <div className="bg-muted/60 rounded-lg px-4 py-2 text-center w-full">
-                    <span className="text-sm text-muted-foreground">Your Rank</span>
-                    <div className="text-xl font-bold text-primary">#{data.userRank}</div>
-                  </div>
-                )}
-                {data.totalParticipants && data.totalParticipants > 0 && (
-                  <div className="bg-muted/60 rounded-lg px-4 py-2 text-center w-full">
-                    <span className="text-sm text-muted-foreground">Total Participants</span>
-                    <div className="text-xl font-bold text-success">{data.totalParticipants}</div>
-                  </div>
-                )}
-              </div>
-            ) : null}
+            </div>
           </CardContent>
         </Card>
-        {/* Challenges section remains unchanged or can be removed if not needed */}
+
         {/* Challenges */}
-        <Card className="hover-lift gradient-ev-light/10 border-success/20 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-foreground flex items-center">
-              <span className="text-2xl mr-2">🎯</span>
+        <Card className="bg-card/50 border-border/50 backdrop-blur-sm dark:bg-slate-800/50 dark:border-slate-700/50">
+          <CardHeader className="border-b border-border/30 dark:border-slate-700/30">
+            <CardTitle className="text-foreground dark:text-white flex items-center text-xl">
+              <span className="text-2xl mr-3">🎯</span>
               Active Challenges
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-6">
             <div className="space-y-4">
               {mockChallenges.map((challenge) => (
                 <div
                   key={challenge.id}
-                  className="p-4 bg-card/50 rounded-lg border border-border/20"
+                  className="p-4 bg-muted/30 dark:bg-slate-700/30 rounded-xl border border-border/30 dark:border-slate-600/30 hover:bg-muted/50 dark:hover:bg-slate-700/50 transition-colors"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center space-x-3">
                       <span className="text-2xl">{challenge.icon}</span>
                       <div>
-                        <h4 className="text-foreground font-semibold">
+                        <h4 className="text-foreground dark:text-white font-semibold">
                           {challenge.title}
                         </h4>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-muted-foreground dark:text-slate-400">
                           {challenge.description}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-primary font-bold">
+                      <div className="text-green-600 dark:text-green-400 font-bold">
                         +{challenge.reward} B3TR
                       </div>
-                      <div className="text-xs text-muted-foreground">
+                      <div className="text-xs text-muted-foreground dark:text-slate-400">
                         {challenge.daysLeft} days left
                       </div>
                     </div>
                   </div>
 
                   <div className="mb-3">
-                    <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground dark:text-slate-400 mb-2">
                       <span>{challenge.participants} participants</span>
                       <span>{challenge.duration}</span>
                     </div>
-                    <div className="w-full bg-muted rounded-full h-2">
+                    <div className="w-full bg-muted dark:bg-slate-600/50 rounded-full h-2">
                       <div
-                        className="gradient-ev-green h-2 rounded-full"
+                        className="bg-gradient-to-r from-green-500 to-green-600 dark:from-green-400 dark:to-green-500 h-2 rounded-full"
                         style={{
                           width: `${(challenge.participants / 50) * 100}%`,
                         }}
@@ -301,13 +308,13 @@ const Leaderboard: React.FC = () => {
                   </div>
 
                   <div className="mb-4">
-                    <p className="text-xs text-muted-foreground mb-2">
+                    <p className="text-xs text-muted-foreground dark:text-slate-400 mb-2">
                       Requirements:
                     </p>
-                    <ul className="text-xs text-muted-foreground space-y-1">
+                    <ul className="text-xs text-muted-foreground dark:text-slate-400 space-y-1">
                       {challenge.requirements.map((req, index) => (
                         <li key={index} className="flex items-center">
-                          <span className="text-primary mr-2">•</span>
+                          <span className="text-green-600 dark:text-green-400 mr-2">•</span>
                           {req}
                         </li>
                       ))}
@@ -319,8 +326,8 @@ const Leaderboard: React.FC = () => {
                     disabled={challenge.isJoined}
                     className={`w-full ${
                       challenge.isJoined
-                        ? "bg-success/20 text-success border-success/30"
-                        : "gradient-ev-green hover:from-emerald-600 hover:to-green-700"
+                        ? "bg-green-500/20 text-green-600 dark:text-green-400 border-green-500/30"
+                        : "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 dark:from-green-500 dark:to-green-600 dark:hover:from-green-600 dark:hover:to-green-700 text-white"
                     }`}
                     size="sm"
                   >
