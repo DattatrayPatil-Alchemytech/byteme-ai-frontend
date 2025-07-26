@@ -29,15 +29,15 @@ function ProvidersInner({ children }: { children: React.ReactNode }) {
   return (
     <DAppKitProvider
       node="https://testnet.vechain.org/"
-      logLevel={"DEBUG"}
       usePersistence
-      requireCertificate // ← force certificate signing
+      requireCertificate
       connectionCertificate={{
         message: {
           purpose: "identification",
           payload: {
             type: "text",
-            content: "054971554de3f7404839a85e620203ec",
+            content:
+              process.env.NEXT_PUBLIC_CONNECTION_CERTIFICATE_CONTENT || "",
           },
         },
       }}

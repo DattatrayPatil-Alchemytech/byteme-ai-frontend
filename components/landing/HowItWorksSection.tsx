@@ -199,20 +199,13 @@ export default function HowItWorksSection() {
           className="mt-16 text-center"
         >
           <div className="inline-block p-8 gradient-ocean rounded-3xl backdrop-blur-sm shadow-2xl">
-                              <h3 className="text-3xl font-bold text-foreground mb-4">
+            <h3 className="text-3xl font-bold text-foreground mb-4">
               🎯 Ready to Get Started?
             </h3>
-                          <p className="text-foreground/90 text-lg mb-6 max-w-md">
+            <p className="text-foreground/90 text-lg mb-6 max-w-md">
               Join the revolution of sustainable driving and start earning
               rewards today
             </p>
-            <motion.button
-                              className="px-8 py-4 bg-card/20 backdrop-blur-sm rounded-full text-foreground font-semibold hover:bg-card/30 transition-all duration-300 border border-border/30"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Connect Your Wallet Now
-            </motion.button>
           </div>
         </motion.div>
       </div>
