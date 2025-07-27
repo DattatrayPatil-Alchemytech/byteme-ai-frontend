@@ -193,7 +193,8 @@ export default function UserProfilePage() {
       setEditId(null);
       setEditName("");
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to update vehicle name";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to update vehicle name";
       toast.error(errorMessage);
       setEditError(errorMessage);
     } finally {
@@ -211,7 +212,8 @@ export default function UserProfilePage() {
       const data = await getUserVehicles();
       setVehicles(data as Vehicle[]);
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to delete vehicle";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to delete vehicle";
       toast.error(errorMessage);
     } finally {
       setDeleteLoadingId(null);
@@ -238,7 +240,8 @@ export default function UserProfilePage() {
       const data = await getUserVehicles();
       setVehicles(data as Vehicle[]);
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to add vehicle";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to add vehicle";
       toast.error(errorMessage);
       setAddError(errorMessage);
     } finally {
@@ -335,7 +338,9 @@ export default function UserProfilePage() {
       key: "vehicleType",
       label: "Type",
       render: (value) => (
-        <span className="capitalize text-muted-foreground">{value as string}</span>
+        <span className="capitalize text-muted-foreground">
+          {value as string}
+        </span>
       ),
     },
     {
@@ -431,7 +436,7 @@ export default function UserProfilePage() {
           align-items: stretch;
         }
 
-        .wallet-balance-container{
+        .wallet-balance-container {
           display: grid;
           grid-template-columns: 1fr;
           gap: 1.5rem;
@@ -448,7 +453,7 @@ export default function UserProfilePage() {
           width: 100%;
           min-height: 140px;
         }
-      
+
         .wallet-balance-container > * {
           width: 100%;
           min-height: 140px;
@@ -480,7 +485,26 @@ export default function UserProfilePage() {
         </button>
 
         {/* Profile Header */}
-        <section className="flex flex-col items-center bg-card rounded-2xl border border-border p-8 sm:p-10 shadow-lg">
+        <section className="flex flex-col items-center bg-card rounded-2xl border border-border p-8 sm:p-10 shadow-lg relative">
+          {/* Update Profile Button - Top Right */}
+          {userProfile && (
+            <Button
+              variant="outline"
+              className="absolute top-6 right-6 rounded-full border border-primary text-primary bg-transparent hover:bg-primary hover:text-white hover:shadow-lg transition-all duration-300 px-4 py-2 font-medium text-sm"
+              onClick={() =>
+                dispatch(
+                  openModal({
+                    modalType: "USER_MODAL",
+                    title: "Welcome! Complete Your Profile",
+                  })
+                )
+              }
+            >
+              <Pencil className="w-3 h-3 mr-1" />
+              Update Profile
+            </Button>
+          )}
+          
           <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-4 border-primary mb-6 flex items-center justify-center bg-muted">
             <User className="w-16 h-16 sm:w-20 sm:h-20 text-primary" />
           </div>
@@ -508,20 +532,6 @@ export default function UserProfilePage() {
                 >
                   {formatTier(userProfile.currentTier)} Tier
                 </div>
-                <Button
-                  variant="default"
-                  className="gradient-ev-green hover-glow mt-4"
-                  onClick={() => 
-                    dispatch(
-                      openModal({
-                        modalType: "USER_MODAL",
-                        title: "Welcome! Complete Your Profile",
-                      })
-                    )
-                  }
-                >
-                  Update Profile
-                </Button>
               </>
             ) : null}
           </div>
