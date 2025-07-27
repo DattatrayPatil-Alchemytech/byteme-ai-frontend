@@ -115,7 +115,7 @@ export default function HeroSection() {
     if (stats && statsVisible && !isLoading) {
       setAnimatedValue(0);
       setTimeout(() => {
-        animateCount(stats.totalTokensDistributed || 101010, 2000);
+        animateCount(stats.totalTokensDistributed || 0, 2000);
       }, 100);
     }
   }, [stats, statsVisible, isLoading]);
