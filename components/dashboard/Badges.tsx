@@ -51,6 +51,7 @@ const getRarityColor = (rarity: string) => {
   }
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function Badges({ badges, onShare }: BadgesProps) {
   const [userBadges, setUserBadges] = useState<UserBadge[]>([]);
   const [isLoading, setIsLoading] = useState(true);

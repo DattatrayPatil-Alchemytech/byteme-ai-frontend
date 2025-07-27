@@ -18,6 +18,7 @@ export const Select: React.FC<SelectProps> = ({
   value,
   onChange,
   placeholder = "Select...",
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   className = "",
 }) => {
   const [open, setOpen] = useState(false);

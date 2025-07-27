@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select} from '@/components/ui/select';
+import { Select } from '@/components/ui/select';
 import { getBadgeDetails, updateBadge, type AdminBadge, type UpdateBadgeRequest } from '@/lib/apiHelpers/adminBadges';
 import { toast } from 'react-hot-toast';
 import { ArrowLeft } from 'lucide-react';
@@ -158,6 +158,7 @@ export default function EditBadgePage() {
     if (badgeId) {
       fetchBadgeDetails();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [badgeId]);
 
   if (isLoading) {

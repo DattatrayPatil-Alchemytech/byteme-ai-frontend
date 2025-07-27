@@ -130,7 +130,7 @@ const OverviewTab = () => {
       <div className="space-y-6 mb-8">
         {[0, 1].map((row) => (
           <div key={row} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {statCards.slice(row * 3, row * 3 + 3).map((card, idx) => (
+            {statCards.slice(row * 3, row * 3 + 3).map((card) => (
               <Card key={card.label} className={`hover-lift bg-card dark:bg-card-dark border ${card.cardClass} backdrop-blur-sm`}>
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">

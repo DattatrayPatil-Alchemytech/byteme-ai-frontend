@@ -299,6 +299,7 @@ export default function AdminBadgesPage() {
   // Fetch badges data when page, limit, or search changes
   useEffect(() => {
     fetchBadges();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, limit, search]);
 
   // Handle search with debounce

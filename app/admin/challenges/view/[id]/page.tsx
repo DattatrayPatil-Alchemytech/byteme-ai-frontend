@@ -120,7 +120,7 @@ export default function ViewChallengePage({
   const now = new Date();
   const isActive = now >= startDate && now <= endDate;
   const isUpcoming = now < startDate;
-  const isExpired = now > endDate;
+  // const isExpired = now > endDate; // Removed unused variable
   const participationPercentage =
     (challenge.currentParticipants / challenge.maxParticipants) * 100;
 

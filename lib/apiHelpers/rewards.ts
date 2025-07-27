@@ -1,4 +1,4 @@
-import { apiGet } from "./apiMiddleware";
+// import { apiGet } from "./apiMiddleware"; // Removed unused import
 
 // Types for rewards stats
 export interface RewardsStats {
