@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
@@ -9,6 +9,9 @@ import Overview from "@/components/rewards/Overview";
 import StatCard from "@/components/rewards/StatCard";
 import DistributeActions from "@/components/rewards/DistributeActions";
 import ParticipantsTable from "@/components/rewards/ParticipantsTable";
+
+// API helpers
+import { getRewardsStats, RewardsStats } from "../../../lib/apiHelpers/rewards";
 
 // Mock data
 import { mockCurrentRound, generateMoreSubmissions } from "./mockRewardsData";
@@ -20,6 +23,26 @@ export default function AdminRewardsPage() {
   const [currentRound] = useState(mockCurrentRound);
   const [isDistributing, setIsDistributing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [rewardsStats, setRewardsStats] = useState<RewardsStats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch rewards stats on component mount
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoading(true);
+        const stats = await getRewardsStats();
+        setRewardsStats(stats);
+      } catch (error) {
+        console.error("Error fetching rewards stats:", error);
+        toast.error("Failed to load rewards statistics");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   // Generate mock submissions
   const allSubmissions = generateMoreSubmissions(112);
@@ -39,77 +62,81 @@ export default function AdminRewardsPage() {
     });
   };
 
-  // Stat cards data
-  const statCardsData = [
-    {
-      icon: "🚗",
-      title: {
-        mobile: "Kilometers",
-        desktop: "Total Kilometers",
-      },
-      value: {
-        mobile: `${Math.floor(currentRound.totalKilometers / 1000)}k`,
-        desktop: currentRound.totalKilometers.toLocaleString(),
-      },
-      subtitle: {
-        mobile: `Avg: ${currentRound.averageKmPerUser}km`,
-        desktop: `Avg: ${currentRound.averageKmPerUser} km/user`,
-      },
-      color: "text-blue-600",
-      bgColor: "bg-blue-100 dark:bg-blue-900/20",
-    },
-    {
-      icon: "📊",
-      title: {
-        mobile: "Submissions",
-        desktop: "Total Submissions",
-      },
-      value: {
-        mobile: currentRound.totalSubmissions,
-        desktop: currentRound.totalSubmissions,
-      },
-      subtitle: {
-        mobile: "Readings",
-        desktop: "Reading submissions",
-      },
-      color: "text-green-600",
-      bgColor: "bg-green-100 dark:bg-green-900/20",
-    },
-    {
-      icon: "🌱",
-      title: {
-        mobile: "CO2 Offset",
-        desktop: "Carbon Offset",
-      },
-      value: {
-        mobile: `${Math.floor(currentRound.carbonOffsetTotal / 1000)}k`,
-        desktop: currentRound.carbonOffsetTotal.toLocaleString(),
-      },
-      subtitle: {
-        mobile: "kg saved",
-        desktop: "kg CO2 saved",
-      },
-      color: "text-emerald-600",
-      bgColor: "bg-emerald-100 dark:bg-emerald-900/20",
-    },
-    {
-      icon: "🏆",
-      title: {
-        mobile: "Top User",
-        desktop: "Top Performer",
-      },
-      value: {
-        mobile: `${currentRound.topPerformerKm}km`,
-        desktop: `${currentRound.topPerformerKm} km`,
-      },
-      subtitle: {
-        mobile: "Best",
-        desktop: "Highest submission",
-      },
-      color: "text-orange-600",
-      bgColor: "bg-orange-100 dark:bg-orange-900/20",
-    },
-  ];
+  // Stat cards data using API data
+  const statCardsData = rewardsStats
+    ? [
+        {
+          icon: "🚗",
+          title: {
+            mobile: "Miles",
+            desktop: "Total Miles",
+          },
+          value: {
+            mobile: `${Math.floor(rewardsStats.totalMiles / 1000)}k`,
+            desktop: rewardsStats.totalMiles.toLocaleString(),
+          },
+          subtitle: {
+            mobile: `Avg: ${rewardsStats.averageMiles}mi`,
+            desktop: `Avg: ${rewardsStats.averageMiles} miles/user`,
+          },
+          color: "text-blue-600",
+          bgColor: "bg-blue-100 dark:bg-blue-900/20",
+        },
+        {
+          icon: "💰",
+          title: {
+            mobile: "Rewards",
+            desktop: "Total Rewards",
+          },
+          value: {
+            mobile: `$${Math.floor(rewardsStats.totalAmount)}`,
+            desktop: `$${rewardsStats.totalAmount.toLocaleString()}`,
+          },
+          subtitle: {
+            mobile: `Avg: $${rewardsStats.averageAmount}`,
+            desktop: `Avg: $${rewardsStats.averageAmount}/user`,
+          },
+          color: "text-green-600",
+          bgColor: "bg-green-100 dark:bg-green-900/20",
+        },
+        {
+          icon: "🌱",
+          title: {
+            mobile: "CO2 Saved",
+            desktop: "Carbon Saved",
+          },
+          value: {
+            mobile: `${Math.floor(rewardsStats.totalCarbonSaved / 1000)}k`,
+            desktop: rewardsStats.totalCarbonSaved.toLocaleString(),
+          },
+          subtitle: {
+            mobile: `Avg: ${rewardsStats.averageCarbonSaved.toFixed(1)}kg`,
+            desktop: `Avg: ${rewardsStats.averageCarbonSaved.toFixed(
+              1
+            )} kg/user`,
+          },
+          color: "text-emerald-600",
+          bgColor: "bg-emerald-100 dark:bg-emerald-900/20",
+        },
+        {
+          icon: "📈",
+          title: {
+            mobile: "Active Day",
+            desktop: "Most Active Day",
+          },
+          value: {
+            mobile: `${rewardsStats.mostActiveDayCount}`,
+            desktop: `${rewardsStats.mostActiveDayCount} rewards`,
+          },
+          subtitle: {
+            mobile: formatDate(rewardsStats.mostActiveDay),
+            desktop: formatDate(rewardsStats.mostActiveDay),
+          },
+          color: "text-orange-600",
+          bgColor: "bg-orange-100 dark:bg-orange-900/20",
+        },
+      ]
+    : [];
 
   // Helper functions
   const getRankColor = (rank: number) => {
@@ -195,14 +222,132 @@ export default function AdminRewardsPage() {
       </div>
 
       {/* Overview */}
-      <Overview currentRound={currentRound} formatDate={formatDate} />
+      <Overview
+        rewardsStats={rewardsStats}
+        loading={loading}
+        formatDate={formatDate}
+      />
 
       {/* Round Stats */}
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        {statCardsData.map((card, index) => (
-          <StatCard key={index} {...card} />
-        ))}
+        {loading
+          ? // Loading skeletons
+            Array.from({ length: 4 }).map((_, index) => (
+              <div
+                key={index}
+                className="bg-card/80 backdrop-blur-sm border-0 shadow-lg rounded-lg p-6 animate-pulse"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-muted rounded-full"></div>
+                  <div className="flex-1">
+                    <div className="h-4 bg-muted rounded w-20 mb-2"></div>
+                    <div className="h-6 bg-muted rounded w-16"></div>
+                  </div>
+                </div>
+              </div>
+            ))
+          : statCardsData.map((card, index) => (
+              <StatCard key={index} {...card} />
+            ))}
       </div>
+
+      {/* Detailed Stats Breakdown */}
+      {!loading && rewardsStats && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* By Type */}
+          <div className="bg-card/80 backdrop-blur-sm border-0 shadow-lg rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
+              <span className="text-2xl mr-2">📊</span>
+              By Type
+            </h3>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground flex items-center">
+                  <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                  Upload
+                </span>
+                <span className="font-medium text-foreground">
+                  {rewardsStats.byType.upload}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground flex items-center">
+                  <span className="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
+                  Badge
+                </span>
+                <span className="font-medium text-foreground">
+                  {rewardsStats.byType.badge}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground flex items-center">
+                  <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                  Challenge
+                </span>
+                <span className="font-medium text-foreground">
+                  {rewardsStats.byType.challenge}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* By Status */}
+          <div className="bg-card/80 backdrop-blur-sm border-0 shadow-lg rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
+              <span className="text-2xl mr-2">🎯</span>
+              By Status
+            </h3>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Pending</span>
+                <span className="font-medium text-yellow-600">
+                  {rewardsStats.byStatus.pending}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Completed</span>
+                <span className="font-medium text-green-600">
+                  {rewardsStats.byStatus.completed}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Failed</span>
+                <span className="font-medium text-red-600">
+                  {rewardsStats.byStatus.failed}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* By Blockchain Status */}
+          <div className="bg-card/80 backdrop-blur-sm border-0 shadow-lg rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
+              <span className="text-2xl mr-2">⛓️</span>
+              Blockchain Status
+            </h3>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Not Sent</span>
+                <span className="font-medium text-orange-600">
+                  {rewardsStats.byBlockchainStatus.not_sent}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Confirmed</span>
+                <span className="font-medium text-green-600">
+                  {rewardsStats.byBlockchainStatus.confirmed}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Failed</span>
+                <span className="font-medium text-red-600">
+                  {rewardsStats.byBlockchainStatus.failed}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Distribution Actions */}
       <DistributeActions
