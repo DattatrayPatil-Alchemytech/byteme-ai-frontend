@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import {
   getWeeklyLeaderboard,
   type LeaderboardResponse,
-  type LeaderboardEntry,
+  // type LeaderboardEntry, // Removed unused import
 } from "@/lib/apiHelpers/userDashboard";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -49,7 +49,7 @@ const mockChallenges = [
 const Leaderboard: React.FC = () => {
   const [data, setData] = useState<LeaderboardResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // const [error, setError] = useState<string | null>(null); // Removed unused variable
 
   useEffect(() => {
     setLoading(true);
@@ -58,7 +58,7 @@ const Leaderboard: React.FC = () => {
         setData(res);
       })
       .catch((err) => {
-        setError("Failed to load leaderboard");
+        console.error("Failed to load leaderboard:", err);
         setData(null);
       })
       .finally(() => setLoading(false));
@@ -192,7 +192,7 @@ const Leaderboard: React.FC = () => {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {data.entries.map((entry, index) => (
+                  {data.entries.map((entry) => (
                     <div
                       key={entry.userId}
                       className={`flex items-center justify-between p-4 rounded-xl transition-all duration-200 ${

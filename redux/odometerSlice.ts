@@ -88,6 +88,39 @@ const odometerSlice = createSlice({
     setFetchError: (state, action: PayloadAction<string | null>) => {
       state.fetchError = action.payload;
     },
+    setFailedUploadDetails: (state, action: PayloadAction<{ uploadId?: string; errorMessage: string }>) => {
+      const { uploadId = "", errorMessage } = action.payload;
+      state.uploadDetails = {
+        id: uploadId,
+        userId: "",
+        vehicleId: "",
+        s3ImageUrl: "",
+        s3ThumbnailUrl: "",
+        imageHash: "",
+        status: "failed",
+        validationStatus: "rejected",
+        validationNotes: errorMessage,
+        isApproved: false,
+        extractedMileage: null,
+        finalMileage: null,
+        ocrConfidenceScore: null,
+        ocrRawText: null,
+        openaiAnalysis: null,
+        vehicleDetected: null,
+        aiValidationResult: null,
+        mileageDifference: null,
+        carbonSaved: "0",
+        emissionFactorUsed: null,
+        processingTimeMs: null,
+        ocrProcessingTimeMs: null,
+        aiProcessingTimeMs: null,
+        fileSizeBytes: 0,
+        imageDimensions: "",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        processedAt: null,
+      };
+    },
     resetOdometer: (state) => {
       return initialState;
     }
@@ -104,6 +137,7 @@ export const {
   setFetchingDetails,
   setUploadDetails,
   setFetchError,
+  setFailedUploadDetails,
   resetOdometer
 } = odometerSlice.actions;
 

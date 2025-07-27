@@ -2,7 +2,7 @@
 
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/store";
-import { closeModal, ModalType } from "@/redux/modalSlice";
+import { closeModal } from "@/redux/modalSlice";
 import UserModal from "./UserModal";
 import LoginModal from "./LoginModal";
 import Modal from "./Modal";

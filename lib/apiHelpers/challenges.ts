@@ -1,4 +1,4 @@
-import { apiGet, apiPost, apiPut, apiDelete } from "./apiMiddleware";
+import { apiGet } from "./apiMiddleware";
 import { Challenge, mockChallenges } from "./challengesMock";
 import { ChallengeListParams } from "../../app/admin/challenges/utils/filterOptions";
 
@@ -36,7 +36,7 @@ export interface CreateChallengeData {
   status: Challenge["status"];
 }
 
-export interface UpdateChallengeData extends Partial<CreateChallengeData> {}
+export type UpdateChallengeData = Partial<CreateChallengeData>;
 
 export interface PublishChallengeResponse {
   message: string;
@@ -88,7 +88,7 @@ export const getChallengesList = async (
  * GET /admin/challenges/{id}
  */
 export const getChallengeById = async (
-  id: number
+  _id: number
 ): Promise<ChallengeResponse> => {
   return new Promise((resolve) =>
     setTimeout(() => {
@@ -113,7 +113,7 @@ export const getChallengeById = async (
  * POST /admin/challenges
  */
 export const createChallenge = async (
-  data: CreateChallengeData
+  _data: CreateChallengeData
 ): Promise<ChallengeResponse> => {
   return new Promise((resolve) =>
     setTimeout(() => {
@@ -139,8 +139,8 @@ export const createChallenge = async (
  * PUT /admin/challenges/{id}
  */
 export const updateChallenge = async (
-  id: number,
-  data: UpdateChallengeData
+  _id: number,
+  _data: UpdateChallengeData
 ): Promise<ChallengeResponse> => {
   return new Promise((resolve) =>
     setTimeout(() => {
@@ -166,7 +166,7 @@ export const updateChallenge = async (
  * DELETE /admin/challenges/{id}
  */
 export const deleteChallenge = async (
-  id: number
+  _id: number
 ): Promise<{ message: string }> => {
   return new Promise((resolve) =>
     setTimeout(() => {
@@ -191,7 +191,7 @@ export const deleteChallenge = async (
  * PUT /admin/challenges/{id}/publish
  */
 export const publishChallenge = async (
-  id: number
+  _id: number
 ): Promise<PublishChallengeResponse> => {
   return new Promise((resolve) =>
     setTimeout(() => {

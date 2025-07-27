@@ -22,6 +22,7 @@ import {
   setFetchingDetails,
   setUploadDetails,
   setFetchError,
+  setFailedUploadDetails,
   resetOdometer,
 } from "@/redux/odometerSlice";
 import {
@@ -51,6 +52,19 @@ export default function UploadsPage() {
   } = useSelector((state: RootState) => state.odometer);
 
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Helper function to handle API failures
+  const handleApiFailure = (error: unknown, uploadId?: string, isFetchError = false) => {
+    const errorMessage = error instanceof Error 
+      ? error.message 
+      : isFetchError ? "Failed to fetch details" : "Upload failed";
+    
+    // Set failed upload details in Redux
+    dispatch(setFailedUploadDetails({ uploadId, errorMessage }));
+    
+    // Show toast notification
+    toast.error(errorMessage);
+  };
 
   // Handle file upload
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -178,20 +192,18 @@ export default function UploadsPage() {
               toast.success("Upload details fetched successfully!");
             }
           } catch (error) {
-            const errorMessage =
-              error instanceof Error
-                ? error.message
-                : "Failed to fetch details";
-            dispatch(setFetchError(errorMessage));
-            toast.error(errorMessage);
+            dispatch(setFetchError(
+              error instanceof Error ? error.message : "Failed to fetch details"
+            ));
+            
+            // Use helper function to handle the failure with upload ID
+            handleApiFailure(error, response.uploadId, true);
           } finally {
             dispatch(setFetchingDetails(false));
           }
         }
       }, 2000);
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Upload failed";
       dispatch(
         setUploadResponse({
           uploadId: "",
@@ -199,7 +211,9 @@ export default function UploadsPage() {
           processingTime: 0,
         })
       );
-      toast.error(errorMessage);
+      
+      // Use helper function to handle the failure
+      handleApiFailure(error);
     } finally {
       dispatch(setUploading(false));
     }

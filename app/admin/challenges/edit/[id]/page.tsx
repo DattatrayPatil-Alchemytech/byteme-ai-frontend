@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import {
   getChallengeById,
-  updateChallenge,
+  // updateChallenge, // Removed unused import
 } from "../../../../../lib/apiHelpers/challenges";
 
 const challengeTypes = ["mileage", "upload", "streak", "social"];

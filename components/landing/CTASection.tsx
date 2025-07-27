@@ -1,13 +1,13 @@
 'use client';
 
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+// import Link from 'next/link'; // Removed unused import
+// import { Button } from '@/components/ui/button'; // Removed unused import
 import { useScrollAnimation } from '@/lib/scroll-animation';
 import { motion } from 'framer-motion';
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation'; // Removed unused import
 
 export default function CTASection() {
-  const router = useRouter();
+  // const router = useRouter(); // Removed unused variable
   const { ref: ctaRef, isVisible: ctaVisible } = useScrollAnimation();
 
   return (
