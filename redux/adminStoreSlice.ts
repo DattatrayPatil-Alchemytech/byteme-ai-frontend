@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Product, ProductsResponse } from '@/lib/apiHelpers/adminStore';
+import { Product, ProductsResponse, Order, OrdersResponse } from '@/lib/apiHelpers/adminStore';
 
 export interface AdminStoreState {
   products: Product[];
@@ -10,6 +10,13 @@ export interface AdminStoreState {
   error: string | null;
   showDeleteModal: boolean;
   selectedProductIdForDelete: string | null;
+  // Orders state
+  orders: Order[];
+  ordersTotal: number;
+  ordersPage: number;
+  ordersLimit: number;
+  ordersLoading: boolean;
+  ordersError: string | null;
 }
 
 const initialState: AdminStoreState = {
@@ -21,6 +28,13 @@ const initialState: AdminStoreState = {
   error: null,
   showDeleteModal: false,
   selectedProductIdForDelete: null,
+  // Orders initial state
+  orders: [],
+  ordersTotal: 0,
+  ordersPage: 1,
+  ordersLimit: 10,
+  ordersLoading: false,
+  ordersError: null,
 };
 
 const adminStoreSlice = createSlice({
@@ -57,6 +71,28 @@ const adminStoreSlice = createSlice({
       state.showDeleteModal = false;
       state.selectedProductIdForDelete = null;
     },
+    // Orders actions
+    setOrders: (state, action: PayloadAction<OrdersResponse>) => {
+      state.orders = action.payload.orders;
+      state.ordersTotal = action.payload.total;
+      state.ordersPage = action.payload.page;
+      state.ordersLimit = action.payload.limit;
+      state.ordersError = null;
+    },
+    setOrdersLoading: (state, action: PayloadAction<boolean>) => {
+      state.ordersLoading = action.payload;
+    },
+    setOrdersError: (state, action: PayloadAction<string | null>) => {
+      state.ordersError = action.payload;
+      state.ordersLoading = false;
+    },
+    clearOrders: (state) => {
+      state.orders = [];
+      state.ordersTotal = 0;
+      state.ordersPage = 1;
+      state.ordersLimit = 10;
+      state.ordersError = null;
+    },
   },
 });
 
@@ -67,6 +103,10 @@ export const {
   clearProducts,
   openDeleteModal,
   closeDeleteModal,
+  setOrders,
+  setOrdersLoading,
+  setOrdersError,
+  clearOrders,
 } = adminStoreSlice.actions;
 
 export default adminStoreSlice.reducer; 
