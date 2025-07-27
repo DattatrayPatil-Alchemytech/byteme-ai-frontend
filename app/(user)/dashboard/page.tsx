@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 import Badges from "@/components/dashboard/Badges";
 import Leaderboard from "@/components/dashboard/Leaderboard";
 import TokenStore from "@/components/dashboard/TokenStore";
@@ -10,12 +12,7 @@ import UserOrders from "@/components/dashboard/UserOrders";
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("overview");
-  const [user] = useState({
-    name: "John Doe",
-    b3trTokens: 1250,
-    currentRank: 15,
-    weeklyMiles: 45,
-  });
+  const user = useSelector((state: RootState) => state.user.user);
   const [badges] = useState([
     {
       id: 1,
@@ -47,14 +44,12 @@ export default function DashboardPage() {
     { id: "orders", label: "Orders", icon: "🛒" },
   ];
 
-  console.log("user -----", user);
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Welcome Message */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground mb-2">
-          Welcome back, {user.name}!
+          Welcome back, {user?.username || "User"}!
         </h1>
         <p className="text-muted-foreground text-lg">
           Track your sustainable driving progress and earn B3TR tokens
