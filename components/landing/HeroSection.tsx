@@ -33,7 +33,7 @@ export default function HeroSection() {
     useScrollAnimationWithDelay(400);
   const { ref: statsRef, isVisible: statsVisible } =
     useScrollAnimationWithDelay(600);
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch(); // Removed unused variable
 
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);

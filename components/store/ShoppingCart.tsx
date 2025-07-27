@@ -20,7 +20,7 @@ import {
   updateCartItemQuantity,
   clearCart
 } from "@/redux/checkoutSlice";
-import { RootState } from "@/redux/store";
+// import { RootState } from "@/redux/store"; // Removed unused import
 
 interface ShoppingCartProps {
   onCheckout: () => void;

@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 import { DataTable, Column } from "@/components/ui/DataTable";
-import { Select } from "@/components/ui/DropdownMenu";
+// import { Select } from "@/components/ui/DropdownMenu"; // Removed unused import
 import { TableSkeleton } from "@/components/ui/TableSkeleton";
 import {
   getVehicleHistory,
@@ -12,7 +12,7 @@ import {
 
 const VehicleHistoryTab: React.FC = () => {
   const [search, setSearch] = useState("");
-  const [vehicleFilter, setVehicleFilter] = useState("");
+  const [vehicleFilter] = useState("");
   const [historyData, setHistoryData] = useState<VehicleHistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -115,13 +115,13 @@ const VehicleHistoryTab: React.FC = () => {
     },
   ];
 
-  const activityOptions = useMemo(() => {
-    const types = historyData.map((row) => row.type);
-    return Array.from(new Set(types)).map((type) => ({
-      value: type,
-      label: type.replace("_", " ").toUpperCase(),
-    }));
-  }, [historyData]);
+  // const activityOptions = useMemo(() => { // Removed unused variable
+  //   const types = historyData.map((row) => row.type);
+  //   return Array.from(new Set(types)).map((type) => ({
+  //     value: type,
+  //     label: type.replace("_", " ").toUpperCase(),
+  //   }));
+  // }, [historyData]);
 
   // No need for client-side filtering since it's handled by backend
   const filteredHistory = useMemo(() => {

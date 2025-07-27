@@ -61,6 +61,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     if (isCheckingAuth) {
       checkAndRefreshAuth();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accessToken]);
 
   // Route protection logic

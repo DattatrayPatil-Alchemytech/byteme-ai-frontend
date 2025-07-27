@@ -70,11 +70,11 @@ interface FieldErrors {
   plateNumber?: string;
 }
 
-// Mock data for badges
-const mockBadges: Badge[] = [
-  { id: 1, name: "Eco Warrior", icon: Award },
-  { id: 2, name: "EV Pioneer", icon: Star },
-];
+// Mock data for badges - removed unused variable
+// const mockBadges: Badge[] = [
+//   { id: 1, name: "Eco Warrior", icon: Award },
+//   { id: 2, name: "EV Pioneer", icon: Star },
+// ];
 
 export default function UserProfilePage() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
@@ -88,7 +88,7 @@ export default function UserProfilePage() {
     vehicleType: "",
     plateNumber: "",
   });
-  const [addError, setAddError] = useState("");
+  // const [addError, setAddError] = useState(""); // Removed unused variable
   const [addFieldErrors, setAddFieldErrors] = useState<FieldErrors>({});
   const [addVehicleLoading, setAddVehicleLoading] = useState(false);
   const [deleteLoadingId, setDeleteLoadingId] = useState<string | null>(null);
@@ -209,7 +209,7 @@ export default function UserProfilePage() {
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "Failed to add vehicle";
       toast.error(errorMessage);
-      setAddError(errorMessage);
+      // setAddError(errorMessage); // Removed unused variable
     } finally {
       setAddVehicleLoading(false);
       setVehiclesLoading(false);
@@ -220,7 +220,7 @@ export default function UserProfilePage() {
   const handleCloseAddDialog = () => {
     setAddDialogOpen(false);
     setNewVehicle({ model: "", vehicleType: "", plateNumber: "" });
-    setAddError("");
+    // setAddError(""); // Removed unused variable
     setAddFieldErrors({});
   };
 
