@@ -1,14 +1,87 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Badges from "@/components/dashboard/Badges";
 import Leaderboard from "@/components/dashboard/Leaderboard";
 import TokenStore from "@/components/dashboard/TokenStore";
 import OverviewTab from "@/components/dashboard/OverviewTab";
 import VehicleHistoryTab from "@/components/dashboard/VehicleHistoryTab";
 import UserOrders from "@/components/dashboard/UserOrders";
+import { RootState, AppDispatch } from "@/redux/store";
+import { uploadVehicleDetails } from "@/lib/apiHelpers/odometer";
+import { 
+  setUploadResponse, 
+  setVehicleDetails, 
+  setClientSideOCRResult, 
+  UploadResponse
+} from "@/redux/odometerSlice";
+import toast from "react-hot-toast";
 
 export default function DashboardPage() {
+  const dispatch = useDispatch<AppDispatch>();
+  const hasCalledAPI = useRef(false);
+  const {
+    vehicleDetails,
+    uploadResponse,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    clientSideOCRResult,
+  } = useSelector((state: RootState) => state.odometer);
+
+  // Call uploadVehicleDetails API if there's existing data in Redux state
+  useEffect(() => {
+    let isMounted = true;
+    
+    const callUploadVehicleDetails = async () => {
+      // Check if we have the required data, component is still mounted, and API hasn't been called yet
+      if (isMounted && !hasCalledAPI.current && uploadResponse?.uploadId && vehicleDetails?.vehicleType && vehicleDetails?.vehicleName && vehicleDetails?.numberPlate) {
+        hasCalledAPI.current = true; // Mark as called to prevent duplicate calls
+        
+        try {
+          
+          const vehicleDetailsPayload = {
+            vehicleType: 'electric',
+            model: vehicleDetails.vehicleName,
+            plateNumber: vehicleDetails.numberPlate,
+          };
+
+          const response = await uploadVehicleDetails(uploadResponse.uploadId, vehicleDetailsPayload);
+          
+          // Check if component is still mounted before updating state
+          if (isMounted && response.success) {
+            toast.success('Vehicle details uploaded successfully!');
+            
+            // Clear the data from Redux state after successful API call
+            dispatch(setUploadResponse(null as unknown as UploadResponse));
+            dispatch(setVehicleDetails({
+              vehicleType: 'two-wheeler-bike',
+              numberPlate: '',
+              vehicleName: ''
+            }));
+            dispatch(setClientSideOCRResult(null));
+            
+          } else if (isMounted) {
+            console.error('uploadVehicleDetails API call failed:', response.message);
+            toast.error('Failed to upload vehicle details: ' + response.message);
+          }
+        } catch (error) {
+          if (isMounted) {
+            console.error('Error calling uploadVehicleDetails API:', error);
+            toast.error('Error uploading vehicle details');
+          }
+        }
+      }
+    };
+
+    callUploadVehicleDetails();
+
+    // Cleanup function to prevent state updates after unmount
+    return () => {
+      isMounted = false;
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [uploadResponse?.uploadId, vehicleDetails?.vehicleType, vehicleDetails?.vehicleName, vehicleDetails?.numberPlate]);
+
   const [activeTab, setActiveTab] = useState("overview");
   const [user] = useState({
     name: "John Doe",
