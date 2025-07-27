@@ -103,7 +103,7 @@ export interface Notification {
   timestamp: string;
   type?: string;
   category?: string;
-  data?: Record<string, any>;
+  data?: Record<string, unknown>;
 }
 
 export interface NotificationResponse {
@@ -140,11 +140,11 @@ export const getNotifications = (
     page: page.toString(),
     limit: limit.toString(),
   });
-  
+
   if (unreadOnly) {
-    params.append('unread', 'true');
+    params.append("unread", "true");
   }
-  
+
   return apiGet<NotificationResponse>(`/notifications?${params.toString()}`, {
     requireAuth: true,
     showToast: false,
@@ -162,15 +162,15 @@ export const getVehicleHistory = (
     page: page.toString(),
     limit: limit.toString(),
   });
-  
+
   if (search && search.trim()) {
-    params.append('search', search.trim());
+    params.append("search", search.trim());
   }
-  
+
   if (type && type.trim()) {
-    params.append('type', type.trim());
+    params.append("type", type.trim());
   }
-  
+
   return apiGet<VehicleHistoryResponse>(`/history?${params.toString()}`, {
     requireAuth: true,
     showToast: false,
