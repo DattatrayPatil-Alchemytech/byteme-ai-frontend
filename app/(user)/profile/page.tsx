@@ -41,6 +41,7 @@ interface UserProfile {
   totalPoints: number;
   totalCarbonSaved: number;
   totalMileage: number;
+  profileImageUrl?: string;
 }
 
 interface Badge {
@@ -506,7 +507,15 @@ export default function UserProfilePage() {
           )}
           
           <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-4 border-primary mb-6 flex items-center justify-center bg-muted">
-            <User className="w-16 h-16 sm:w-20 sm:h-20 text-primary" />
+            {userProfile?.profileImageUrl ? (
+              <img
+                src={userProfile.profileImageUrl}
+                alt="Profile"
+                className="w-full h-full object-cover rounded-full"
+              />
+            ) : (
+              <User className="w-16 h-16 sm:w-20 sm:h-20 text-primary" />
+            )}
           </div>
           <div className="text-center">
             {userProfileLoading ? (
