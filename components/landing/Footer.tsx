@@ -89,7 +89,7 @@ export default function Footer() {
         <Separator className="mb-8" />
 
         <div className="flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground">
-          <p>&copy; 2024 byteme ai. All rights reserved.</p>
+          <p>&copy; 2025 byteme ai. All rights reserved.</p>
           <p>Built on VeChain blockchain for sustainable driving rewards.</p>
         </div>
       </div>

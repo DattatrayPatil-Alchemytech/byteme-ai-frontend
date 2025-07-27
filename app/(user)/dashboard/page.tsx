@@ -83,12 +83,7 @@ export default function DashboardPage() {
   }, [uploadResponse?.uploadId, vehicleDetails?.vehicleType, vehicleDetails?.vehicleName, vehicleDetails?.numberPlate]);
 
   const [activeTab, setActiveTab] = useState("overview");
-  const [user] = useState({
-    name: "John Doe",
-    b3trTokens: 1250,
-    currentRank: 15,
-    weeklyMiles: 45,
-  });
+  const user = useSelector((state: RootState) => state.user.user);
   const [badges] = useState([
     {
       id: 1,
@@ -125,7 +120,7 @@ export default function DashboardPage() {
       {/* Welcome Message */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground mb-2">
-          Welcome back, {user.name}!
+          Welcome back, {user?.username || "User"}!
         </h1>
         <p className="text-muted-foreground text-lg">
           Track your sustainable driving progress and earn B3TR tokens

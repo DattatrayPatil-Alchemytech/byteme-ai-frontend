@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { motion } from 'framer-motion';
 import { Mail, MessageCircle, Clock, Send, CheckCircle } from 'lucide-react';
+import Link from 'next/link';
 
 export default function ContactSupportPage() {
   const [formData, setFormData] = useState({
@@ -122,15 +123,15 @@ export default function ContactSupportPage() {
                 <div className="pt-6 border-t border-border">
                   <h3 className="font-semibold mb-3">Quick Help</h3>
                   <div className="space-y-2">
-                    <a href="/documentation" className="block text-sm text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 transition-colors">
+                    <Link href="/documentation" className="block text-sm text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 transition-colors">
                       📚 Documentation
-                    </a>
-                    <a href="/faq" className="block text-sm text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 transition-colors">
+                    </Link>
+                    <Link href="/#faq" className="block text-sm text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 transition-colors">
                       ❓ FAQ
-                    </a>
-                    <a href="/uploads" className="block text-sm text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 transition-colors">
+                    </Link>
+                    <Link href="/uploads" className="block text-sm text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 transition-colors">
                       📤 Upload Guide
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </CardContent>
