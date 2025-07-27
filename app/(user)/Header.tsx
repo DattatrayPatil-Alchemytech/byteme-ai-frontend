@@ -1,16 +1,16 @@
 "use client";
 
 //Node Modules
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useWallet } from "@vechain/dapp-kit-react";
 
 //Components
-import { Bell } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import toast from "react-hot-toast";
 import WalletConnect from "@/components/auth/WalletConnect";
+import NotificationBell from "@/components/notifications/NotificationBell";
 
 //Redux
 import { useDispatch, useSelector } from "react-redux";
@@ -19,12 +19,6 @@ import { RootState } from "@/redux/store";
 
 //Helpers
 import { disconnectUser } from "@/lib/apiHelpers/user";
-
-// Mock notifications (replace with real data or context as needed)
-const notifications = [
-  { id: 1, message: "Your vehicle registration is approved!", read: false },
-  { id: 2, message: "New badge earned: Eco Warrior!", read: true },
-];
 
 export default function Header() {
   const router = useRouter();
@@ -35,9 +29,7 @@ export default function Header() {
     (state: RootState) => state.user
   );
   const [userName, setUserName] = useState("");
-  const [showNotifications, setShowNotifications] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const bellRef = useRef<HTMLButtonElement>(null);
 
   // Check if we're on the uploads page
   const isUploadsPage = pathname === "/uploads";
@@ -54,21 +46,6 @@ export default function Header() {
       }
     }
   }, [user]);
-
-  // Close popover on outside click
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (bellRef.current && !bellRef.current.contains(event.target as Node)) {
-        setShowNotifications(false);
-      }
-    }
-    if (showNotifications) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showNotifications]);
 
   const handleLogout = async () => {
     if (isLoggingOut) return; // Prevent multiple logout attempts
@@ -148,44 +125,7 @@ export default function Header() {
                 )}
 
                 {/* Notification Bell */}
-                <button
-                  ref={bellRef}
-                  className="relative p-2 rounded-full hover:bg-primary/10 transition"
-                  onClick={() => setShowNotifications((v) => !v)}
-                  aria-label="Show notifications"
-                >
-                  <Bell className="w-6 h-6 text-primary" />
-                  {notifications.some((n) => !n.read) && (
-                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-ping" />
-                  )}
-                </button>
-                {showNotifications && (
-                  <div className="absolute right-0 top-12 w-80 bg-card rounded-xl shadow-xl border border-border z-50 p-4 animate-fade-in">
-                    <div className="font-bold text-lg mb-2 text-foreground">
-                      Notifications
-                    </div>
-                    <ul className="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
-                      {notifications.length === 0 ? (
-                        <li className="text-muted-foreground">
-                          No notifications
-                        </li>
-                      ) : (
-                        notifications.map((note) => (
-                          <li
-                            key={note.id}
-                            className={
-                              note.read
-                                ? "text-muted-foreground"
-                                : "font-medium text-foreground"
-                            }
-                          >
-                            {note.message}
-                          </li>
-                        ))
-                      )}
-                    </ul>
-                  </div>
-                )}
+                <NotificationBell />
                 {/* Profile Icon Link */}
                 <Link
                   href="/profile"
