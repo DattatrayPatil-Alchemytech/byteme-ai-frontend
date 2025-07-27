@@ -6,6 +6,7 @@ import Leaderboard from "@/components/dashboard/Leaderboard";
 import TokenStore from "@/components/dashboard/TokenStore";
 import OverviewTab from "@/components/dashboard/OverviewTab";
 import VehicleHistoryTab from "@/components/dashboard/VehicleHistoryTab";
+import UserOrders from "@/components/dashboard/UserOrders";
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -43,6 +44,7 @@ export default function DashboardPage() {
     { id: "leaderboard", label: "Leaderboard", icon: "🏅" },
     { id: "history", label: "History", icon: "🕑" },
     { id: "store", label: "Store", icon: "🛍️" },
+    { id: "orders", label: "Orders", icon: "🛒" },
   ];
 
   return (
@@ -83,6 +85,7 @@ export default function DashboardPage() {
       {activeTab === "leaderboard" && <Leaderboard />}
       {activeTab === "history" && <VehicleHistoryTab />}
       {activeTab === "store" && <TokenStore />}
+      {activeTab === "orders" && <UserOrders />}
 
       {/* Mobile Bottom Navigation Bar */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-xl border-t border-border shadow-lg z-50">

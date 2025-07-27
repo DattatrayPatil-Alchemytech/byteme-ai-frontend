@@ -124,7 +124,7 @@ export default function TokenStore() {
   // If in checkout mode, show checkout page
   if (isCheckout && checkoutProduct) {
     const checkoutProductCompat = {
-      id: parseInt(checkoutProduct.id),
+      id: checkoutProduct.id, // Keep original ID as string
       name: checkoutProduct.name,
       description: checkoutProduct.description,
       category: checkoutProduct.category,
