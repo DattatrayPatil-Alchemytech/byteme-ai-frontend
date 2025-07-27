@@ -58,7 +58,7 @@ export const getUserVehicles = (): Promise<VehicleData[]> => {
 };
 
 // Add Vehicle
-export const addVehicle = (vehicle: { model: string; vehicleType: string; plateNumber: string }): Promise<any> => {
+export const addVehicle = (vehicle: { model: string; vehicleType: string; plateNumber: string }): Promise<void> => {
   const state = store.getState();
   const currentToken = state.user.accessToken;
 
@@ -76,7 +76,7 @@ export const addVehicle = (vehicle: { model: string; vehicleType: string; plateN
 };
 
 // Delete Vehicle
-export const deleteVehicle = (vehicleId: string): Promise<any> => {
+export const deleteVehicle = (vehicleId: string): Promise<void> => {
   const state = store.getState();
   const currentToken = state.user.accessToken;
 
@@ -94,7 +94,7 @@ export const deleteVehicle = (vehicleId: string): Promise<any> => {
 };
 
 // Update Vehicle
-export const updateVehicle = (vehicleId: string, updates: Partial<VehicleData>): Promise<any> => {
+export const updateVehicle = (vehicleId: string, updates: Partial<VehicleData>): Promise<void> => {
   const state = store.getState();
   const currentToken = state.user.accessToken;
 
@@ -112,7 +112,7 @@ export const updateVehicle = (vehicleId: string, updates: Partial<VehicleData>):
 };
 
 // Get User Profile
-export const getUserProfile = (): Promise<any> => {
+export const getUserProfile = (): Promise<void> => {
   const state = store.getState();
   const currentToken = state.user.accessToken;
 

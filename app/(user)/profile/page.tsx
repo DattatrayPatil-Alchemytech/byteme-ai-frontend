@@ -27,34 +27,73 @@ import {
 } from "@/lib/apiHelpers/profile";
 import toast from "react-hot-toast";
 
+// TypeScript interfaces
+interface UserProfile {
+  username: string;
+  email: string;
+  walletAddress: string;
+  b3trBalance: number;
+  currentTier: string;
+  totalPoints: number;
+  totalCarbonSaved: number;
+  totalMileage: number;
+}
+
+interface Badge {
+  id: number;
+  name: string;
+  icon: React.ComponentType<{ className?: string }>;
+}
+
+interface Vehicle {
+  id: string;
+  customName: string | null;
+  model: string;
+  vehicleType: string;
+  plateNumber: string | null;
+  make: string | null;
+  year: number | null;
+  emissionFactor: string | null;
+  isPrimary: boolean | null;
+  isActive: boolean | null;
+}
+
+interface NewVehicle {
+  model: string;
+  vehicleType: string;
+  plateNumber: string;
+}
+
+interface FieldErrors {
+  model?: string;
+  vehicleType?: string;
+  plateNumber?: string;
+}
+
 // Mock data for badges
-const mockBadges = [
+const mockBadges: Badge[] = [
   { id: 1, name: "Eco Warrior", icon: Award },
   { id: 2, name: "EV Pioneer", icon: Star },
 ];
 
 export default function UserProfilePage() {
-  const [vehicles, setVehicles] = useState<any[]>([]);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [vehiclesLoading, setVehiclesLoading] = useState(true);
   const [editId, setEditId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editError, setEditError] = useState("");
   const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [newVehicle, setNewVehicle] = useState({
+  const [newVehicle, setNewVehicle] = useState<NewVehicle>({
     model: "",
     vehicleType: "",
     plateNumber: "",
   });
   const [addError, setAddError] = useState("");
-  const [addFieldErrors, setAddFieldErrors] = useState<{
-    model?: string;
-    vehicleType?: string;
-    plateNumber?: string;
-  }>({});
+  const [addFieldErrors, setAddFieldErrors] = useState<FieldErrors>({});
   const [addVehicleLoading, setAddVehicleLoading] = useState(false);
   const [deleteLoadingId, setDeleteLoadingId] = useState<string | null>(null);
   const [editLoadingId, setEditLoadingId] = useState<string | null>(null);
-  const [userProfile, setUserProfile] = useState<any>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [userProfileLoading, setUserProfileLoading] = useState(true);
   const [userProfileError, setUserProfileError] = useState("");
   const router = useRouter();
@@ -63,10 +102,10 @@ export default function UserProfilePage() {
     setUserProfileLoading(true);
     getUserProfile()
       .then((data) => {
-        setUserProfile(data);
+        setUserProfile(data as unknown as UserProfile);
         setUserProfileError("");
       })
-      .catch((err) => {
+      .catch((err: Error) => {
         setUserProfileError(err?.message || "Failed to load profile");
         setUserProfile(null);
       })
@@ -79,9 +118,9 @@ export default function UserProfilePage() {
     setVehiclesLoading(true);
     getUserVehicles()
       .then((data: VehicleData[]) => {
-        setVehicles(data);
+        setVehicles(data as Vehicle[]);
       })
-      .catch((err) => {
+      .catch((err: Error) => {
         console.error("Failed to fetch vehicles", err);
         setVehicles([]);
       })
@@ -90,12 +129,13 @@ export default function UserProfilePage() {
       });
   }, []);
 
-  const handleEdit = (row: any) => {
+  const handleEdit = (row: Vehicle) => {
     setEditId(row.id);
     setEditName(row.customName || row.model || "");
     setEditError("");
   };
-  const handleSave = async (row: any) => {
+
+  const handleSave = async (row: Vehicle) => {
     if (!editName.trim()) {
       setEditError("Name cannot be empty");
       return;
@@ -106,29 +146,31 @@ export default function UserProfilePage() {
       const updateObj = {
         vehicleType: row.vehicleType,
         customName: editName.trim(),
-        make: row.make,
+        make: row.make || undefined,
         model: row.model,
-        year: row.year,
-        plateNumber: row.plateNumber,
-        emissionFactor: row.emissionFactor,
-        isPrimary: row.isPrimary,
-        isActive: row.isActive,
+        year: row.year || undefined,
+        plateNumber: row.plateNumber || undefined,
+        emissionFactor: row.emissionFactor || undefined,
+        isPrimary: row.isPrimary || undefined,
+        isActive: row.isActive || undefined,
       };
       await updateVehicle(row.id, updateObj);
       toast.success("Vehicle name updated successfully!");
       setVehiclesLoading(true);
       const data = await getUserVehicles();
-      setVehicles(data);
+      setVehicles(data as Vehicle[]);
       setEditId(null);
       setEditName("");
-    } catch (err: any) {
-      toast.error(err?.message || "Failed to update vehicle name");
-      setEditError(err?.message || "Failed to update vehicle name");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to update vehicle name";
+      toast.error(errorMessage);
+      setEditError(errorMessage);
     } finally {
       setEditLoadingId(null);
       setVehiclesLoading(false);
     }
   };
+
   const handleRemove = async (id: string) => {
     setDeleteLoadingId(id);
     try {
@@ -136,9 +178,10 @@ export default function UserProfilePage() {
       toast.success("Vehicle deleted successfully!");
       setVehiclesLoading(true);
       const data = await getUserVehicles();
-      setVehicles(data);
-    } catch (err: any) {
-      toast.error(err?.message || "Failed to delete vehicle");
+      setVehicles(data as Vehicle[]);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to delete vehicle";
+      toast.error(errorMessage);
     } finally {
       setDeleteLoadingId(null);
       setVehiclesLoading(false);
@@ -146,11 +189,7 @@ export default function UserProfilePage() {
   };
 
   const handleAddVehicle = async () => {
-    const errors: {
-      model?: string;
-      vehicleType?: string;
-      plateNumber?: string;
-    } = {};
+    const errors: FieldErrors = {};
     if (!newVehicle.model.trim()) errors.model = "Model is required";
     if (!newVehicle.vehicleType.trim()) errors.vehicleType = "Type is required";
     setAddFieldErrors(errors);
@@ -166,10 +205,11 @@ export default function UserProfilePage() {
       handleCloseAddDialog();
       setVehiclesLoading(true);
       const data = await getUserVehicles();
-      setVehicles(data);
-    } catch (err: any) {
-      toast.error(err?.message || "Failed to add vehicle");
-      setAddError(err?.message || "Failed to add vehicle");
+      setVehicles(data as Vehicle[]);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to add vehicle";
+      toast.error(errorMessage);
+      setAddError(errorMessage);
     } finally {
       setAddVehicleLoading(false);
       setVehiclesLoading(false);
@@ -185,19 +225,19 @@ export default function UserProfilePage() {
   };
 
   // Helper function to format wallet address
-  const formatWalletAddress = (address: string) => {
+  const formatWalletAddress = (address: string): string => {
     if (!address) return "N/A";
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
   // Helper function to format tier
-  const formatTier = (tier: string) => {
+  const formatTier = (tier: string): string => {
     if (!tier) return "N/A";
     return tier.charAt(0).toUpperCase() + tier.slice(1);
   };
 
   // Helper function to get tier color
-  const getTierColor = (tier: string) => {
+  const getTierColor = (tier: string): string => {
     switch (tier?.toLowerCase()) {
       case "bronze":
         return "text-amber-600 dark:text-amber-400";
@@ -218,7 +258,7 @@ export default function UserProfilePage() {
       key: "customName",
       label: "Name",
       render: (value, row) => {
-        const vehicle = row as any;
+        const vehicle = row as unknown as Vehicle;
         return editId === vehicle.id ? (
           <>
             <input
@@ -271,7 +311,7 @@ export default function UserProfilePage() {
       key: "plateNumber",
       label: "Number Plate",
       render: (value) => {
-        const stringValue = value as string | undefined;
+        const stringValue = value as string | null;
         return stringValue ? (
           <span className="font-mono text-success">{stringValue}</span>
         ) : (
@@ -283,18 +323,17 @@ export default function UserProfilePage() {
       key: "edit",
       label: "",
       render: (value, row) => {
-        const vehicle = row as { id: string | number };
-        const idStr = String(vehicle.id);
+        const vehicle = row as unknown as Vehicle;
         return (
           <div className="flex gap-2">
             <Button
               variant="link"
               size="sm"
               className="p-0 h-auto min-w-0 text-destructive"
-              onClick={() => handleRemove(idStr)}
-              disabled={deleteLoadingId === idStr}
+              onClick={() => handleRemove(vehicle.id)}
+              disabled={deleteLoadingId === vehicle.id}
             >
-              {deleteLoadingId === idStr ? "Removing..." : "Remove"}
+              {deleteLoadingId === vehicle.id ? "Removing..." : "Remove"}
             </Button>
           </div>
         );
@@ -556,7 +595,7 @@ export default function UserProfilePage() {
             Badges & Achievements
           </div>
           <div className="flex flex-wrap gap-6 justify-center sm:justify-start">
-            {mockBadges.map((badge: any) => {
+            {mockBadges.map((badge: Badge) => {
               const Icon = badge.icon;
               return (
                 <div key={badge.id} className="flex flex-col items-center">

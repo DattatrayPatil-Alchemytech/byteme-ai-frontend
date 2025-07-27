@@ -439,7 +439,7 @@ export default function UploadsPage() {
               <div>
                   <span className="text-muted-foreground">Vehicle: </span>
                   <span className="font-medium">{uploadDetails.vehicleId}</span>
-                </div>
+              </div>
             </div>
             
               {uploadDetails.carbonSaved && (
