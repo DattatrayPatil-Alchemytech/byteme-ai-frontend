@@ -17,6 +17,10 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import Modal from "@/components/modals/Modal";
+import { useDispatch } from "react-redux";
+import { openModal } from "@/redux/modalSlice";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 import {
   getUserVehicles,
   VehicleData,
@@ -37,6 +41,7 @@ interface UserProfile {
   totalPoints: number;
   totalCarbonSaved: number;
   totalMileage: number;
+  profileImageUrl?: string;
 }
 
 interface Badge {
@@ -97,6 +102,8 @@ export default function UserProfilePage() {
   const [userProfileLoading, setUserProfileLoading] = useState(true);
   const [userProfileError, setUserProfileError] = useState("");
   const router = useRouter();
+  const dispatch = useDispatch();
+  const { modalType, isOpen } = useSelector((state: RootState) => state.modal);
 
   useEffect(() => {
     setUserProfileLoading(true);
@@ -128,6 +135,31 @@ export default function UserProfilePage() {
         setVehiclesLoading(false);
       });
   }, []);
+
+  // Listen for modal state changes to refresh profile data
+  useEffect(() => {
+    // If USER_MODAL was open and is now closed, refresh the profile data
+    if (!isOpen && modalType === null) {
+      // Small delay to ensure the modal has fully closed and any updates are processed
+      const timer = setTimeout(() => {
+        setUserProfileLoading(true);
+        getUserProfile()
+          .then((data) => {
+            setUserProfile(data as unknown as UserProfile);
+            setUserProfileError("");
+          })
+          .catch((err: Error) => {
+            setUserProfileError(err?.message || "Failed to load profile");
+            setUserProfile(null);
+          })
+          .finally(() => {
+            setUserProfileLoading(false);
+          });
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, modalType]);
 
   const handleEdit = (row: Vehicle) => {
     setEditId(row.id);
@@ -162,7 +194,8 @@ export default function UserProfilePage() {
       setEditId(null);
       setEditName("");
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to update vehicle name";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to update vehicle name";
       toast.error(errorMessage);
       setEditError(errorMessage);
     } finally {
@@ -180,7 +213,8 @@ export default function UserProfilePage() {
       const data = await getUserVehicles();
       setVehicles(data as Vehicle[]);
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to delete vehicle";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to delete vehicle";
       toast.error(errorMessage);
     } finally {
       setDeleteLoadingId(null);
@@ -207,7 +241,8 @@ export default function UserProfilePage() {
       const data = await getUserVehicles();
       setVehicles(data as Vehicle[]);
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to add vehicle";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to add vehicle";
       toast.error(errorMessage);
       // setAddError(errorMessage); // Removed unused variable
     } finally {
@@ -304,7 +339,9 @@ export default function UserProfilePage() {
       key: "vehicleType",
       label: "Type",
       render: (value) => (
-        <span className="capitalize text-muted-foreground">{value as string}</span>
+        <span className="capitalize text-muted-foreground">
+          {value as string}
+        </span>
       ),
     },
     {
@@ -400,7 +437,7 @@ export default function UserProfilePage() {
           align-items: stretch;
         }
 
-        .wallet-balance-container{
+        .wallet-balance-container {
           display: grid;
           grid-template-columns: 1fr;
           gap: 1.5rem;
@@ -417,7 +454,7 @@ export default function UserProfilePage() {
           width: 100%;
           min-height: 140px;
         }
-      
+
         .wallet-balance-container > * {
           width: 100%;
           min-height: 140px;
@@ -449,9 +486,36 @@ export default function UserProfilePage() {
         </button>
 
         {/* Profile Header */}
-        <section className="flex flex-col items-center bg-card rounded-2xl border border-border p-8 sm:p-10 shadow-lg">
+        <section className="flex flex-col items-center bg-card rounded-2xl border border-border p-8 sm:p-10 shadow-lg relative">
+          {/* Update Profile Button - Top Right */}
+          {userProfile && (
+            <Button
+              variant="outline"
+              className="absolute top-6 right-6 rounded-lg border border-primary text-primary bg-transparent hover:bg-primary hover:text-white hover:shadow-lg transition-all duration-300 p-2.5"
+              onClick={() =>
+                dispatch(
+                  openModal({
+                    modalType: "USER_MODAL",
+                    title: "Welcome! Complete Your Profile",
+                  })
+                )
+              }
+              title="Update Profile"
+            >
+              <Pencil className="w-4 h-4" />
+            </Button>
+          )}
+          
           <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-4 border-primary mb-6 flex items-center justify-center bg-muted">
-            <User className="w-16 h-16 sm:w-20 sm:h-20 text-primary" />
+            {userProfile?.profileImageUrl ? (
+              <img
+                src={userProfile.profileImageUrl}
+                alt="Profile"
+                className="w-full h-full object-cover rounded-full"
+              />
+            ) : (
+              <User className="w-16 h-16 sm:w-20 sm:h-20 text-primary" />
+            )}
           </div>
           <div className="text-center">
             {userProfileLoading ? (
