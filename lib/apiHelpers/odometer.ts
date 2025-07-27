@@ -8,6 +8,23 @@ export interface UploadOdometerResponse {
   processingTime: number;
 }
 
+// Types for vehicle details API
+export interface VehicleDetailsRequest {
+  vehicleType?: string;
+  customName?: string;
+  make?: string;
+  model?: string;
+  year?: number;
+  plateNumber?: string;
+  emissionFactor?: number;
+}
+
+export interface VehicleDetailsResponse {
+  success: boolean;
+  message: string;
+  vehicleId?: string;
+}
+
 export interface UploadDetailsResponse {
   id: string;
   userId: string;
@@ -42,19 +59,27 @@ export interface UploadDetailsResponse {
 // Upload odometer image with vehicle details
 export const uploadOdometerImage = async (
   imageFile: File,
-  vehicleDetails: VehicleDetails
+  vehicleDetails: VehicleDetails,
+  isAuthenticated?: boolean
 ): Promise<UploadOdometerResponse> => {
   // Create FormData for multipart upload according to Swagger spec
   const formData = new FormData();
   formData.append('image', imageFile);
-  formData.append('vehicleId', vehicleDetails.numberPlate);
-  
-  // Create notes object with vehicle type and name
-  const notes = {
-    type: vehicleDetails.vehicleType,
-    name: vehicleDetails.vehicleName
-  };
-  formData.append('notes', JSON.stringify(notes));
+  if (isAuthenticated) {
+    if (vehicleDetails.vehicleId !== undefined) {
+      formData.append('vehicleId', vehicleDetails.vehicleId);
+    }
+  } else {
+    if (vehicleDetails.numberPlate !== undefined) {
+      formData.append('vehicleId', vehicleDetails.numberPlate);
+      // Create notes object with vehicle type and name
+      const notes = {
+        type: vehicleDetails.vehicleType,
+        name: vehicleDetails.vehicleName
+      };
+      formData.append('notes', JSON.stringify(notes));
+    }
+  }
 
   return apiPost<UploadOdometerResponse>('/odometer/upload', formData, {
     requireAuth: false,
@@ -70,6 +95,21 @@ export const fetchUploadDetails = async (
     requireAuth: false,
     showToast: false,
   });
+};
+
+// Upload vehicle details for an odometer upload
+export const uploadVehicleDetails = async (
+  uploadId: string,
+  vehicleDetails: VehicleDetailsRequest
+): Promise<VehicleDetailsResponse> => {
+  return apiPost<VehicleDetailsResponse>(
+    `/odometer/upload/${uploadId}/vehicle`,
+    vehicleDetails,
+    {
+      requireAuth: true,
+      showToast: false,
+    }
+  );
 };
 
 // Export types for use in components

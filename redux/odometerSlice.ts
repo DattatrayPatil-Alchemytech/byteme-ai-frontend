@@ -1,11 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { type UploadDetailsResponse } from '@/lib/apiHelpers/odometer';
+import { type VehicleData } from '@/lib/apiHelpers/profile';
 
 // Types
 export interface VehicleDetails {
   vehicleType: 'two-wheeler-bike' | 'two-wheeler-scooter' | 'three-wheeler' | 'four-wheeler';
   numberPlate: string;
   vehicleName: string;
+  vehicleId?: string;
 }
 
 export interface OdometerExtraction {
@@ -13,6 +15,13 @@ export interface OdometerExtraction {
   confidence: number;
   rawText: string;
   extractedText: string;
+}
+
+export interface ClientSideOCRResult {
+  kilometers: number;
+  confidence: number;
+  originalText: string;
+  patternUsed: number;
 }
 
 export interface UploadResponse {
@@ -31,12 +40,23 @@ export interface OdometerState {
   isUploading: boolean;
   uploadProgress: number;
   
+  // Client-side OCR state
+  isProcessingOCR: boolean;
+  ocrProcessingStep: string;
+  clientSideOCRResult: ClientSideOCRResult | null;
+  ocrError: string | null;
+  
   // API state
   uploadId: string | null;
   uploadResponse: UploadResponse | null;
   isFetchingDetails: boolean;
   uploadDetails: UploadDetailsResponse | null;
   fetchError: string | null;
+  
+  // Vehicles state
+  vehicles: VehicleData[];
+  vehiclesLoading: boolean;
+  vehiclesError: string | null;
 }
 
 const initialState: OdometerState = {
@@ -49,11 +69,18 @@ const initialState: OdometerState = {
   uploadedFile: null,
   isUploading: false,
   uploadProgress: 0,
+  isProcessingOCR: false,
+  ocrProcessingStep: '',
+  clientSideOCRResult: null,
+  ocrError: null,
   uploadId: null,
   uploadResponse: null,
   isFetchingDetails: false,
   uploadDetails: null,
-  fetchError: null
+  fetchError: null,
+  vehicles: [],
+  vehiclesLoading: false,
+  vehiclesError: null
 };
 
 const odometerSlice = createSlice({
@@ -121,6 +148,27 @@ const odometerSlice = createSlice({
         processedAt: null,
       };
     },
+    setProcessingOCR: (state, action: PayloadAction<boolean>) => {
+      state.isProcessingOCR = action.payload;
+    },
+    setOCRProcessingStep: (state, action: PayloadAction<string>) => {
+      state.ocrProcessingStep = action.payload;
+    },
+    setClientSideOCRResult: (state, action: PayloadAction<ClientSideOCRResult | null>) => {
+      state.clientSideOCRResult = action.payload;
+    },
+    setOCRError: (state, action: PayloadAction<string | null>) => {
+      state.ocrError = action.payload;
+    },
+    setVehicles: (state, action: PayloadAction<VehicleData[]>) => {
+      state.vehicles = action.payload;
+    },
+    setVehiclesLoading: (state, action: PayloadAction<boolean>) => {
+      state.vehiclesLoading = action.payload;
+    },
+    setVehiclesError: (state, action: PayloadAction<string | null>) => {
+      state.vehiclesError = action.payload;
+    },
     resetOdometer: (state) => {
       return initialState;
     }
@@ -138,6 +186,13 @@ export const {
   setUploadDetails,
   setFetchError,
   setFailedUploadDetails,
+  setProcessingOCR,
+  setOCRProcessingStep,
+  setClientSideOCRResult,
+  setOCRError,
+  setVehicles,
+  setVehiclesLoading,
+  setVehiclesError,
   resetOdometer
 } = odometerSlice.actions;
 
