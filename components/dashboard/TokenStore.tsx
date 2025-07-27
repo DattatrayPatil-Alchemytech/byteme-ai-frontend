@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,25 +8,26 @@ import CheckoutPage from '@/components/store/CheckoutPage';
 import { RootState, AppDispatch } from '@/redux/store';
 import { setProducts, setLoading, setError, openProductModal, closeProductModal } from '@/redux/storeProductsSlice';
 import { getProducts, PRODUCT_CATEGORIES, Product, ProductCategory } from '@/lib/apiHelpers/storeProducts';
-import { Eye, ShoppingCart } from 'lucide-react';
+import { Eye, ShoppingCart, Package } from 'lucide-react';
 import ProductModal from '@/components/modals/ProductModal';
+import toast from 'react-hot-toast';
 
 export default function TokenStore() {
   const dispatch = useDispatch<AppDispatch>();
   const { products, isLoading, error, total, showProductModal, selectedProductId } = useSelector((state: RootState) => state.storeProducts);
+  const { user } = useSelector((state: RootState) => state.user);
+  const userTokens = user?.b3trBalance || 0;
+  const isMounted = useRef(false);
 
   const [selectedCategory, setSelectedCategory] = useState<ProductCategory | 'all'>('all');
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [currentLimit, setCurrentLimit] = useState(20);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isCheckout, setIsCheckout] = useState(false);
   const [checkoutProduct, setCheckoutProduct] = useState<Product | null>(null);
   const [checkoutQuantity, setCheckoutQuantity] = useState(1);
 
-  // User tokens - you can get this from Redux or API
-  const userTokens = 1230; // Replace with actual user tokens from Redux/API
 
   // Debounce search input
   useEffect(() => {
@@ -38,6 +39,12 @@ export default function TokenStore() {
 
   // Fetch products from API when filters change
   useEffect(() => {
+    // Skip the first render to prevent double API calls
+    if (!isMounted.current) {
+      isMounted.current = true;
+      return;
+    }
+
     const fetchProducts = async () => {
       try {
         dispatch(setLoading(true));
@@ -56,13 +63,33 @@ export default function TokenStore() {
     fetchProducts();
   }, [dispatch, selectedCategory, debouncedSearch, currentPage, currentLimit]);
 
+  // Initial load - fetch products on mount
+  useEffect(() => {
+    const fetchInitialProducts = async () => {
+      try {
+        dispatch(setLoading(true));
+        const response = await getProducts(
+          1,
+          20,
+          undefined,
+          undefined
+        );
+        dispatch(setProducts(response));
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to fetch products';
+        dispatch(setError(errorMessage));
+      }
+    };
+    fetchInitialProducts();
+  }, [dispatch]);
+
   // Handle shopping cart click
   const handlePurchaseClick = (product: Product) => {
     const productPrice = parseFloat(product.price);
     const maxQuantity = Math.floor(userTokens / productPrice);
     
     if (maxQuantity < 1) {
-      alert(`Insufficient tokens. You need at least ${productPrice} B3TR tokens to purchase this item.`);
+      toast.error(`Insufficient tokens. You need at least ${productPrice} B3TR tokens to purchase this item.`);
       return;
     }
     
@@ -154,16 +181,6 @@ export default function TokenStore() {
         </div>
         <div className="flex gap-2 items-center">
           <input
-            type="number"
-            placeholder="Min Price"
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-24"
-          />
-          <input
-            type="number"
-            placeholder="Max Price"
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-24"
-          />
-          <input
             type="text"
             value={search}
             onChange={e => {
@@ -194,39 +211,81 @@ export default function TokenStore() {
 
       {/* Full-width Product List */}
       <div className="space-y-4">
-        {products.map((product) => (
-          <Card key={product.id} className="hover-lift gradient-ev-light/10 border-success/20 backdrop-blur-sm cursor-pointer w-full">
-            <CardContent className="p-6">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 w-full">
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-foreground font-semibold text-lg mb-1 truncate">{product.name}</h4>
-                  <p className="text-muted-foreground text-sm mb-2 truncate">{product.description}</p>
-                  <div className="flex items-center space-x-4 text-sm flex-wrap">
-                    <span className="text-primary font-semibold">{product.price} B3TR</span>
-                    <span className="text-muted-foreground">Stock: {product.stockQuantity}</span>
-                    {product.isEcoFriendly && (
-                      <span className="text-success">Eco-Friendly</span>
-                    )}
-                  </div>
-                </div>
-                <div className="flex-shrink-0 flex items-center gap-2">
-                  <Button size="icon" variant="outline" className="rounded-full" title="View Details" onClick={() => dispatch(openProductModal(product.id))}>
-                    <Eye className="w-5 h-5" />
-                  </Button>
-                  <Button 
-                    size="icon" 
-                    variant="outline" 
-                    className="rounded-full" 
-                    title="Purchase"
-                    onClick={() => handlePurchaseClick(product)}
+        {products.length === 0 && !isLoading && !error ? (
+          <Card className="hover-lift gradient-ev-light/10 border-success/20 backdrop-blur-sm w-full">
+            <CardContent className="p-12 text-center">
+              <div className="w-20 h-20 bg-muted/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Package className="w-10 h-10 text-muted-foreground" />
+              </div>
+              <h3 className="text-xl font-semibold text-foreground mb-2">No Products Available</h3>
+              <p className="text-muted-foreground mb-4">
+                {selectedCategory !== 'all' 
+                  ? `No products found in the "${selectedCategory}" category.`
+                  : debouncedSearch 
+                    ? `No products found matching "${debouncedSearch}".`
+                    : "There are currently no products available in the store."
+                }
+              </p>
+              <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                {selectedCategory !== 'all' && (
+                  <Button
+                    variant="outline"
+                    onClick={() => setSelectedCategory('all')}
+                    className="text-sm"
                   >
-                    <ShoppingCart className="w-5 h-5" />
+                    View All Categories
                   </Button>
-                </div>
+                )}
+                {debouncedSearch && (
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setSearch('');
+                      setDebouncedSearch('');
+                    }}
+                    className="text-sm"
+                  >
+                    Clear Search
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>
-        ))}
+        ) : (
+          products.map((product) => (
+            <Card key={product.id} className="hover-lift gradient-ev-light/10 border-success/20 backdrop-blur-sm cursor-pointer w-full">
+              <CardContent className="p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 w-full">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-foreground font-semibold text-lg mb-1 truncate">{product.name}</h4>
+                    <p className="text-muted-foreground text-sm mb-2 truncate">{product.description}</p>
+                    <div className="flex items-center space-x-4 text-sm flex-wrap">
+                      <span className="text-primary font-semibold">{product.price} B3TR</span>
+                      <span className="text-muted-foreground">Stock: {product.stockQuantity}</span>
+                      {product.isEcoFriendly && (
+                        <span className="text-success">Eco-Friendly</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex-shrink-0 flex items-center gap-2">
+                    <Button size="icon" variant="outline" className="rounded-full" title="View Details" onClick={() => dispatch(openProductModal(product.id))}>
+                      <Eye className="w-5 h-5" />
+                    </Button>
+                    <Button 
+                      size="icon" 
+                      variant="outline" 
+                      className="rounded-full" 
+                      title="Purchase"
+                      onClick={() => handlePurchaseClick(product)}
+                    >
+                      <ShoppingCart className="w-5 h-5" />
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        )}
       </div>
 
       {/* Pagination Controls */}

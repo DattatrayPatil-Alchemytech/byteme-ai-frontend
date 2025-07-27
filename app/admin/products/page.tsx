@@ -1,248 +1,104 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import { useDispatch, useSelector } from 'react-redux';
+import SafeImage from '@/components/ui/SafeImage';
 import { Button } from '@/components/ui/button';
 import { DataTable, Column, Action } from '@/components/ui/DataTable';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Trash2 } from 'lucide-react';
-
-// Define product type
-interface Product {
-  id: number;
-  name: string;
-  category: string;
-  price: number;
-  stock: number;
-  status: string;
-  description: string;
-  sku: string;
-  createdAt: string;
-  image: string;
-}
-
-// Mock product data
-const mockProducts: Product[] = [
-  {
-    id: 1,
-    name: 'Solar Phone Charger',
-    category: 'Electronics',
-    price: 29.99,
-    stock: 150,
-    status: 'active',
-    description: 'Portable solar charger for mobile devices',
-    sku: 'SOL-001',
-    createdAt: '2024-01-15',
-    image: 'https://images.unsplash.com/photo-1601972599720-36938d4ecd31?w=100&h=100&fit=crop'
-  },
-  {
-    id: 2,
-    name: 'Eco-Friendly Water Bottle',
-    category: 'Lifestyle',
-    price: 19.99,
-    stock: 200,
-    status: 'active',
-    description: 'Reusable stainless steel water bottle',
-    sku: 'BTL-002',
-    createdAt: '2024-01-20',
-    image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=100&h=100&fit=crop'
-  },
-
-  {
-    id: 5,
-    name: 'Organic Cotton Tote Bag',
-    category: 'Fashion',
-    price: 24.99,
-    stock: 120,
-    status: 'active',
-    description: 'Sustainable shopping tote bag',
-    sku: 'BAG-005',
-    createdAt: '2024-02-05',
-    image: 'https://images.unsplash.com/photo-1597481499750-3e6b22637e12?w=100&h=100&fit=crop'
-  },
-  {
-    id: 6,
-    name: 'Wind Turbine Kit',
-    category: 'Energy',
-    price: 199.99,
-    stock: 25,
-    status: 'active',
-    description: 'DIY wind turbine for home energy',
-    sku: 'WND-006',
-    createdAt: '2024-02-10',
-    image: 'https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=100&h=100&fit=crop'
-  },
-  {
-    id: 7,
-    name: 'Compost Bin',
-    category: 'Garden',
-    price: 39.99,
-    stock: 80,
-    status: 'active',
-    description: 'Indoor composting solution',
-    sku: 'CMP-007',
-    createdAt: '2024-02-15',
-    image: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=100&h=100&fit=crop'
-  },
-  {
-    id: 8,
-    name: 'Beeswax Food Wraps',
-    category: 'Kitchen',
-    price: 18.99,
-    stock: 200,
-    status: 'active',
-    description: 'Eco-friendly food storage wraps',
-    sku: 'WRP-008',
-    createdAt: '2024-02-20',
-    image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=100&h=100&fit=crop'
-  },
-  {
-    id: 9,
-    name: 'Electric Bike Charger',
-    category: 'Transportation',
-    price: 149.99,
-    stock: 30,
-    status: 'active',
-    description: 'Fast charging station for e-bikes',
-    sku: 'EBI-009',
-    createdAt: '2024-02-25',
-    image: 'https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=100&h=100&fit=crop'
-  },
-  {
-    id: 10,
-    name: 'Recycled Paper Notebook',
-    category: 'Office',
-    price: 8.99,
-    stock: 500,
-    status: 'active',
-    description: '100% recycled paper notebooks',
-    sku: 'NOT-010',
-    createdAt: '2024-03-01',
-    image: 'https://images.unsplash.com/photo-1531346680769-a1d79b57de5c?w=100&h=100&fit=crop'
-  },
-  {
-    id: 11,
-    name: 'Solar Garden Lights',
-    category: 'Garden',
-    price: 34.99,
-    stock: 100,
-    status: 'active',
-    description: 'Solar-powered garden lighting',
-    sku: 'GLT-011',
-    createdAt: '2024-03-05',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=100&h=100&fit=crop'
-  },
-  {
-    id: 12,
-    name: 'Hemp Face Mask',
-    category: 'Personal Care',
-    price: 15.99,
-    stock: 150,
-    status: 'active',
-    description: 'Natural hemp face mask',
-    sku: 'MSK-012',
-    createdAt: '2024-03-10',
-    image: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=100&h=100&fit=crop'
-  },
-  {
-    id: 13,
-    name: 'Bamboo Cutlery Set',
-    category: 'Kitchen',
-    price: 22.99,
-    stock: 180,
-    status: 'active',
-    description: 'Reusable bamboo cutlery',
-    sku: 'CUT-013',
-    createdAt: '2024-03-15',
-    image: 'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=100&h=100&fit=crop'
-  },
-
-  {
-    id: 15,
-    name: 'Organic Soap Bar',
-    category: 'Personal Care',
-    price: 6.99,
-    stock: 400,
-    status: 'active',
-    description: 'Natural organic soap',
-    sku: 'SAP-015',
-    createdAt: '2024-03-25',
-    image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=100&h=100&fit=crop'
-  },
-  {
-    id: 16,
-    name: 'Solar Panel Kit',
-    category: 'Energy',
-    price: 599.99,
-    stock: 20,
-    status: 'active',
-    description: 'Residential solar panel system',
-    sku: 'SOL-016',
-    createdAt: '2024-04-01',
-    image: 'https://images.unsplash.com/photo-1509391366360-2e959784a276?w=100&h=100&fit=crop'
-  },
-  {
-    id: 17,
-    name: 'Recycled Glass Vase',
-    category: 'Home Decor',
-    price: 45.99,
-    stock: 60,
-    status: 'active',
-    description: 'Beautiful recycled glass vase',
-    sku: 'VAS-017',
-    createdAt: '2024-04-05',
-    image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=100&h=100&fit=crop'
-  },
-  {
-    id: 18,
-    name: 'Bamboo Coffee Cup',
-    category: 'Kitchen',
-    price: 16.99,
-    stock: 250,
-    status: 'active',
-    description: 'Insulated bamboo coffee cup',
-    sku: 'CUP-018',
-    createdAt: '2024-04-10',
-    image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=100&h=100&fit=crop'
-  },
-  {
-    id: 19,
-    name: 'Organic Cotton Sheets',
-    category: 'Home',
-    price: 89.99,
-    stock: 75,
-    status: 'active',
-    description: '100% organic cotton bed sheets',
-    sku: 'SHT-019',
-    createdAt: '2024-04-15',
-    image: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=100&h=100&fit=crop'
-  },
-  {
-    id: 20,
-    name: 'Solar Phone Case',
-    category: 'Electronics',
-    price: 49.99,
-    stock: 120,
-    status: 'active',
-    description: 'Phone case with built-in solar charger',
-    sku: 'CAS-020',
-    createdAt: '2024-04-20',
-    image: 'https://images.unsplash.com/photo-1601972599720-36938d4ecd31?w=100&h=100&fit=crop'
-  }
-];
+import { RootState, AppDispatch } from '@/redux/store';
+import { setProducts, setLoading, setError, openDeleteModal, closeDeleteModal } from '@/redux/adminStoreSlice';
+import { getAllProducts, deleteProduct, PRODUCT_CATEGORIES, ProductCategory } from '@/lib/apiHelpers/adminStore';
+import DeleteProductModal from '@/components/modals/DeleteProductModal';
+import toast from 'react-hot-toast';
 
 export default function ProductsPage() {
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
+  const { products, isLoading, error, total, showDeleteModal, selectedProductIdForDelete } = useSelector((state: RootState) => state.adminStore);
+  const isMounted = useRef(false);
+
+  // Local state for filters and pagination
+  const [selectedCategory, setSelectedCategory] = useState<ProductCategory | 'all'>('all');
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [currentLimit, setCurrentLimit] = useState(20);
+
+  // Debounce search input
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 3000);
+    return () => clearTimeout(handler);
+  }, [search]);
+
+  // Fetch products when filters change
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        dispatch(setLoading(true));
+        const response = await getAllProducts(
+          currentPage,
+          currentLimit,
+          selectedCategory === 'all' ? undefined : selectedCategory,
+          debouncedSearch || undefined
+        );
+        dispatch(setProducts(response));
+        dispatch(setLoading(false));
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to fetch products';
+        dispatch(setError(errorMessage));
+        dispatch(setLoading(false));
+        toast.error(errorMessage);
+      }
+    };
+
+    // Only fetch on mount or when filters change
+    if (isMounted.current) {
+      fetchProducts();
+    } else {
+      isMounted.current = true;
+      fetchProducts();
+    }
+  }, [dispatch, selectedCategory, debouncedSearch, currentPage, currentLimit]);
+
+  // Pagination logic
+  const totalPages = Math.ceil(total / currentLimit);
 
   const handleEdit = (product: Record<string, unknown>) => {
-    router.push(`/admin/products/edit/${product.id as number}`);
+    router.push(`/admin/products/edit/${product.id as string}`);
   };
 
   const handleDelete = (product: Record<string, unknown>) => {
-    if (confirm('Are you sure you want to delete this product?')) {
-      // In a real app, you would call an API here
-      console.log('Deleting product:', product.id);
-      alert('Product deleted successfully!');
+    dispatch(openDeleteModal(product.id as string));
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!selectedProductIdForDelete) return;
+    
+    try {
+      dispatch(setLoading(true));
+      await deleteProduct(selectedProductIdForDelete);
+      toast.success('Product deleted successfully!');
+      dispatch(closeDeleteModal());
+      
+      // Refresh the products list
+      const response = await getAllProducts(
+        currentPage,
+        currentLimit,
+        selectedCategory === 'all' ? undefined : selectedCategory,
+        debouncedSearch || undefined
+      );
+      dispatch(setProducts(response));
+      dispatch(setLoading(false));
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to delete product';
+      dispatch(setError(errorMessage));
+      dispatch(setLoading(false));
+      toast.error(errorMessage);
     }
   };
 
@@ -253,17 +109,21 @@ export default function ProductsPage() {
   // Define columns for the DataTable
   const columns: Column[] = [
     {
-      key: 'image',
+      key: 'imageUrl',
       label: 'Image',
       width: '100px',
       render: (value) => (
-        <Image
-          src={value as string}
-          alt="Product"
-          width={48}
-          height={48}
-          className="w-12 h-12 rounded-lg object-cover"
-        />
+        <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center">
+          <SafeImage
+            src={value as string}
+            alt="Product"
+            width={48}
+            height={48}
+            className="w-12 h-12 rounded-lg object-cover"
+            fallbackText="No Image"
+            fallbackClassName="w-12 h-12 rounded-lg"
+          />
+        </div>
       )
     },
     {
@@ -282,17 +142,21 @@ export default function ProductsPage() {
       render: (value) => <Badge variant="secondary">{value as string}</Badge>
     },
     {
-      key: 'sku',
-      label: 'SKU',
-      render: (value) => <span className="font-mono text-sm">{value as string}</span>
-    },
-    {
       key: 'price',
       label: 'Price',
-      render: (value) => `$${value as number}`
+      render: (value, row) => (
+        <div>
+          <div className="font-medium">${String(value)}</div>
+          {(row.originalPrice !== undefined && row.originalPrice !== null && row.originalPrice !== value) ? (
+            <div className="text-sm text-muted-foreground line-through">
+              ${String(row.originalPrice)}
+            </div>
+          ) : null}
+        </div>
+      )
     },
     {
-      key: 'stock',
+      key: 'stockQuantity',
       label: 'Stock',
       render: (value) => (
         <span className={(value as number) < 50 ? 'text-red-600 font-medium' : 'text-foreground'}>
@@ -306,6 +170,15 @@ export default function ProductsPage() {
       render: (value) => (
         <Badge variant={(value as string) === 'active' ? 'default' : 'secondary'}>
           {value as string}
+        </Badge>
+      )
+    },
+    {
+      key: 'isEcoFriendly',
+      label: 'Eco-Friendly',
+      render: (value) => (
+        <Badge variant={value ? 'default' : 'secondary'}>
+          {value ? 'Yes' : 'No'}
         </Badge>
       )
     },
@@ -351,20 +224,153 @@ export default function ProductsPage() {
         </Button>
       </div>
 
+      {/* Categories and Search */}
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+        <div className="flex gap-2 items-center">
+          <select
+            value={selectedCategory}
+            onChange={(e) => {
+              setSelectedCategory(e.target.value as ProductCategory | 'all');
+              setCurrentPage(1); // Reset to first page when category changes
+            }}
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            style={{ minWidth: 160 }}
+          >
+            <option value="all">All Categories</option>
+            {PRODUCT_CATEGORIES.map((category) => (
+              <option key={category} value={category}>
+                {category.charAt(0).toUpperCase() + category.slice(1)}
+              </option>
+            ))}
+          </select>
+          <input
+            type="text"
+            value={search}
+            onChange={e => {
+              setSearch(e.target.value);
+              setCurrentPage(1); // Reset to first page when search changes
+            }}
+            placeholder="Search products..."
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            style={{ minWidth: 200 }}
+          />
+        </div>
+      </div>
+
+      {/* Loading State */}
+      {isLoading && (
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <span className="ml-2 text-muted-foreground">Loading products...</span>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-6">
+          <p className="text-destructive text-sm">{error}</p>
+        </div>
+      )}
+
       {/* Products DataTable */}
-      <DataTable
-        data={mockProducts as unknown as Record<string, unknown>[]}
-        columns={columns}
-        actions={actions}
-        title="Product List"
-        searchable={true}
-        searchPlaceholder="Search products by name, category, or SKU..."
-        searchInputClassName="border border-border bg-background text-foreground rounded-lg px-5 py-3 w-full md:w-64 text-base font-medium shadow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary hover:ring-2 hover:ring-primary/30 hover:bg-muted placeholder:text-muted-foreground"
-        searchKeys={['name', 'category', 'sku']}
-        pagination={true}
-        itemsPerPageOptions={[5, 10, 20, 50]}
-        defaultItemsPerPage={10}
-        emptyMessage="No products found"
+      {!isLoading && !error && (
+        <>
+          {products.length === 0 ? (
+            <div className="text-center py-12 mt-30">
+              <h3 className="text-xl font-semibold text-foreground mb-2">No Products Found</h3>
+              <p className="text-muted-foreground mb-6">
+                {selectedCategory !== 'all' 
+                  ? `No products found in the "${selectedCategory}" category.`
+                  : debouncedSearch 
+                    ? `No products found matching "${debouncedSearch}".`
+                    : "There are currently no products in your catalog. Create your first product to get started."
+                }
+              </p>
+              <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                {selectedCategory !== 'all' && (
+                  <Button
+                    variant="outline"
+                    onClick={() => setSelectedCategory('all')}
+                    className="text-sm"
+                  >
+                    View All Categories
+                  </Button>
+                )}
+                {debouncedSearch && (
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setSearch('');
+                      setDebouncedSearch('');
+                    }}
+                    className="text-sm"
+                  >
+                    Clear Search
+                  </Button>
+                )}
+                <Button onClick={handleCreateProduct} className="gradient-ev-green hover-glow">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Your First Product
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <DataTable
+                data={products as unknown as Record<string, unknown>[]}
+                columns={columns}
+                actions={actions}
+                title="Product List"
+                searchable={false} // We're handling search manually
+                pagination={false} // We're handling pagination manually
+                emptyMessage="No products found"
+              />
+              
+              {/* Custom Pagination */}
+              {totalPages > 1 && (
+                <div className="flex justify-end items-center mt-6 gap-2">
+                  <span className="text-sm text-muted-foreground mr-2">Page</span>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  >
+                    Prev
+                  </Button>
+                  <span className="text-sm font-semibold">{currentPage} / {totalPages}</span>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  >
+                    Next
+                  </Button>
+                  <select
+                    className="ml-4 border border-gray-300 rounded px-2 py-1 text-sm"
+                    value={currentLimit}
+                    onChange={e => {
+                      setCurrentLimit(Number(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                  >
+                    {[10, 20, 50, 100].map((l) => (
+                      <option key={l} value={l}>{l} / page</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </>
+          )}
+        </>
+      )}
+
+      {/* Delete Product Modal */}
+      <DeleteProductModal
+        show={showDeleteModal}
+        onClose={() => dispatch(closeDeleteModal())}
+        handleDeleteConfirm={handleDeleteConfirm}
       />
     </div>
   );

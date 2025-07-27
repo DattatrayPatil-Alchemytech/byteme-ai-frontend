@@ -7,6 +7,7 @@ import modalReducer from "./modalSlice";
 import checkoutReducer from "./checkoutSlice";
 import odometerReducer from "./odometerSlice";
 import storeProductsReducer from "./storeProductsSlice";
+import adminStoreReducer from "./adminStoreSlice";
 
 // Persist configuration
 const persistConfig = {
@@ -23,6 +24,7 @@ const rootReducer = combineReducers({
   checkout: checkoutReducer,
   odometer: odometerReducer,
   storeProducts: storeProductsReducer,
+  adminStore: adminStoreReducer,
 });
 
 // Create persisted reducer

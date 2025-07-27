@@ -1,115 +1,147 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { use } from 'react';
-import Image from 'next/image';
+import SafeImage from '@/components/ui/SafeImage';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Save, Upload } from 'lucide-react';
+import { updateProduct, getProductById, PRODUCT_CATEGORIES, ProductCategory } from '@/lib/apiHelpers/adminStore';
+import { ArrowLeft, Save, Plus, X } from 'lucide-react';
+import toast from 'react-hot-toast';
 
-const categories = [
-  'Electronics',
-  'Lifestyle',
-  'Personal Care',
-  'Garden',
-  'Fashion',
-  'Energy',
-  'Kitchen',
-  'Transportation',
-  'Office',
-  'Home Decor',
-  'Home'
-];
-
-// Define product type
-interface Product {
-  id: number;
-  name: string;
-  category: string;
-  price: number;
-  stock: number;
-  status: string;
-  description: string;
-  sku: string;
-  createdAt: string;
-  image: string;
-  weight: string;
-  dimensions: string;
-  brand: string;
-  tags: string;
+interface DiscountInfo {
+  percentage: number;
+  validUntil: string;
+  minimumPurchase: number;
 }
 
-// Mock product data (in real app, this would come from API)
-const mockProducts: Product[] = [
-  {
-    id: 1,
-    name: 'Solar Phone Charger',
-    category: 'Electronics',
-    price: 29.99,
-    stock: 150,
-    status: 'active',
-    description: 'Portable solar charger for mobile devices',
-    sku: 'SOL-001',
-    createdAt: '2024-01-15',
-    image: 'https://images.unsplash.com/photo-1601972599720-36938d4ecd31?w=100&h=100&fit=crop',
-    weight: '0.5',
-    dimensions: '10 x 5 x 2',
-    brand: 'EcoTech',
-    tags: 'solar, portable, eco-friendly'
-  }
-];
+interface ShippingDimensions {
+  length: number;
+  width: number;
+  height: number;
+}
+
+interface ShippingInfo {
+  weight: number;
+  dimensions: ShippingDimensions;
+  shippingCost: number;
+  estimatedDelivery: string;
+}
 
 export default function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
-  const resolvedParams = use(params);
-  const productId = Number(resolvedParams.id);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingProduct, setIsLoadingProduct] = useState(true);
+  const isMounted = useRef(false);
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    category: '',
+    category: '' as ProductCategory | '',
     price: '',
-    stock: '',
-    sku: '',
-    status: 'active',
-    image: '',
-    weight: '',
-    dimensions: '',
-    brand: '',
-    tags: ''
+    originalPrice: '',
+    stockQuantity: '',
+    imageUrl: '',
+    images: [] as string[],
+    specifications: {} as Record<string, string | number | boolean>,
+    tags: [] as string[],
+    discountInfo: {
+      percentage: 0,
+      validUntil: '',
+      minimumPurchase: 1
+    } as DiscountInfo,
+    isEcoFriendly: false,
+    ecoDescription: '',
+    shippingInfo: {
+      weight: 0,
+      dimensions: {
+        length: 0,
+        width: 0,
+        height: 0
+      },
+      shippingCost: 0,
+      estimatedDelivery: ''
+    } as ShippingInfo,
   });
 
+  // Additional form states for dynamic fields
+  const [newImage, setNewImage] = useState('');
+  const [newTag, setNewTag] = useState('');
+  const [specKey, setSpecKey] = useState('');
+  const [specValue, setSpecValue] = useState('');
+
+  // Fetch product data on component mount
   useEffect(() => {
-    // Load product data
-    const product = mockProducts.find(p => p.id === productId);
-    if (product) {
+    const fetchProduct = async () => {
+      try {
+        const resolvedParams = await params;
+        const productId = resolvedParams.id;
+        
+        const response = await getProductById(productId);
+        const product = response.product || response;
+        
+        // Helper function to safely get nested object properties
+        const getNestedValue = (obj: Record<string, string | number | boolean> | null | undefined, key: string, defaultValue: number | string) => {
+          if (!obj || typeof obj !== 'object') return defaultValue;
+          const value = obj[key];
+          if (typeof value === 'number') return value;
+          if (typeof value === 'string') return defaultValue;
+          return defaultValue;
+        };
+        
+        // Populate form data with proper type checking
       setFormData({
-        name: product.name,
-        description: product.description,
-        category: product.category,
-        price: product.price.toString(),
-        stock: product.stock.toString(),
-        sku: product.sku,
-        status: product.status,
-        image: product.image,
-        weight: product.weight,
-        dimensions: product.dimensions,
-        brand: product.brand,
-        tags: product.tags
-      });
+          name: product.name || '',
+          description: product.description || '',
+          category: product.category || '',
+          price: product.price?.toString() || '',
+          originalPrice: product.originalPrice?.toString() || '',
+          stockQuantity: product.stockQuantity?.toString() || '',
+          imageUrl: product.imageUrl || '',
+          images: product.images || [],
+          specifications: product.specifications || {},
+          tags: product.tags || [],
+          discountInfo: {
+            percentage: getNestedValue(product.discountInfo, 'percentage', 0) as number,
+            validUntil: getNestedValue(product.discountInfo, 'validUntil', '') as string,
+            minimumPurchase: getNestedValue(product.discountInfo, 'minimumPurchase', 1) as number
+          },
+          isEcoFriendly: Boolean(product.isEcoFriendly),
+          ecoDescription: product.ecoDescription || '',
+          shippingInfo: {
+            weight: getNestedValue(product.shippingInfo, 'weight', 0) as number,
+            dimensions: {
+              length: Number((product.shippingInfo?.dimensions as { length?: number; width?: number; height?: number } | null)?.length) || 0,
+              width: Number((product.shippingInfo?.dimensions as { length?: number; width?: number; height?: number } | null)?.width) || 0,
+              height: Number((product.shippingInfo?.dimensions as { length?: number; width?: number; height?: number } | null)?.height) || 0
+            },
+            shippingCost: getNestedValue(product.shippingInfo, 'shippingCost', 0) as number,
+            estimatedDelivery: getNestedValue(product.shippingInfo, 'estimatedDelivery', '') as string
+          }
+        });
+        
+        setIsLoadingProduct(false);
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to fetch product';
+        toast.error(errorMessage);
+        setIsLoadingProduct(false);
+      }
+    };
+
+    if (!isMounted.current) {
+      isMounted.current = true;
+      fetchProduct();
     }
-  }, [productId]);
+  }, [params]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+    const { name, value, type } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
     }));
   };
 
@@ -120,23 +152,147 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     }));
   };
 
+  const handleAddImage = () => {
+    if (newImage.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        images: [...prev.images, newImage.trim()]
+      }));
+      setNewImage('');
+    }
+  };
+
+  const handleRemoveImage = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleAddTag = () => {
+    if (newTag.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        tags: [...prev.tags, newTag.trim()]
+      }));
+      setNewTag('');
+    }
+  };
+
+  const handleRemoveTag = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      tags: prev.tags.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleAddSpecification = () => {
+    if (specKey.trim() && specValue.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        specifications: {
+          ...prev.specifications,
+          [specKey.trim()]: specValue.trim()
+        }
+      }));
+      setSpecKey('');
+      setSpecValue('');
+    }
+  };
+
+  const handleRemoveSpecification = (key: string) => {
+    setFormData(prev => {
+      const newSpecs = { ...prev.specifications };
+      delete newSpecs[key];
+      return {
+        ...prev,
+        specifications: newSpecs
+      };
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      const resolvedParams = await params;
+      const productId = resolvedParams.id;
 
-    // In a real app, you would send the data to your API
-    console.log('Updating product:', formData);
-    
-    alert('Product updated successfully!');
+      // Prepare the API payload
+      const payload = {
+        name: formData.name,
+        description: formData.description,
+        category: formData.category as ProductCategory,
+        price: parseFloat(formData.price),
+        originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : undefined,
+        stockQuantity: parseInt(formData.stockQuantity),
+        imageUrl: formData.imageUrl || undefined,
+        images: formData.images.length > 0 ? formData.images : undefined,
+        specifications: Object.keys(formData.specifications).length > 0 ? formData.specifications : undefined,
+        tags: formData.tags.length > 0 ? formData.tags : undefined,
+        discountInfo: Object.keys(formData.discountInfo).length > 0 ? {
+          percentage: formData.discountInfo.percentage,
+          validUntil: formData.discountInfo.validUntil,
+          minimumPurchase: formData.discountInfo.minimumPurchase
+        } as Record<string, string | number | boolean> : undefined,
+        isEcoFriendly: formData.isEcoFriendly,
+        ecoDescription: formData.ecoDescription || undefined,
+        shippingInfo: Object.keys(formData.shippingInfo).length > 0 ? {
+          weight: formData.shippingInfo.weight,
+          dimensions: formData.shippingInfo.dimensions,
+          shippingCost: formData.shippingInfo.shippingCost,
+          estimatedDelivery: formData.shippingInfo.estimatedDelivery
+        } as unknown as Record<string, string | number | boolean> : undefined,
+      };
+
+      await updateProduct(productId, payload);
+      toast.success('Product updated successfully!');
     router.push('/admin/products');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update product';
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleBack = () => {
     router.push('/admin/products');
   };
+
+  // Validation function to check if all required fields are filled
+  const isFormValid = () => {
+    return (
+      formData.name.trim() !== '' &&
+      formData.category !== '' &&
+      formData.price.trim() !== '' &&
+      parseFloat(formData.price) > 0 &&
+      formData.stockQuantity.trim() !== '' &&
+      parseInt(formData.stockQuantity) >= 0
+    );
+  };
+
+  // Show loading state while fetching product
+  if (isLoadingProduct) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center space-x-4">
+          <Button variant="ghost" onClick={handleBack} className="p-2">
+            <ArrowLeft className="w-4 h-4" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Edit Product</h1>
+            <p className="text-muted-foreground">Update product information</p>
+          </div>
+        </div>
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <span className="ml-2 text-muted-foreground">Loading product...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -174,20 +330,25 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="sku">SKU *</Label>
-                    <Input
-                      id="sku"
-                      name="sku"
-                      value={formData.sku}
-                      onChange={handleInputChange}
-                      placeholder="e.g., SOL-001"
+                    <Label htmlFor="category">Category *</Label>
+                    <select 
+                      value={formData.category} 
+                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleSelectChange('category', e.target.value)}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                       required
-                    />
+                    >
+                      <option value="">Select category</option>
+                      {PRODUCT_CATEGORIES.map((category) => (
+                        <option key={category} value={category}>
+                          {category.charAt(0).toUpperCase() + category.slice(1)}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="description">Description *</Label>
+                  <Label htmlFor="description">Description</Label>
                   <Textarea
                     id="description"
                     name="description"
@@ -195,36 +356,34 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                     onChange={handleInputChange}
                     placeholder="Enter product description"
                     rows={4}
-                    required
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="category">Category *</Label>
-                    <Select 
-                      value={formData.category} 
-                      onChange={(e) => handleSelectChange('category', e.target.value)}
-                    >
-                      <option value="">Select category</option>
-                      {categories.map((category) => (
-                        <option key={category} value={category}>
-                          {category}
-                        </option>
-                      ))}
-                    </Select>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="isEcoFriendly"
+                    name="isEcoFriendly"
+                    checked={formData.isEcoFriendly}
+                    onChange={handleInputChange}
+                    className="rounded border-gray-300"
+                  />
+                  <Label htmlFor="isEcoFriendly">Eco-Friendly Product</Label>
                   </div>
+
+                {formData.isEcoFriendly && (
                   <div className="space-y-2">
-                    <Label htmlFor="brand">Brand</Label>
-                    <Input
-                      id="brand"
-                      name="brand"
-                      value={formData.brand}
+                    <Label htmlFor="ecoDescription">Eco-Friendly Description</Label>
+                    <Textarea
+                      id="ecoDescription"
+                      name="ecoDescription"
+                      value={formData.ecoDescription}
                       onChange={handleInputChange}
-                      placeholder="Enter brand name"
+                      placeholder="Describe the eco-friendly features..."
+                      rows={2}
                     />
                   </div>
-                </div>
+                )}
               </CardContent>
             </Card>
 
@@ -250,122 +409,371 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="stock">Stock Quantity *</Label>
+                    <Label htmlFor="originalPrice">Original Price</Label>
                     <Input
-                      id="stock"
-                      name="stock"
-                      type="number"
-                      min="0"
-                      value={formData.stock}
-                      onChange={handleInputChange}
-                      placeholder="0"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="status">Status</Label>
-                  <Select 
-                    value={formData.status} 
-                    onChange={(e) => handleSelectChange('status', e.target.value)}
-                  >
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                    <option value="draft">Draft</option>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Product Details */}
-            <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-foreground">Product Details</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="weight">Weight (kg)</Label>
-                    <Input
-                      id="weight"
-                      name="weight"
+                      id="originalPrice"
+                      name="originalPrice"
                       type="number"
                       step="0.01"
                       min="0"
-                      value={formData.weight}
+                      value={formData.originalPrice}
                       onChange={handleInputChange}
                       placeholder="0.00"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="dimensions">Dimensions (cm)</Label>
-                    <Input
-                      id="dimensions"
-                      name="dimensions"
-                      value={formData.dimensions}
-                      onChange={handleInputChange}
-                      placeholder="L x W x H"
-                    />
-                  </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="tags">Tags</Label>
+                  <Label htmlFor="stockQuantity">Stock Quantity *</Label>
                   <Input
-                    id="tags"
-                    name="tags"
-                    value={formData.tags}
+                    id="stockQuantity"
+                    name="stockQuantity"
+                    type="number"
+                    min="0"
+                    value={formData.stockQuantity}
                     onChange={handleInputChange}
-                    placeholder="Enter tags separated by commas"
+                    placeholder="0"
+                    required
                   />
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Images */}
+            <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-lg">
+              <CardHeader>
+                <CardTitle className="text-foreground">Product Images</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="imageUrl">Main Image URL</Label>
+                  <Input
+                    id="imageUrl"
+                    name="imageUrl"
+                    value={formData.imageUrl}
+                    onChange={handleInputChange}
+                    placeholder="https://example.com/image.jpg"
+                  />
+                </div>
+                
+                {formData.imageUrl && (
+                  <div className="space-y-2">
+                    <Label>Main Image Preview</Label>
+                    <div className="border-2 border-dashed border-border rounded-lg p-4">
+                      <SafeImage
+                        src={formData.imageUrl}
+                        alt="Product preview"
+                        width={400}
+                        height={192}
+                        className="w-full h-48 object-cover rounded-lg"
+                        fallbackText="Image failed to load"
+                        fallbackClassName="w-full h-48"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                  <div className="space-y-2">
+                  <Label>Additional Images</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      value={newImage}
+                      onChange={(e) => setNewImage(e.target.value)}
+                      placeholder="https://example.com/image2.jpg"
+                    />
+                    <Button type="button" onClick={handleAddImage} size="sm">
+                      <Plus className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  
+                  {formData.images.length > 0 && (
+                    <div className="space-y-2">
+                      <Label>Added Images:</Label>
+                      <div className="space-y-2">
+                        {formData.images.map((image, index) => (
+                          <div key={index} className="flex items-center gap-2">
+                            <span className="text-sm text-muted-foreground flex-1 truncate">{image}</span>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleRemoveImage(index)}
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Tags */}
+            <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-lg">
+              <CardHeader>
+                <CardTitle className="text-foreground">Product Tags</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex gap-2">
+                  <Input
+                    value={newTag}
+                    onChange={(e) => setNewTag(e.target.value)}
+                    placeholder="Enter tag"
+                  />
+                  <Button type="button" onClick={handleAddTag} size="sm">
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+
+                {formData.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {formData.tags.map((tag, index) => (
+                      <div key={index} className="flex items-center gap-1 bg-primary/10 text-primary px-2 py-1 rounded">
+                        <span className="text-sm">{tag}</span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleRemoveTag(index)}
+                          className="h-auto p-0 text-primary hover:text-primary/70"
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Specifications */}
+            <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-lg">
+              <CardHeader>
+                <CardTitle className="text-foreground">Specifications</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                  <Input
+                    value={specKey}
+                    onChange={(e) => setSpecKey(e.target.value)}
+                    placeholder="Specification name"
+                  />
+                  <Input
+                    value={specValue}
+                    onChange={(e) => setSpecValue(e.target.value)}
+                    placeholder="Specification value"
+                  />
+                  <Button type="button" onClick={handleAddSpecification} size="sm">
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+                
+                {Object.keys(formData.specifications).length > 0 && (
+                  <div className="space-y-2">
+                    <Label>Added Specifications:</Label>
+                    <div className="space-y-2">
+                      {Object.entries(formData.specifications).map(([key, value]) => (
+                        <div key={key} className="flex items-center gap-2">
+                          <span className="text-sm font-medium">{key}:</span>
+                          <span className="text-sm text-muted-foreground flex-1">{String(value)}</span>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleRemoveSpecification(key)}
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Image Upload */}
+            {/* Discount Information */}
             <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-lg">
               <CardHeader>
-                <CardTitle className="text-foreground">Product Image</CardTitle>
+                <CardTitle className="text-foreground">Discount Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="image">Image URL</Label>
+                  <Label htmlFor="discountPercentage">Discount Percentage (%)</Label>
                   <Input
-                    id="image"
-                    name="image"
-                    value={formData.image}
-                    onChange={handleInputChange}
-                    placeholder="https://example.com/image.jpg"
+                    id="discountPercentage"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    value={formData.discountInfo.percentage.toString()}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      discountInfo: {
+                        ...prev.discountInfo,
+                        percentage: parseFloat(e.target.value) || 0
+                      }
+                    }))}
+                    placeholder="0.00"
                   />
                 </div>
                 
-                {formData.image && (
+                <div className="space-y-2">
+                  <Label htmlFor="validUntil">Valid Until</Label>
+                  <Input
+                    id="validUntil"
+                    type="date"
+                    value={formData.discountInfo.validUntil}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      discountInfo: {
+                        ...prev.discountInfo,
+                        validUntil: e.target.value
+                      }
+                    }))}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="minimumPurchase">Minimum Purchase Quantity</Label>
+                  <Input
+                    id="minimumPurchase"
+                    type="number"
+                    min="1"
+                    value={formData.discountInfo.minimumPurchase.toString()}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      discountInfo: {
+                        ...prev.discountInfo,
+                        minimumPurchase: parseInt(e.target.value) || 1
+                      }
+                    }))}
+                    placeholder="1"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Shipping Information */}
+            <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-lg">
+              <CardHeader>
+                <CardTitle className="text-foreground">Shipping Information</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label>Preview</Label>
-                    <div className="border-2 border-dashed border-border rounded-lg p-4">
-                      <Image
-                        src={formData.image}
-                        alt="Product preview"
-                        width={400}
-                        height={192}
-                        className="w-full h-48 object-cover rounded-lg"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
+                  <Label htmlFor="weight">Weight (kg)</Label>
+                  <Input
+                    id="weight"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.shippingInfo.weight.toString()}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      shippingInfo: {
+                        ...prev.shippingInfo,
+                        weight: parseFloat(e.target.value) || 0
+                      }
+                    }))}
+                    placeholder="0.00"
                       />
                     </div>
+                
+                <div className="space-y-2">
+                  <Label>Dimensions (cm)</Label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <Input
+                      placeholder="Length"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={formData.shippingInfo.dimensions.length.toString()}
+                      onChange={(e) => setFormData(prev => ({
+                        ...prev,
+                        shippingInfo: {
+                          ...prev.shippingInfo,
+                          dimensions: {
+                            ...prev.shippingInfo.dimensions,
+                            length: parseFloat(e.target.value) || 0
+                          }
+                        }
+                      }))}
+                    />
+                    <Input
+                      placeholder="Width"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={formData.shippingInfo.dimensions.width.toString()}
+                      onChange={(e) => setFormData(prev => ({
+                        ...prev,
+                        shippingInfo: {
+                          ...prev.shippingInfo,
+                          dimensions: {
+                            ...prev.shippingInfo.dimensions,
+                            width: parseFloat(e.target.value) || 0
+                          }
+                        }
+                      }))}
+                    />
+                    <Input
+                      placeholder="Height"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={formData.shippingInfo.dimensions.height.toString()}
+                      onChange={(e) => setFormData(prev => ({
+                        ...prev,
+                        shippingInfo: {
+                          ...prev.shippingInfo,
+                          dimensions: {
+                            ...prev.shippingInfo.dimensions,
+                            height: parseFloat(e.target.value) || 0
+                          }
+                        }
+                      }))}
+                    />
                   </div>
-                )}
-
-                <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
-                  <Upload className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-                  <p className="text-sm text-muted-foreground">
-                    Drag and drop an image here, or click to browse
-                  </p>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="shippingCost">Shipping Cost</Label>
+                  <Input
+                    id="shippingCost"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.shippingInfo.shippingCost.toString()}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      shippingInfo: {
+                        ...prev.shippingInfo,
+                        shippingCost: parseFloat(e.target.value) || 0
+                      }
+                    }))}
+                    placeholder="0.00"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="estimatedDelivery">Estimated Delivery</Label>
+                  <Input
+                    id="estimatedDelivery"
+                    value={formData.shippingInfo.estimatedDelivery}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      shippingInfo: {
+                        ...prev.shippingInfo,
+                        estimatedDelivery: e.target.value
+                      }
+                    }))}
+                    placeholder="e.g., 3-5 days"
+                  />
                 </div>
               </CardContent>
             </Card>
@@ -378,8 +786,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
               <CardContent className="space-y-4">
                 <Button
                   type="submit"
-                  disabled={isLoading}
-                  className="w-full gradient-ev-green hover-glow"
+                  disabled={isLoading || !isFormValid()}
+                  className={`w-full gradient-ev-green hover-glow ${(isLoading || !isFormValid()) ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                 >
                   {isLoading ? (
                     <div className="flex items-center space-x-2">
