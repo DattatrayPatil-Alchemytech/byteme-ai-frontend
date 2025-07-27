@@ -107,12 +107,71 @@ export interface OrderItem {
 
 export interface Order {
   id: string;
+  user: {
+    id: string;
+    username: string;
+    email: string;
+    walletAddress: string | null;
+    walletType: string | null;
+    nonce: string | null;
+    emailOtp: string | null;
+    lastLogin: string | null;
+    isActive: boolean;
+    isVerified: boolean;
+    profileImageUrl: string | null;
+    totalMileage: string;
+    totalCarbonSaved: string;
+    totalPoints: number;
+    currentTier: string;
+    b3trBalance: string;
+    createdAt: string;
+    updatedAt: string;
+  };
   userId: string;
-  items: OrderItem[];
-  totalAmount: number;
-  status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
+  product: {
+    id: string;
+    name: string;
+    description: string;
+    category: string;
+    price: string;
+    originalPrice: string | null;
+    stockQuantity: number;
+    status: string;
+    imageUrl: string | null;
+    images: string[] | null;
+    specifications: Record<string, unknown> | null;
+    tags: string[] | null;
+    soldCount: number;
+    viewCount: number;
+    rating: string;
+    reviewCount: number;
+    discountInfo: Record<string, unknown> | null;
+    isEcoFriendly: boolean;
+    ecoDescription: string | null;
+    shippingInfo: Record<string, unknown> | null;
+    createdAt: string;
+    updatedAt: string;
+  };
+  productId: string;
+  quantity: number;
+  unitPrice: string;
+  totalPrice: string;
+  discountAmount: number | null;
+  status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'refunded';
+  paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
   shippingAddress?: ShippingAddress;
-  customerNotes?: string;
+  billingAddress?: ShippingAddress | null;
+  trackingNumber?: string | null;
+  trackingInfo?: Record<string, unknown> | null;
+  notes?: string | null;
+  customerNotes?: string | null;
+  metadata?: Record<string, unknown> | null;
+  cancelledAt?: string | null;
+  cancelledBy?: string | null;
+  cancellationReason?: string | null;
+  refundedAt?: string | null;
+  refundAmount?: number | null;
+  refundReason?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -215,18 +274,24 @@ export const getProductById = async (
 };
 
 // Get all orders
-export const getOrders = async (
+export const getAllOrders = async (
   page: number = 1,
-  limit: number = 10
+  limit: number = 20,
+  status?: Order['status']
 ): Promise<OrdersResponse> => {
   const params = new URLSearchParams({
     page: page.toString(),
     limit: limit.toString(),
   });
 
-  return apiGet<OrdersResponse>(`admin/store/orders?${params.toString()}`, {
+  if (status) {
+    params.append('status', status);
+  }
+
+  return apiGet<OrdersResponse>(`/admin/store/orders?${params.toString()}`, {
     requireAuth: true,
     showToast: false,
+    isAdmin: true,
   });
 };
 
@@ -237,6 +302,19 @@ export const getOrderById = async (
   return apiGet<OrderResponse>(`admin/store/orders/${orderId}`, {
     requireAuth: true,
     showToast: false,
+    isAdmin: true,
+  });
+};
+
+// Update order status (Admin)
+export const updateOrderStatus = async (
+  orderId: string,
+  status: Order['status']
+): Promise<{ message: string; order: Order }> => {
+  return apiPut<{ message: string; order: Order }>(`/admin/store/orders/${orderId}/status`, { status }, {
+    requireAuth: true,
+    showToast: false,
+    isAdmin: true,
   });
 };
 

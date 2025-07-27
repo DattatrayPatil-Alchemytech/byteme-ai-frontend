@@ -11,20 +11,16 @@ import {
   CheckCircle, 
   CreditCard, 
   Package, 
-  Truck, 
   Shield, 
   Leaf,
-  Wallet,
-  Clock,
   MapPin,
-  Phone,
-  Mail
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { createOrder, CreateOrderRequest, ShippingAddress } from "@/lib/apiHelpers/storeProducts";
 
 interface Product {
-  id: number;
+  id: string;
   name: string;
   description: string;
   category: string;
@@ -45,15 +41,12 @@ interface CheckoutPageProps {
 }
 
 interface ShippingInfo {
-  fullName: string;
-  email: string;
-  phone: string;
-  address: string;
+  street: string;
   city: string;
   state: string;
   zipCode: string;
   country: string;
-  specialInstructions: string;
+  customerNotes: string;
 }
 
 export default function CheckoutPage({ 
@@ -66,17 +59,15 @@ export default function CheckoutPage({
 }: CheckoutPageProps) {
   const router = useRouter();
   const [step, setStep] = useState<"shipping" | "review" | "processing" | "success">("shipping");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isProcessing, setIsProcessing] = useState(false);
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo>({
-    fullName: "",
-    email: "",
-    phone: "",
-    address: "",
+    street: "",
     city: "",
     state: "",
     zipCode: "",
-    country: "United States",
-    specialInstructions: "",
+    country: "USA",
+    customerNotes: "",
   });
 
   const subtotal = product.price * quantity;
@@ -97,9 +88,9 @@ export default function CheckoutPage({
   };
 
   const handleContinueToReview = () => {
-    // Basic validation
-    if (!shippingInfo.fullName || !shippingInfo.email || !shippingInfo.address) {
-      toast.error("Please fill in all required fields");
+    // Basic validation for required fields
+    if (!shippingInfo.street || !shippingInfo.city || !shippingInfo.state || !shippingInfo.zipCode) {
+      toast.error("Please fill in all required shipping address fields");
       return;
     }
     setStep("review");
@@ -110,18 +101,33 @@ export default function CheckoutPage({
     setStep("processing");
 
     try {
-      // Simulate API call for purchase processing
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      // Prepare shipping address for API
+      const shippingAddress: ShippingAddress = {
+        street: shippingInfo.street,
+        city: shippingInfo.city,
+        state: shippingInfo.state,
+        zipCode: shippingInfo.zipCode,
+        country: shippingInfo.country,
+      };
+
+      // Prepare order data according to API payload
+      const orderData: CreateOrderRequest = {
+        productId: product.id, // Use original product ID as string
+        quantity: quantity,
+        shippingAddress: shippingAddress,
+        customerNotes: shippingInfo.customerNotes || undefined,
+      };
+
+      // Call the actual API
+      const response = await createOrder(orderData);
       
-      // Generate order ID
-      const orderId = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      
-      // Simulate success
+      // Handle success
       setStep("success");
-      onPurchaseComplete(orderId);
+      onPurchaseComplete(response.order.id);
       
       toast.success("Purchase completed successfully!");
     } catch (error) {
+      console.error('Error creating order:', error);
       toast.error("Purchase failed. Please try again.");
       setStep("review");
     } finally {
@@ -133,10 +139,6 @@ export default function CheckoutPage({
     setStep("shipping");
   };
 
-  const handleViewOrder = (orderId: string) => {
-    // Navigate to order details or dashboard
-    router.push("/dashboard");
-  };
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
@@ -268,59 +270,13 @@ export default function CheckoutPage({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="fullName" className="text-foreground">Full Name *</Label>
-                    <Input
-                      id="fullName"
-                      name="fullName"
-                      value={shippingInfo.fullName}
-                      onChange={handleInputChange}
-                      placeholder="John Doe"
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="email" className="text-foreground">Email *</Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={shippingInfo.email}
-                      onChange={handleInputChange}
-                      placeholder="john@example.com"
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="phone" className="text-foreground">Phone</Label>
-                    <Input
-                      id="phone"
-                      name="phone"
-                      value={shippingInfo.phone}
-                      onChange={handleInputChange}
-                      placeholder="+1 (555) 123-4567"
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="country" className="text-foreground">Country</Label>
-                    <Input
-                      id="country"
-                      name="country"
-                      value={shippingInfo.country}
-                      onChange={handleInputChange}
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-                
+                {/* Shipping Address Fields - Required by API */}
                 <div>
-                  <Label htmlFor="address" className="text-foreground">Address *</Label>
+                  <Label htmlFor="street" className="text-foreground">Street Address *</Label>
                   <Input
-                    id="address"
-                    name="address"
-                    value={shippingInfo.address}
+                    id="street"
+                    name="street"
+                    value={shippingInfo.street}
                     onChange={handleInputChange}
                     placeholder="123 Main Street"
                     className="mt-1"
@@ -329,7 +285,7 @@ export default function CheckoutPage({
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <Label htmlFor="city" className="text-foreground">City</Label>
+                    <Label htmlFor="city" className="text-foreground">City *</Label>
                     <Input
                       id="city"
                       name="city"
@@ -340,7 +296,7 @@ export default function CheckoutPage({
                     />
                   </div>
                   <div>
-                    <Label htmlFor="state" className="text-foreground">State</Label>
+                    <Label htmlFor="state" className="text-foreground">State *</Label>
                     <Input
                       id="state"
                       name="state"
@@ -351,7 +307,7 @@ export default function CheckoutPage({
                     />
                   </div>
                   <div>
-                    <Label htmlFor="zipCode" className="text-foreground">ZIP Code</Label>
+                    <Label htmlFor="zipCode" className="text-foreground">ZIP Code *</Label>
                     <Input
                       id="zipCode"
                       name="zipCode"
@@ -364,11 +320,23 @@ export default function CheckoutPage({
                 </div>
 
                 <div>
-                  <Label htmlFor="specialInstructions" className="text-foreground">Special Instructions</Label>
+                  <Label htmlFor="country" className="text-foreground">Country</Label>
+                  <Input
+                    id="country"
+                    name="country"
+                    value={shippingInfo.country}
+                    onChange={handleInputChange}
+                    placeholder="USA"
+                    className="mt-1"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="customerNotes" className="text-foreground">Special Instructions</Label>
                   <Textarea
-                    id="specialInstructions"
-                    name="specialInstructions"
-                    value={shippingInfo.specialInstructions}
+                    id="customerNotes"
+                    name="customerNotes"
+                    value={shippingInfo.customerNotes}
                     onChange={handleInputChange}
                     placeholder="Any special delivery instructions..."
                     className="mt-1"
@@ -424,12 +392,15 @@ export default function CheckoutPage({
                     Shipping Address
                   </h4>
                   <div className="text-sm text-muted-foreground space-y-1">
-                    <p>{shippingInfo.fullName}</p>
-                    <p>{shippingInfo.address}</p>
+                    <p>{shippingInfo.street}</p>
                     <p>{shippingInfo.city}, {shippingInfo.state} {shippingInfo.zipCode}</p>
                     <p>{shippingInfo.country}</p>
-                    {shippingInfo.phone && <p>📞 {shippingInfo.phone}</p>}
-                    <p>📧 {shippingInfo.email}</p>
+                    {shippingInfo.customerNotes && (
+                      <div className="mt-2 pt-2 border-t border-border">
+                        <p className="font-medium">Special Instructions:</p>
+                        <p>{shippingInfo.customerNotes}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -571,21 +542,6 @@ export default function CheckoutPage({
               <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                 <Shield className="w-4 h-4" />
                 <span>Secure B3TR transaction</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Features Highlight */}
-          <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-lg">
-            <CardContent className="p-4">
-              <h4 className="font-semibold text-foreground mb-3">Product Features</h4>
-              <div className="space-y-2">
-                {product.features.map((feature, index) => (
-                  <div key={index} className="flex items-center space-x-2 text-sm">
-                    <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
-                    <span className="text-muted-foreground">{feature}</span>
-                  </div>
-                ))}
               </div>
             </CardContent>
           </Card>
