@@ -24,6 +24,7 @@ export default function AdminLayout({
   const sidebarItems = [
     { id: "overview", label: "Overview", icon: "📊", path: "/admin/dashboard" },
     { id: "users", label: "Users", icon: "👥", path: "/admin/users" },
+    { id: "badges", label: "Badges", icon: "🏅", path: "/admin/badges" },
     { id: "orders", label: "Orders", icon: "📦", path: "/admin/orders" },
     { id: "products", label: "Products", icon: "🛍️", path: "/admin/products" },
     {
@@ -58,6 +59,7 @@ export default function AdminLayout({
     if (pathname.startsWith("/admin/users")) return "users";
     if (pathname.startsWith("/admin/orders")) return "orders";
     if (pathname.startsWith("/admin/products")) return "products";
+    if (pathname.startsWith("/admin/badges")) return "badges";
     if (pathname.startsWith("/admin/challenges")) return "challenges";
     if (pathname.startsWith("/admin/rewards")) return "rewards";
     if (pathname.startsWith("/admin/settings")) return "settings";
