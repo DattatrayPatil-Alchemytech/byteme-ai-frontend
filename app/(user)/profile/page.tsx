@@ -17,6 +17,8 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import Modal from "@/components/modals/Modal";
+import { useDispatch } from "react-redux";
+import { openModal } from "@/redux/modalSlice";
 import {
   getUserVehicles,
   VehicleData,
@@ -97,6 +99,7 @@ export default function UserProfilePage() {
   const [userProfileLoading, setUserProfileLoading] = useState(true);
   const [userProfileError, setUserProfileError] = useState("");
   const router = useRouter();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     setUserProfileLoading(true);
@@ -477,6 +480,20 @@ export default function UserProfilePage() {
                 >
                   {formatTier(userProfile.currentTier)} Tier
                 </div>
+                <Button
+                  variant="default"
+                  className="gradient-ev-green hover-glow mt-4"
+                  onClick={() => 
+                    dispatch(
+                      openModal({
+                        modalType: "USER_MODAL",
+                        title: "Welcome! Complete Your Profile",
+                      })
+                    )
+                  }
+                >
+                  Update Profile
+                </Button>
               </>
             ) : null}
           </div>
