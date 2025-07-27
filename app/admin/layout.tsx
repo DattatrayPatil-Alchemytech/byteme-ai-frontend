@@ -91,7 +91,7 @@ export default function AdminLayout({
               </div>
 
               {/* Navigation */}
-              <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+              <nav className="flex-1 px-4 py-1 space-y-2 overflow-y-auto">
                 {sidebarItems.map((item) => (
                   <button
                     key={item.id}
@@ -109,26 +109,26 @@ export default function AdminLayout({
               </nav>
 
               {/* Footer - Always at bottom */}
-              <div className="p-6 border-t border-border/50 mt-auto bg-gradient-to-b from-background/50 to-background/80 backdrop-blur-sm">
+              <div className="p-3 border-t border-border/50 mt-auto bg-gradient-to-b from-background/50 to-background/80 backdrop-blur-sm">
                 {/* Admin Profile Card */}
-                <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 p-4 mb-4 border border-slate-200/50 dark:border-slate-700/50">
-                  <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-green-400/20 to-emerald-500/20 rounded-full -translate-y-8 translate-x-8"></div>
+                <div className="relative overflow-hidden rounded-md bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 p-2 mb-2 border border-slate-200/50 dark:border-slate-700/50">
+                  <div className="absolute top-0 right-0 w-12 h-12 bg-gradient-to-br from-green-400/20 to-emerald-500/20 rounded-full -translate-y-4 translate-x-4"></div>
                   <div className="relative flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-2">
                       <div className="relative">
-                        <div className="w-12 h-12 bg-gradient-to-br from-green-500 via-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg shadow-green-500/25">
-                          <span className="text-white text-lg font-bold">
+                        <div className="w-8 h-8 bg-gradient-to-br from-green-500 via-emerald-500 to-teal-500 rounded-md flex items-center justify-center shadow-lg shadow-green-500/25">
+                          <span className="text-white text-xs font-bold">
                             {admin?.username?.charAt(0).toUpperCase() || "A"}
                           </span>
                         </div>
-                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white dark:border-slate-900 rounded-full"></div>
+                        <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-green-500 border border-white dark:border-slate-900 rounded-full"></div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
+                        <p className="capitalize mx-2 text-xs font-semibold text-slate-900 dark:text-slate-100 truncate">
                           {admin?.username || "Admin"}
                         </p>
-                        <div className="flex items-center space-x-1 mt-1">
-                          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        <div className="flex items-center space-x-1">
+                          <div className="w-1 h-1 mt-1 bg-green-500 rounded-full animate-pulse"></div>
                           <p className="text-xs text-slate-600 dark:text-slate-400">
                             Online
                           </p>
@@ -136,7 +136,7 @@ export default function AdminLayout({
                       </div>
                     </div>
                     <div className="relative group">
-                      <ThemeToggle className="!border !border-gray-400 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all duration-200 group-hover:scale-105" />
+                      <ThemeToggle className="!border !border-gray-400 rounded-sm bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all duration-200 group-hover:scale-105" />
                     </div>
                   </div>
                 </div>
@@ -146,11 +146,11 @@ export default function AdminLayout({
                   <Button
                     onClick={handleLogout}
                     variant="outline"
-                    className="w-full h-12 bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-950/50 dark:to-pink-950/50 border-red-200 dark:border-red-800/50 text-red-700 dark:text-red-300 hover:from-red-100 hover:to-pink-100 dark:hover:from-red-900/50 dark:hover:to-pink-900/50 hover:border-red-300 dark:hover:border-red-700 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-red-500/25"
+                    className="w-full h-10 bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-950/50 dark:to-pink-950/50 border-red-200 dark:border-red-800/50 text-red-700 dark:text-red-300 hover:from-red-100 hover:to-pink-100 dark:hover:from-red-900/50 dark:hover:to-pink-900/50 hover:border-red-300 dark:hover:border-red-700 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-red-500/25"
                   >
                     <div className="flex items-center justify-center space-x-2">
                       <svg
-                        className="w-4 h-4"
+                        className="w-3.5 h-3.5"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -162,7 +162,7 @@ export default function AdminLayout({
                           d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                         />
                       </svg>
-                      <span className="font-medium">Sign Out</span>
+                      <span className="text-sm font-medium">Sign Out</span>
                     </div>
                   </Button>
                   <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-pink-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>

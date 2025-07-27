@@ -106,14 +106,14 @@ export default function AdminLoginPage() {
                 >
                   <Image
                     src="/favicon.png"
-                    height="50"
-                    width="50"
+                    height="30"
+                    width="30"
                     alt={"Byteme Ai"}
                   />
                 </motion.div>
                 <Link
                   href="/"
-                  className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent block"
+                  className="text-1xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent block"
                 >
                   ByteMe AI
                 </Link>

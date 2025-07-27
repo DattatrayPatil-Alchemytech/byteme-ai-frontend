@@ -10,7 +10,7 @@ export default function Footer() {
             ByteMe AI
           </Link>
           <p className="text-muted-foreground text-sm">
-            © 2024 ByteMe AI. All rights reserved.
+            © 2025 ByteMe AI. All rights reserved.
           </p>
         </div>
       </div>
