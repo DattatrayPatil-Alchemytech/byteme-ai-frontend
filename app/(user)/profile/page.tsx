@@ -490,7 +490,7 @@ export default function UserProfilePage() {
           {userProfile && (
             <Button
               variant="outline"
-              className="absolute top-6 right-6 rounded-full border border-primary text-primary bg-transparent hover:bg-primary hover:text-white hover:shadow-lg transition-all duration-300 px-4 py-2 font-medium text-sm"
+              className="absolute top-6 right-6 rounded-lg border border-primary text-primary bg-transparent hover:bg-primary hover:text-white hover:shadow-lg transition-all duration-300 p-2.5"
               onClick={() =>
                 dispatch(
                   openModal({
@@ -499,9 +499,9 @@ export default function UserProfilePage() {
                   })
                 )
               }
+              title="Update Profile"
             >
-              <Pencil className="w-3 h-3 mr-1" />
-              Update Profile
+              <Pencil className="w-4 h-4" />
             </Button>
           )}
           
