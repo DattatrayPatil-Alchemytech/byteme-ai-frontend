@@ -28,6 +28,9 @@ const ModalWrapper = dynamic(() => import("@/components/modals/ModalWrapper"), {
 function ProvidersInner({ children }: { children: React.ReactNode }) {
   const nodeURL =
     process.env.NEXT_PUBLIC_VECHAIN_NODE_URL || "https://testnet.vechain.org/";
+  const content =
+    process.env.NEXT_PUBLIC_CONNECTION_CERTIFICATE_CONTENT ||
+    "Sign this message to authenticate with Drive & Earn";
   return (
     <DAppKitProvider
       node={nodeURL}
@@ -38,8 +41,7 @@ function ProvidersInner({ children }: { children: React.ReactNode }) {
           purpose: "identification",
           payload: {
             type: "text",
-            content:
-              process.env.NEXT_PUBLIC_CONNECTION_CERTIFICATE_CONTENT || 'Sign this message to authenticate with Drive & Earn',
+            content: content,
           },
         },
       }}

@@ -1,18 +1,24 @@
 "use client";
 
+//Node Modules
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
+import { useWallet } from "@vechain/dapp-kit-react";
+
+//Components
 import { Bell } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { useWallet } from "@vechain/dapp-kit-react";
+import toast from "react-hot-toast";
+import WalletConnect from "@/components/auth/WalletConnect";
+
+//Redux
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/redux/userSlice";
-import { disconnectUser } from "@/lib/apiHelpers/user";
 import { RootState } from "@/redux/store";
-import toast from "react-hot-toast";
-import { Button } from "../components/button";
-import { openModal } from "@/redux/modalSlice";
+
+//Helpers
+import { disconnectUser } from "@/lib/apiHelpers/user";
 
 // Mock notifications (replace with real data or context as needed)
 const notifications = [
@@ -25,7 +31,9 @@ export default function Header() {
   const pathname = usePathname();
   const dispatch = useDispatch();
   const { disconnect } = useWallet();
-  const { user, isAuthenticated } = useSelector((state: RootState) => state.user);
+  const { user, isAuthenticated } = useSelector(
+    (state: RootState) => state.user
+  );
   const [userName, setUserName] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -137,7 +145,7 @@ export default function Header() {
                       />
                     </svg>
                   </Link>
-              )}
+                )}
 
                 {/* Notification Bell */}
                 <button
@@ -158,7 +166,9 @@ export default function Header() {
                     </div>
                     <ul className="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
                       {notifications.length === 0 ? (
-                        <li className="text-muted-foreground">No notifications</li>
+                        <li className="text-muted-foreground">
+                          No notifications
+                        </li>
                       ) : (
                         notifications.map((note) => (
                           <li
@@ -201,7 +211,7 @@ export default function Header() {
                   disabled={isLoggingOut}
                   className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   title={isLoggingOut ? "Logging out..." : "Logout"}
-                  >
+                >
                   {isLoggingOut ? (
                     <div className="w-6 h-6 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
                   ) : (
@@ -218,21 +228,12 @@ export default function Header() {
                         d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                       />
                     </svg>
-                    )}
+                  )}
                 </button>
               </>
             )}
             {!isAuthenticated && (
-              <Button
-                className="gradient-ev-green text-white"
-                onClick={() => {
-                  dispatch(
-                    openModal({ modalType: "LOGIN_MODAL", title: "Welcome" })
-                  );
-                }}
-              >
-                Sign in / Sign up
-              </Button>
+              <WalletConnect className="gradient-ev-green text-white" />
             )}
           </div>
         </div>
