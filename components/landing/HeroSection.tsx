@@ -1,17 +1,29 @@
 "use client";
 
+//Node Modules
 import { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
+import Link from "next/link";
+
+//Components
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import WalletConnect from "../auth/WalletConnect";
+
+//Redux
+import { useDispatch } from "react-redux";
+
+//Helpers
 import {
   useScrollAnimation,
   useScrollAnimationWithDelay,
 } from "@/lib/scroll-animation";
-import { openModal } from "@/redux/modalSlice";
-import { motion } from "framer-motion";
-import Link from "next/link";
-import { useDispatch } from "react-redux";
-import { DashboardStats, getDashboardStats } from "@/lib/apiHelpers/adminDashboard";
+
+//API Helpers
+import {
+  DashboardStats,
+  getDashboardStats,
+} from "@/lib/apiHelpers/adminDashboard";
 
 export default function HeroSection() {
   const { ref: titleRef, isVisible: titleVisible } = useScrollAnimation();
@@ -22,7 +34,7 @@ export default function HeroSection() {
   const { ref: statsRef, isVisible: statsVisible } =
     useScrollAnimationWithDelay(600);
   const dispatch = useDispatch();
-  
+
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [animatedValue, setAnimatedValue] = useState(0);
@@ -35,7 +47,7 @@ export default function HeroSection() {
         const data = await getDashboardStats();
         setStats(data);
       } catch (error) {
-        console.error('Failed to fetch public stats:', error);
+        console.error("Failed to fetch public stats:", error);
         setStats({
           totalUsers: 0,
           activeUsers: 0,
@@ -47,7 +59,7 @@ export default function HeroSection() {
           totalUploads: 0,
           pendingUploads: 0,
           totalOrders: 0,
-          pendingOrders: 0
+          pendingOrders: 0,
         });
       } finally {
         setIsLoading(false);
@@ -63,9 +75,9 @@ export default function HeroSection() {
 
   const formatNumber = (num: number): string => {
     if (num >= 1000000) {
-      return (num / 1000000).toFixed(1) + 'M';
+      return (num / 1000000).toFixed(1) + "M";
     } else if (num >= 1000) {
-      return (num / 1000).toFixed(1) + 'K';
+      return (num / 1000).toFixed(1) + "K";
     }
     return num.toString();
   };
@@ -82,10 +94,12 @@ export default function HeroSection() {
     const updateCount = (currentTime: number) => {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      
+
       const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-      const currentValue = Math.floor(startValue + (targetValue - startValue) * easeOutQuart);
-      
+      const currentValue = Math.floor(
+        startValue + (targetValue - startValue) * easeOutQuart
+      );
+
       setAnimatedValue(currentValue);
 
       if (progress < 1) {
@@ -175,18 +189,11 @@ export default function HeroSection() {
               Start Earning Today
             </Button>
           </Link>
-          <motion.button
-            className="px-8 py-4 bg-card/20 backdrop-blur-sm rounded-full text-foreground font-semibold hover:bg-card/30 transition-all duration-300 border border-success/20"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => {
-              dispatch(
-                openModal({ modalType: "LOGIN_MODAL", title: "Welcome" })
-              );
-            }}
-          >
-            Sign in / Sign up
-          </motion.button>
+
+          {/* Connect Wallet - Mobile Only with Different Theme-Aware Styling */}
+          <div className="sm:hidden">
+            <WalletConnect className="px-8 py-4 bg-card/20 backdrop-blur-sm rounded-full text-foreground font-semibold hover:bg-card/30 transition-all duration-300 border border-success/20" />
+          </div>
         </motion.div>
 
         {/* Enhanced Live Contract Stats with Odometer Display */}
@@ -215,7 +222,9 @@ export default function HeroSection() {
                         key={index}
                         className="w-12 h-16 bg-black rounded-md flex items-center justify-center animate-pulse"
                       >
-                        <span className="text-2xl font-mono text-gray-400">0</span>
+                        <span className="text-2xl font-mono text-gray-400">
+                          0
+                        </span>
                       </div>
                     ))}
                   </div>

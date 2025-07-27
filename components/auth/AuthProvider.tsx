@@ -78,10 +78,10 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     }
 
     // Optional: Redirect authenticated users from landing page to dashboard
-    if (isAuthenticated && isPublicRoute && pathname === "/") {
-      router.push("/dashboard");
-      return;
-    }
+    // if (isAuthenticated && isPublicRoute && pathname === "/") {
+    //   router.push("/dashboard");
+    //   return;
+    // }
 
     // Mark auth check as complete
     setIsAuthDone(true);
