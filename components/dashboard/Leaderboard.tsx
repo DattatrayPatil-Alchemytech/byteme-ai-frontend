@@ -173,8 +173,8 @@ const Leaderboard: React.FC = () => {
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Leaderboard */}
-        <Card className="bg-card/50 border-border/50 backdrop-blur-sm dark:bg-slate-800/50 dark:border-slate-700/50">
+        {/* Leaderboard - First on desktop, second on mobile/tablet */}
+        <Card className="bg-card/50 border-border/50 backdrop-blur-sm dark:bg-slate-800/50 dark:border-slate-700/50 order-2 lg:order-1">
           <CardHeader className="border-b border-border/30 dark:border-slate-700/30">
             <CardTitle className="text-foreground dark:text-white flex items-center text-xl">
               <span className="text-2xl mr-3">📈</span>
@@ -262,8 +262,8 @@ const Leaderboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Challenges */}
-        <Card className="bg-card/50 border-border/50 backdrop-blur-sm dark:bg-slate-800/50 dark:border-slate-700/50">
+        {/* Challenges - Second on desktop, first on mobile/tablet */}
+        <Card className="bg-card/50 border-border/50 backdrop-blur-sm dark:bg-slate-800/50 dark:border-slate-700/50 order-1 lg:order-2">
           <CardHeader className="border-b border-border/30 dark:border-slate-700/30">
             <CardTitle className="text-foreground dark:text-white flex items-center text-xl">
               <span className="text-2xl mr-3">🎯</span>
