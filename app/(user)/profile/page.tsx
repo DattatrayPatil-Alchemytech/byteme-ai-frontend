@@ -19,6 +19,8 @@ import { Select } from "@/components/ui/select";
 import Modal from "@/components/modals/Modal";
 import { useDispatch } from "react-redux";
 import { openModal } from "@/redux/modalSlice";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 import {
   getUserVehicles,
   VehicleData,
@@ -100,6 +102,7 @@ export default function UserProfilePage() {
   const [userProfileError, setUserProfileError] = useState("");
   const router = useRouter();
   const dispatch = useDispatch();
+  const { modalType, isOpen } = useSelector((state: RootState) => state.modal);
 
   useEffect(() => {
     setUserProfileLoading(true);
@@ -131,6 +134,31 @@ export default function UserProfilePage() {
         setVehiclesLoading(false);
       });
   }, []);
+
+  // Listen for modal state changes to refresh profile data
+  useEffect(() => {
+    // If USER_MODAL was open and is now closed, refresh the profile data
+    if (!isOpen && modalType === null) {
+      // Small delay to ensure the modal has fully closed and any updates are processed
+      const timer = setTimeout(() => {
+        setUserProfileLoading(true);
+        getUserProfile()
+          .then((data) => {
+            setUserProfile(data as unknown as UserProfile);
+            setUserProfileError("");
+          })
+          .catch((err: Error) => {
+            setUserProfileError(err?.message || "Failed to load profile");
+            setUserProfile(null);
+          })
+          .finally(() => {
+            setUserProfileLoading(false);
+          });
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, modalType]);
 
   const handleEdit = (row: Vehicle) => {
     setEditId(row.id);

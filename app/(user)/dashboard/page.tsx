@@ -47,6 +47,8 @@ export default function DashboardPage() {
     { id: "orders", label: "Orders", icon: "🛒" },
   ];
 
+  console.log("user -----", user);
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Welcome Message */}
