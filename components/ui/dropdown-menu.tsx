@@ -43,6 +43,7 @@ const DropdownMenu = React.forwardRef<HTMLDivElement, DropdownMenuProps>(
 DropdownMenu.displayName = "DropdownMenu"
 
 const DropdownMenuTrigger = React.forwardRef<HTMLButtonElement, DropdownMenuTriggerProps>(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ({ children, className, asChild = false, ...props }, ref) => {
     return (
       <button

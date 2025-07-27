@@ -3,12 +3,11 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Package, Clock, CheckCircle, XCircle, Truck, MapPin } from 'lucide-react';
+import { Package } from 'lucide-react';
 import { RootState } from '@/redux/store';
 import { AppDispatch } from '@/redux/store';
-import { getOrders, Order } from '@/lib/apiHelpers/storeProducts';
+import { getOrders } from '@/lib/apiHelpers/storeProducts';
 import toast from 'react-hot-toast';
 import { setOrders, setOrdersError, setOrdersLoading } from '@/redux/ordersSlice';
 
@@ -42,37 +41,37 @@ export default function UserOrders() {
   // Pagination logic
   const totalPages = Math.ceil(ordersTotal / currentLimit);
 
-  // Get status icon and color
-  const getStatusInfo = (status: Order['status']) => {
-    switch (status) {
-      case 'pending':
-        return { icon: <Clock className="w-4 h-4" />, color: 'warning', label: 'Pending' };
-      case 'confirmed':
-        return { icon: <CheckCircle className="w-4 h-4" />, color: 'success', label: 'Confirmed' };
-      case 'shipped':
-        return { icon: <Truck className="w-4 h-4" />, color: 'info', label: 'Shipped' };
-      case 'delivered':
-        return { icon: <CheckCircle className="w-4 h-4" />, color: 'success', label: 'Delivered' };
-      case 'cancelled':
-        return { icon: <XCircle className="w-4 h-4" />, color: 'destructive', label: 'Cancelled' };
-      default:
-        return { icon: <Clock className="w-4 h-4" />, color: 'secondary', label: status };
-    }
-  };
+  // Get status icon and color - removed unused functions
+  // const getStatusInfo = (status: Order['status']) => {
+  //   switch (status) {
+  //     case 'pending':
+  //       return { icon: <Clock className="w-4 h-4" />, color: 'warning', label: 'Pending' };
+  //     case 'confirmed':
+  //       return { icon: <CheckCircle className="w-4 h-4" />, color: 'success', label: 'Confirmed' };
+  //     case 'shipped':
+  //       return { icon: <Truck className="w-4 h-4" />, color: 'info', label: 'Shipped' };
+  //     case 'delivered':
+  //       return { icon: <CheckCircle className="w-4 h-4" />, color: 'success', label: 'Delivered' };
+  //     case 'cancelled':
+  //       return { icon: <XCircle className="w-4 h-4" />, color: 'destructive', label: 'Cancelled' };
+  //     default:
+  //       return { icon: <Clock className="w-4 h-4" />, color: 'secondary', label: status };
+  //   }
+  // };
 
-  // Get payment status color
-  const getPaymentStatusColor = (paymentStatus: string) => {
-    switch (paymentStatus) {
-      case 'paid':
-        return 'success';
-      case 'pending':
-        return 'warning';
-      case 'failed':
-        return 'destructive';
-      default:
-        return 'secondary';
-    }
-  };
+  // Get payment status color - removed unused function
+  // const getPaymentStatusColor = (paymentStatus: string) => {
+  //   switch (paymentStatus) {
+  //     case 'paid':
+  //       return 'success';
+  //     case 'pending':
+  //       return 'warning';
+  //     case 'failed':
+  //       return 'destructive';
+  //     default:
+  //       return 'secondary';
+  //   }
+  // };
 
   if (ordersLoading) {
     return (

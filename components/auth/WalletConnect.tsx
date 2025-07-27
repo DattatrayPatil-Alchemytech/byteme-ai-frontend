@@ -93,6 +93,7 @@ export function WalletConnect({
   // Handle wallet connection and login
   useEffect(() => {
     handleLogin();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [certificate]);
 
   const handleCB = () => {

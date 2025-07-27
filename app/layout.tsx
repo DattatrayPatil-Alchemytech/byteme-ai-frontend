@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "./providers";
-import { Toaster } from "react-hot-toast";
+// import { Toaster } from "react-hot-toast"; // Removed unused import
 
 export const metadata: Metadata = {
   title: "ByteMe AI",

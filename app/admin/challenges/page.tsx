@@ -90,6 +90,7 @@ export default function ChallengesPage() {
   // Fetch challenges when non-search filters or pagination change
   useEffect(() => {
     fetchChallenges();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     filters.type,
     filters.status,
@@ -109,20 +110,21 @@ export default function ChallengesPage() {
     }, 500);
 
     return () => clearTimeout(timeoutId);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters.search]);
 
-  const handleEdit = (challenge: Record<string, unknown>) => {
-    router.push(`/admin/challenges/edit/${challenge.id as number}`);
+  const handleEdit = (challenge: Challenge) => {
+    router.push(`/admin/challenges/edit/${challenge.id}`);
   };
 
-  const handleView = (challenge: Record<string, unknown>) => {
-    router.push(`/admin/challenges/view/${challenge.id as number}`);
+  const handleView = (challenge: Challenge) => {
+    router.push(`/admin/challenges/view/${challenge.id}`);
   };
 
-  const handleDelete = async (challenge: Record<string, unknown>) => {
+  const handleDelete = async (challenge: Challenge) => {
     if (confirm("Are you sure you want to delete this challenge?")) {
       try {
-        await deleteChallenge(challenge.id as number);
+        await deleteChallenge(challenge.id);
         alert("Challenge deleted successfully!");
         // Refetch challenges to update the list
         fetchChallenges();
@@ -133,10 +135,10 @@ export default function ChallengesPage() {
     }
   };
 
-  const handlePublish = async (challenge: Record<string, unknown>) => {
+  const handlePublish = async (challenge: Challenge) => {
     if (confirm("Are you sure you want to publish this challenge?")) {
       try {
-        await publishChallenge(challenge.id as number);
+        await publishChallenge(challenge.id);
         alert("Challenge published successfully!");
         // Refetch challenges to update the list with current filters and pagination
         fetchChallenges();
@@ -236,30 +238,33 @@ export default function ChallengesPage() {
     {
       key: "name",
       label: "Challenge",
-      render: (value, row) => (
-        <div>
-          <div className="flex items-center space-x-2">
-            <span className="text-lg">{getTypeIcon(row.type as string)}</span>
-            <div className="font-medium text-foreground">{value as string}</div>
-            {row.metadata && (row.metadata as any).featured && (
-              <Badge variant="secondary" className="text-xs">
-                Featured
+      render: (value, row) => {
+        const challenge = row as unknown as Challenge;
+        return (
+          <div>
+            <div className="flex items-center space-x-2">
+              <span className="text-lg">{getTypeIcon(challenge.type)}</span>
+              <div className="font-medium text-foreground">{value as string}</div>
+              {challenge.metadata && challenge.metadata.featured && (
+                <Badge variant="secondary" className="text-xs">
+                  Featured
+                </Badge>
+              )}
+            </div>
+            <div className="text-sm text-muted-foreground truncate max-w-xs">
+              {challenge.description}
+            </div>
+            <div className="flex items-center space-x-2 mt-1">
+              <Badge className={getDifficultyColor(challenge.difficulty)}>
+                {challenge.difficulty}
               </Badge>
-            )}
+              <Badge variant="outline" className="text-xs">
+                {challenge.type}
+              </Badge>
+            </div>
           </div>
-          <div className="text-sm text-muted-foreground truncate max-w-xs">
-            {row.description as string}
-          </div>
-          <div className="flex items-center space-x-2 mt-1">
-            <Badge className={getDifficultyColor(row.difficulty as string)}>
-              {row.difficulty as string}
-            </Badge>
-            <Badge variant="outline" className="text-xs">
-              {row.type as string}
-            </Badge>
-          </div>
-        </div>
-      ),
+        );
+      },
     },
     {
       key: "rewards",
@@ -288,8 +293,9 @@ export default function ChallengesPage() {
       key: "participants",
       label: "Participants",
       render: (value, row) => {
-        const current = row.currentParticipants as number;
-        const max = row.maxParticipants as number;
+        const challenge = row as unknown as Challenge;
+        const current = challenge.currentParticipants;
+        const max = challenge.maxParticipants;
         const percentage = (current / max) * 100;
         return (
           <div className="text-sm">
@@ -313,12 +319,13 @@ export default function ChallengesPage() {
       key: "dates",
       label: "Duration",
       render: (value, row) => {
-        const startDate = new Date(row.startDate as string);
-        const endDate = new Date(row.endDate as string);
+        const challenge = row as unknown as Challenge;
+        const startDate = new Date(challenge.startDate);
+        const endDate = new Date(challenge.endDate);
         const now = new Date();
         const isActive = now >= startDate && now <= endDate;
         const isUpcoming = now < startDate;
-        const isExpired = now > endDate;
+        // const isExpired = now > endDate; // Removed unused variable
 
         return (
           <div className="text-sm">
@@ -401,69 +408,72 @@ export default function ChallengesPage() {
     {
       key: "actions",
       label: "Actions",
-      render: (value, row) => (
-        <div className="flex items-center space-x-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleView(row)}
-            className="h-6 w-6 sm:h-8 sm:w-8 p-0"
-          >
-            <Eye className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleEdit(row)}
-            className="h-6 w-6 sm:h-8 sm:w-8 p-0"
-          >
-            <Edit className="h-4 w-4" />
-          </Button>
-          {row.status === "draft" && (
+      render: (value, row) => {
+        const challenge = row as unknown as Challenge;
+        return (
+          <div className="flex items-center space-x-1">
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => handlePublish(row)}
-              className="h-6 w-6 sm:h-8 sm:w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
+              onClick={() => handleView(challenge)}
+              className="h-6 w-6 sm:h-8 sm:w-8 p-0"
             >
-              <Send className="h-4 w-4" />
+              <Eye className="h-4 w-4" />
             </Button>
-          )}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleDelete(row)}
-            className="h-6 w-6 sm:h-8 sm:w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-      ),
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleEdit(challenge)}
+              className="h-6 w-6 sm:h-8 sm:w-8 p-0"
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+            {challenge.status === "draft" && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handlePublish(challenge)}
+                className="h-6 w-6 sm:h-8 sm:w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleDelete(challenge)}
+              className="h-6 w-6 sm:h-8 sm:w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        );
+      },
     },
   ];
 
-  // Define actions for the DataTable
-  const actions: Action[] = [
-    {
-      label: "View",
-      icon: <Eye className="h-4 w-4" />,
-      onClick: handleView,
-      variant: "ghost",
-    },
-    {
-      label: "Edit",
-      icon: <Edit className="h-4 w-4" />,
-      onClick: handleEdit,
-      variant: "ghost",
-    },
-    {
-      label: "Delete",
-      icon: <Trash2 className="h-4 w-4" />,
-      onClick: handleDelete,
-      variant: "ghost",
-      className: "text-red-600 hover:text-red-700 hover:bg-red-50",
-    },
-  ];
+  // Define actions for the DataTable - removed unused variable
+  // const actions: Action[] = [
+  //   {
+  //     label: "View",
+  //     icon: <Eye className="h-4 w-4" />,
+  //     onClick: (row: Record<string, unknown>) => handleView(row as unknown as Challenge),
+  //     variant: "ghost",
+  //   },
+  //   {
+  //     label: "Edit",
+  //     icon: <Edit className="h-4 w-4" />,
+  //     onClick: (row: Record<string, unknown>) => handleEdit(row as unknown as Challenge),
+  //     variant: "ghost",
+  //   },
+  //   {
+  //     label: "Delete",
+  //     icon: <Trash2 className="h-4 w-4" />,
+  //     onClick: (row: Record<string, unknown>) => handleDelete(row as unknown as Challenge),
+  //     variant: "ghost",
+  //     className: "text-red-600 hover:text-red-700 hover:bg-red-50",
+  //   },
+  // ];
 
   return (
     <div className="space-y-4 lg:space-y-6">
@@ -871,7 +881,7 @@ export default function ChallengesPage() {
                     size="sm"
                     variant="outline"
                     className="flex-1"
-                    onClick={() => handleView({ id: challenge.id })}
+                    onClick={() => handleView(challenge)}
                   >
                     <Eye className="w-3 h-3 mr-1" />
                     View
@@ -880,7 +890,7 @@ export default function ChallengesPage() {
                     size="sm"
                     variant="outline"
                     className="flex-1"
-                    onClick={() => handleEdit({ id: challenge.id })}
+                    onClick={() => handleEdit(challenge)}
                   >
                     <Edit className="w-3 h-3 mr-1" />
                     Edit
@@ -889,7 +899,7 @@ export default function ChallengesPage() {
                     size="sm"
                     variant="outline"
                     className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                    onClick={() => handleDelete({ id: challenge.id })}
+                    onClick={() => handleDelete(challenge)}
                   >
                     <Trash2 className="w-3 h-3" />
                   </Button>
