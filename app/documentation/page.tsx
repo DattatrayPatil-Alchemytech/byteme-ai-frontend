@@ -2,10 +2,8 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { motion } from "framer-motion";
 import Link from "next/link";
-import { Upload, Wallet, Trophy, Leaf, Users, BarChart3, Shield, Zap, Globe } from "lucide-react";
+import { Upload, Wallet, Trophy, Leaf, Shield } from "lucide-react";
 
 export default function DocumentationPage() {
   
