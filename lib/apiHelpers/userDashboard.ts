@@ -96,6 +96,23 @@ export interface VehicleHistoryResponse {
   limit: number;
 }
 
+// Notification interfaces
+export interface Notification {
+  id: string;
+  message: string;
+  timestamp: string;
+  type?: string;
+  category?: string;
+  data?: Record<string, unknown>;
+}
+
+export interface NotificationResponse {
+  notifications: Notification[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 // Function to get user vehicles for dashboard
 export const getDashboardData = (): Promise<DashboardData> => {
   return apiGet<DashboardData>(`/user/dashboard`, {
@@ -113,6 +130,27 @@ export const getWeeklyLeaderboard = async (): Promise<LeaderboardResponse> => {
   });
 };
 
+// Get notifications with pagination
+export const getNotifications = (
+  page: number = 1,
+  limit: number = 20,
+  unreadOnly: boolean = false
+): Promise<NotificationResponse> => {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString(),
+  });
+
+  if (unreadOnly) {
+    params.append("unread", "true");
+  }
+
+  return apiGet<NotificationResponse>(`/notifications?${params.toString()}`, {
+    requireAuth: true,
+    showToast: false,
+  });
+};
+
 // Get vehicle history with pagination
 export const getVehicleHistory = (
   page: number = 1,
@@ -124,15 +162,15 @@ export const getVehicleHistory = (
     page: page.toString(),
     limit: limit.toString(),
   });
-  
+
   if (search && search.trim()) {
-    params.append('search', search.trim());
+    params.append("search", search.trim());
   }
-  
+
   if (type && type.trim()) {
-    params.append('type', type.trim());
+    params.append("type", type.trim());
   }
-  
+
   return apiGet<VehicleHistoryResponse>(`/history?${params.toString()}`, {
     requireAuth: true,
     showToast: false,
