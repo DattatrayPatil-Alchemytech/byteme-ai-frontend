@@ -59,7 +59,7 @@ export default function NotificationBell({
         aria-label="Show notifications"
         disabled={loading}
       >
-        <Bell className="w-6 h-6 text-primary" />
+        <Bell className="w-6 h-6 text-muted-foreground hover:text-foreground transition-colors" />
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
