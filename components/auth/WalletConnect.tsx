@@ -1,10 +1,9 @@
 import { useWallet, useWalletModal } from "@vechain/dapp-kit-react";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 
 //components
 import { Button } from "../ui/button";
-import { Copy, Wallet } from "lucide-react";
 import toast from "react-hot-toast";
 
 //redux
@@ -22,17 +21,24 @@ import { RootState } from "@/redux/store";
 interface WalletConnectProps {
   title?: string;
   disabled?: boolean;
+  cbTitle?: string;
+  cb?: () => void;
+  className?: string;
 }
 
 export function WalletConnect({
-  title = "Get Started",
+  title = "Connect Wallet",
   disabled = false,
+  cbTitle = "Go To Dashboard",
+  cb,
+  className = "",
 }: WalletConnectProps) {
   const { account, connectionCertificate: certificate } = useWallet();
   const { open } = useWalletModal();
   const router = useRouter();
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user);
+  const { disconnect } = useWallet();
 
   const handleLogin = async () => {
     if (certificate && account && !user.isAuthenticated) {
@@ -65,7 +71,9 @@ export function WalletConnect({
             );
           }, 300);
         }
+        //close if any modal
         dispatch(closeModal());
+        router.push("/dashboard");
       } catch (error) {
         console.error("Login failed:", error);
 
@@ -73,6 +81,7 @@ export function WalletConnect({
         dispatch(
           loginFailure(error instanceof Error ? error.message : "Login failed")
         );
+        disconnect();
 
         // Toast error is already handled by the API middleware
         // but we can add a custom message here if needed
@@ -86,46 +95,40 @@ export function WalletConnect({
     handleLogin();
   }, [certificate]);
 
-  const handleCopyAddress = () => {
-    navigator.clipboard.writeText(account || "");
-    toast.success("Wallet address copied to clipboard!");
+  const handleCB = () => {
+    if (cb) {
+      cb();
+    } else {
+      router.push("/dashboard");
+    }
   };
 
-  const formatAddress = (address: string) => {
-    return `${address.slice(0, 10)}...${address.slice(-8)}`;
-  };
-
-  return account ? (
-    <div className="w-full flex gap-2">
+  if (account && user.isAuthenticated) {
+    return (
       <Button
-        variant="outline"
-        disabled={disabled}
-        className="flex-1 justify-start bg-background border-2 border-primary/30 hover:border-primary/50 hover:bg-accent/50 text-foreground transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+        onClick={handleCB}
+        size="lg"
+        className={
+          className ||
+          `w-full gradient-ev-green hover-glow text-white font-semibold px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed`
+        }
       >
-        <Wallet className="h-4 w-4 mr-2 text-primary" />
-        <span className="font-mono text-sm font-medium">
-          {formatAddress(account)}
-        </span>
+        {cbTitle}
       </Button>
+    );
+  }
 
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={handleCopyAddress}
-        disabled={disabled}
-        className="px-3 border border-border hover:bg-primary/10 hover:border-primary/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        <Copy className="h-4 w-4 text-primary" />
-      </Button>
-    </div>
-  ) : (
+  return (
     <Button
       onClick={open}
       disabled={user.isLoading || disabled}
       size="lg"
-      className="w-full gradient-ev-green hover-glow text-white font-semibold px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+      className={
+        className ||
+        "w-full gradient-ev-green hover-glow text-white font-semibold px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+      }
     >
-      {user.isLoading || disabled ? (
+      {user.isLoading || disabled || (account && !user.isAuthenticated) ? (
         <>
           <span className="inline-block animate-spin mr-2">⏳</span>
           Connecting...
