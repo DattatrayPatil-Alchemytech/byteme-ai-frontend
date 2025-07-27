@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { getBadgeDetails, updateBadge, type AdminBadge, type UpdateBadgeRequest } from '@/lib/apiHelpers/adminBadges';
 import { toast } from 'react-hot-toast';
+import { ArrowLeft } from 'lucide-react';
 
 export default function EditBadgePage() {
   const router = useRouter();
@@ -39,7 +40,6 @@ export default function EditBadgePage() {
       difficulty: 1,
       estimatedTime: '',
     },
-    notes: '',
   });
 
   const [newTag, setNewTag] = useState('');
@@ -51,6 +51,11 @@ export default function EditBadgePage() {
       const badgeData = await getBadgeDetails(badgeId);
       setBadge(badgeData);
       
+      // Parse metadata if it's a string
+      const metadata = typeof badgeData.metadata === 'string' 
+        ? JSON.parse(badgeData.metadata) 
+        : badgeData.metadata;
+
       // Populate form data
       setFormData({
         name: badgeData.name,
@@ -62,8 +67,7 @@ export default function EditBadgePage() {
         conditions: badgeData.conditions,
         rewards: badgeData.rewards,
         pointsValue: badgeData.pointsValue,
-        metadata: badgeData.metadata,
-        notes: badgeData.notes || '',
+        metadata: metadata,
       });
     } catch (error) {
       console.error('Error fetching badge details:', error);
@@ -181,11 +185,21 @@ export default function EditBadgePage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Edit Badge</h1>
-          <p className="text-muted-foreground mt-2">
-            Update badge information
-          </p>
+        <div className="flex items-center space-x-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => router.push('/admin/badges')}
+            className="flex items-center space-x-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Edit Badge</h1>
+            <p className="text-muted-foreground mt-2">
+              Update badge information
+            </p>
+          </div>
         </div>
         <Button
           variant="outline"

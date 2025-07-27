@@ -18,7 +18,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const sidebarItems = [
     { id: 'overview', label: 'Overview', icon: '📊', path: '/admin/dashboard' },
     { id: 'users', label: 'Users', icon: '👥', path: '/admin/users' },
-    // { id: 'badges', label: 'Badges', icon: '🏅', path: '/admin/badges' },
+    { id: 'badges', label: 'Badges', icon: '🏅', path: '/admin/badges' },
     { id: 'orders', label: 'Orders', icon: '📦', path: '/admin/orders' },
     { id: 'products', label: 'Products', icon: '🛍️', path: '/admin/products' },
     { id: 'rewards', label: 'Rewards', icon: '🏆', path: '/admin/rewards' },
@@ -44,7 +44,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const getActiveTab = () => {
     if (pathname === '/admin' || pathname === '/admin/dashboard') return 'overview';
     if (pathname.startsWith('/admin/users')) return 'users';
-    // if (pathname.startsWith('/admin/badges')) return 'badges';
+    if (pathname.startsWith('/admin/badges')) return 'badges';
     if (pathname.startsWith('/admin/orders')) return 'orders';
     if (pathname.startsWith('/admin/products')) return 'products';
     if (pathname.startsWith('/admin/rewards')) return 'rewards';
@@ -116,10 +116,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                       </div>
                     </div>
                     <div className="relative group">
-                      <button className="!border !border-gray-400 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all duration-200 group-hover:scale-105">
-                        <ThemeToggle />
-                      </button>
-                     
+                      <ThemeToggle className="!border !border-gray-400 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all duration-200 group-hover:scale-105" />
                     </div>
                   </div>
                 </div>
@@ -172,7 +169,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 Admin Dashboard
               </h1>
               <div className="flex items-center space-x-2">
-                <ThemeToggle />
+                <ThemeToggle className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50" />
                 <button
                   onClick={handleLogout}
                   className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50"

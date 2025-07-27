@@ -5,25 +5,37 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { DataTable } from '@/components/ui/DataTable';
 import { TableSkeleton } from '@/components/ui/TableSkeleton';
-import { getBadgesList, toggleBadgeStatus, publishBadge, type AdminBadge, type BadgesListResponse } from '@/lib/apiHelpers/adminBadges';
+import { getBadgesList, publishBadge, deleteBadge, type AdminBadge, type BadgesListResponse } from '@/lib/apiHelpers/adminBadges';
 import { toast } from 'react-hot-toast';
-import Image from 'next/image';
+import { Edit, Trash2, Globe } from 'lucide-react';
+import { DeleteConfirmationModal } from '@/components/ui/DeleteConfirmationModal';
 
 export default function AdminBadgesPage() {
   const router = useRouter();
+  const [search, setSearch] = useState("");
   const [badges, setBadges] = useState<AdminBadge[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
   const [totalBadges, setTotalBadges] = useState(0);
+  const [limit, setLimit] = useState(10);
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean;
+    badgeId: string | null;
+    badgeName: string;
+  }>({
+    isOpen: false,
+    badgeId: null,
+    badgeName: '',
+  });
 
   // Fetch badges data
   const fetchBadges = async () => {
     try {
       setIsLoading(true);
-      const response: BadgesListResponse = await getBadgesList(1, 1000); // Get all badges for client-side filtering
+      const response: BadgesListResponse = await getBadgesList(currentPage, limit, search);
       setBadges(response.badges);
       setTotalBadges(response.total);
     } catch (error) {
@@ -37,19 +49,53 @@ export default function AdminBadgesPage() {
     }
   };
 
-  // Handle status toggle
-  const handleToggleStatus = async (badgeId: string) => {
+  // Handle delete badge
+  const handleDeleteBadge = async (badgeId: string) => {
     try {
       setIsUpdating(badgeId);
-      await toggleBadgeStatus(badgeId);
-      toast.success('Badge status updated successfully');
+      await deleteBadge(badgeId);
+      toast.success('Badge deleted successfully');
       // Refresh the data
       fetchBadges();
     } catch (error) {
-      console.error('Error toggling badge status:', error);
-      toast.error('Failed to update badge status');
+      console.error('Error deleting badge:', error);
+      toast.error('Failed to delete badge');
     } finally {
       setIsUpdating(null);
+    }
+  };
+
+  // Open delete modal
+  const openDeleteModal = (badgeId: string, badgeName: string) => {
+    setDeleteModal({
+      isOpen: true,
+      badgeId,
+      badgeName,
+    });
+  };
+
+  // Close delete modal
+  const closeDeleteModal = () => {
+    setDeleteModal({
+      isOpen: false,
+      badgeId: null,
+      badgeName: '',
+    });
+  };
+
+  // Parse metadata - handles both JSON string and object
+  const parseMetadata = (metadata: string | object) => {
+    try {
+      if (typeof metadata === 'string') {
+        return JSON.parse(metadata);
+      } else if (typeof metadata === 'object' && metadata !== null) {
+        return metadata;
+      } else {
+        return { category: 'Unknown', tags: [], difficulty: 0 };
+      }
+    } catch (error) {
+      console.error('Error parsing metadata:', error);
+      return { category: 'Unknown', tags: [], difficulty: 0 };
     }
   };
 
@@ -69,11 +115,6 @@ export default function AdminBadgesPage() {
     }
   };
 
-  // Handle view badge details
-  const handleViewBadge = (badgeId: string) => {
-    router.push(`/admin/badges/${badgeId}`);
-  };
-
   // Handle edit badge
   const handleEditBadge = (badgeId: string) => {
     router.push(`/admin/badges/edit/${badgeId}`);
@@ -84,32 +125,15 @@ export default function AdminBadgesPage() {
     router.push('/admin/badges/create');
   };
 
-  // Get rarity color
-  const getRarityColor = (rarity: string) => {
-    switch (rarity.toLowerCase()) {
-      case 'common':
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
-      case 'uncommon':
-        return 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200';
-      case 'rare':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-200';
-      case 'epic':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-200';
-      case 'legendary':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
-    }
-  };
 
   // Get type color
   const getTypeColor = (type: string) => {
     switch (type.toLowerCase()) {
       case 'mileage':
         return 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-200';
-      case 'carbon':
+      case 'carbon_saved':
         return 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200';
-      case 'streak':
+      case 'upload_streak':
         return 'bg-orange-100 text-orange-800 dark:bg-orange-800 dark:text-orange-200';
       case 'achievement':
         return 'bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-200';
@@ -127,14 +151,13 @@ export default function AdminBadgesPage() {
         const badge = row as unknown as AdminBadge;
         return (
           <div className="flex items-center space-x-3">
-            <Image 
+            {/* <Image 
+              height={'50'}
+              width={'50'}
               src={badge.iconUrl || badge.imageUrl} 
               alt={badge.name}
               className="w-8 h-8 rounded-full object-cover"
-              onError={(e) => {
-                e.currentTarget.src = '/placeholder-badge.png';
-              }}
-            />
+            /> */}
             <div>
               <div className="font-medium text-foreground">{badge.name}</div>
               <div className="text-sm text-muted-foreground">{badge.description}</div>
@@ -161,7 +184,7 @@ export default function AdminBadgesPage() {
       render: (value: unknown, row: Record<string, unknown>) => {
         const badge = row as unknown as AdminBadge;
         return (
-          <Badge className={getRarityColor(badge.rarity)}>
+          <Badge style={{ backgroundColor: badge.rarityColor + '20', color: badge.rarityColor, borderColor: badge.rarityColor + '40' }}>
             {badge.rarity}
           </Badge>
         );
@@ -178,35 +201,23 @@ export default function AdminBadgesPage() {
       },
     },
     {
+      key: 'earnedCount',
+      label: 'Earned',
+      render: (value: unknown, row: Record<string, unknown>) => {
+        const badge = row as unknown as AdminBadge;
+        return (
+          <span className="font-medium text-green-600 dark:text-green-400">{badge.earnedCount}</span>
+        );
+      },
+    },
+    {
       key: 'rewards',
       label: 'Rewards',
       render: (value: unknown, row: Record<string, unknown>) => {
         const badge = row as unknown as AdminBadge;
         return (
           <div className="text-sm">
-            <div>B3TR: {badge.rewards.b3trTokens}</div>
-            <div>XP: {badge.rewards.experience}</div>
-          </div>
-        );
-      },
-    },
-    {
-      key: 'difficulty',
-      label: 'Difficulty',
-      render: (value: unknown, row: Record<string, unknown>) => {
-        const badge = row as unknown as AdminBadge;
-        return (
-          <div className="flex items-center space-x-1">
-            {[...Array(5)].map((_, i) => (
-              <div
-                key={i}
-                className={`w-2 h-2 rounded-full ${
-                  i < badge.metadata.difficulty 
-                    ? 'bg-yellow-500' 
-                    : 'bg-gray-300 dark:bg-gray-600'
-                }`}
-              />
-            ))}
+            <div>{badge.formattedRewards}</div>
           </div>
         );
       },
@@ -216,9 +227,10 @@ export default function AdminBadgesPage() {
       label: 'Status',
       render: (value: unknown, row: Record<string, unknown>) => {
         const badge = row as unknown as AdminBadge;
+        const isActive = badge.status === 'active';
         return (
-          <Badge className={badge.isActive ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-200'}>
-            {badge.isActive ? 'Active' : 'Inactive'}
+          <Badge className={isActive ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-200'}>
+            {isActive ? 'Active' : 'Inactive'}
           </Badge>
         );
       },
@@ -245,40 +257,37 @@ export default function AdminBadgesPage() {
             <Button
               size="sm"
               variant="outline"
-              onClick={() => handleViewBadge(badge.id)}
+              onClick={() => handleEditBadge(badge.id)}
+              title="Edit Badge"
+              disabled={isUpdating === badge.id}
             >
-              View
+              {isUpdating === badge.id ? (
+                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Edit className="w-4 h-4" />
+              )}
             </Button>
             <Button
               size="sm"
               variant="outline"
-              onClick={() => handleEditBadge(badge.id)}
-            >
-              Edit
-            </Button>
-            <Button
-              size="sm"
-              variant={badge.isActive ? "destructive" : "default"}
-              onClick={() => handleToggleStatus(badge.id)}
-              disabled={isUpdating === badge.id}
-            >
-              {isUpdating === badge.id ? (
-                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-              ) : (
-                badge.isActive ? 'Disable' : 'Enable'
-              )}
-            </Button>
-            <Button
-              size="sm"
-              variant={badge.isPublished ? "outline" : "default"}
               onClick={() => handlePublishBadge(badge.id)}
+              title={badge.isPublished ? "Unpublish Badge" : "Publish Badge"}
               disabled={isUpdating === badge.id}
             >
               {isUpdating === badge.id ? (
                 <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
               ) : (
-                badge.isPublished ? 'Unpublish' : 'Publish'
+                <Globe className="w-4 h-4" />
               )}
+            </Button>
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={() => openDeleteModal(badge.id, badge.name)}
+              title="Delete Badge"
+              disabled={isUpdating === badge.id}
+            >
+              <Trash2 className="w-4 h-4" />
             </Button>
           </div>
         );
@@ -286,24 +295,52 @@ export default function AdminBadgesPage() {
     },
   ];
 
-  // Initial data fetch
+  // Fetch badges data when page, limit, or search changes
   useEffect(() => {
     fetchBadges();
-  }, []);
+  }, [currentPage, limit, search]);
+
+  // Handle search with debounce
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setCurrentPage(1); // Reset to first page when searching
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [search]);
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Badges Management</h1>
-          <p className="text-muted-foreground mt-2">
+          <p className="text-muted-foreground">
             Manage system badges and achievements
           </p>
         </div>
         <Button onClick={handleCreateBadge} className="gradient-ev-green text-white">
           Create Badge
         </Button>
+      </div>
+
+      {/* Badges List Title, Count, and Search Row */}
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-foreground">Badges List</h2>
+          <p className="text-muted-foreground">
+            {isLoading ? 'Loading...' : `${badges.length} of ${totalBadges} badges`}
+          </p>
+        </div>
+        <div className="flex flex-col md:flex-row md:items-center gap-4">
+          <input
+            type="text"
+            placeholder="Search badges by name, description, type, or status..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="border border-border bg-background text-foreground rounded-lg px-5 py-3 w-full md:w-64 text-base font-medium shadow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary hover:ring-2 hover:ring-primary/30 hover:bg-muted placeholder:text-muted-foreground"
+          />
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -323,7 +360,7 @@ export default function AdminBadgesPage() {
             <span className="text-2xl">✅</span>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{badges.filter(b => b.isActive).length}</div>
+            <div className="text-2xl font-bold">{badges.filter(b => b.status === 'active').length}</div>
           </CardContent>
         </Card>
         <Card>
@@ -332,7 +369,7 @@ export default function AdminBadgesPage() {
             <span className="text-2xl">❌</span>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{badges.filter(b => !b.isActive).length}</div>
+            <div className="text-2xl font-bold">{badges.filter(b => b.status !== 'active').length}</div>
           </CardContent>
         </Card>
         <Card>
@@ -342,7 +379,10 @@ export default function AdminBadgesPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {new Set(badges.map(b => b.metadata.category)).size}
+              {new Set(badges.map(b => {
+                const metadata = parseMetadata(b.metadata);
+                return metadata.category;
+              })).size}
             </div>
           </CardContent>
         </Card>
@@ -351,28 +391,91 @@ export default function AdminBadgesPage() {
 
 
       {/* Badges Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Badges List</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <TableSkeleton columns={8} rows={5} />
-          ) : (
-            <DataTable
-              data={badges as unknown as Record<string, unknown>[]}
-              columns={columns}
-              searchable={true}
-              searchKeys={['name', 'description', 'type']}
-              searchPlaceholder="Search badges by name, description, or type..."
-              pagination={true}
-              defaultItemsPerPage={10}
-              loading={isLoading}
-              emptyMessage="No badges found"
-            />
-          )}
-        </CardContent>
-      </Card>
+      <div className="bg-muted/40 rounded-2xl p-0 md:p-2 overflow-x-auto border border-border">
+        {isLoading ? (
+          <TableSkeleton columns={8} rows={5} />
+        ) : (
+          <DataTable
+            data={badges as unknown as Record<string, unknown>[]}
+            columns={columns}
+            emptyMessage="No badges found"
+            pagination={false} // Disable built-in pagination since we're using backend pagination
+          />
+        )}
+      </div>
+
+      {/* Backend Pagination Controls */}
+      {isLoading ? (
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-16 bg-muted rounded animate-pulse"></div>
+            <div className="h-8 w-16 bg-muted rounded animate-pulse"></div>
+            <div className="h-4 w-16 bg-muted rounded animate-pulse"></div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-48 bg-muted rounded animate-pulse"></div>
+            <div className="flex gap-1">
+              <div className="h-8 w-20 bg-muted rounded animate-pulse"></div>
+              <div className="h-8 w-16 bg-muted rounded animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+      ) : totalBadges > 0 ? (
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">Show</span>
+            <select
+              value={limit}
+              onChange={(e) => {
+                setLimit(Number(e.target.value));
+                setCurrentPage(1); // Reset to first page when changing limit
+              }}
+              className="border border-border bg-background text-foreground rounded px-2 py-1 text-sm"
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+            <span className="text-sm text-muted-foreground">entries</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">
+              Showing {(currentPage - 1) * limit + 1} to{" "}
+              {Math.min(currentPage * limit, totalBadges)} of {totalBadges} badges
+            </span>
+
+            <div className="flex gap-1">
+              <button
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1 text-sm border border-border bg-background text-foreground rounded hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => setCurrentPage(currentPage + 1)}
+                disabled={currentPage >= Math.ceil(totalBadges / limit)}
+                className="px-3 py-1 text-sm border border-border bg-background text-foreground rounded hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={deleteModal.isOpen}
+        onClose={closeDeleteModal}
+        onConfirm={() => deleteModal.badgeId && handleDeleteBadge(deleteModal.badgeId)}
+        title="Delete Badge"
+        message="Are you sure you want to delete this badge? This action will permanently remove the badge from the system."
+        itemName={deleteModal.badgeName}
+        isLoading={isUpdating === deleteModal.badgeId}
+      />
     </div>
   );
 } 

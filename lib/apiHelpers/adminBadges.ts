@@ -7,10 +7,13 @@ export interface AdminBadge {
   description: string;
   type: string;
   rarity: string;
+  status: string;
   imageUrl: string;
   iconUrl: string;
   conditions: {
     mileage?: number;
+    uploadStreak?: number;
+    carbonSaved?: number;
     timeFrame?: string;
     [key: string]: unknown;
   };
@@ -21,16 +24,13 @@ export interface AdminBadge {
     [key: string]: unknown;
   };
   pointsValue: number;
-  metadata: {
-    category: string;
-    tags: string[];
-    difficulty: number;
-    estimatedTime: string;
-    [key: string]: unknown;
-  };
-  notes?: string;
-  isActive: boolean;
+  earnedCount: number;
+  metadata: string | object; // Can be JSON string or object
   isPublished: boolean;
+  canBeEdited: boolean;
+  formattedRewards: string;
+  difficultyDisplay: string;
+  rarityColor: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -111,14 +111,6 @@ export const updateBadge = (id: string, badgeData: UpdateBadgeRequest): Promise<
 // Delete badge
 export const deleteBadge = (id: string): Promise<void> => {
   return apiDelete<void>(`/admin/badges/${id}`, {
-    requireAuth: true,
-    isAdmin: true, // Use admin token
-  });
-};
-
-// Toggle badge active/disabled status
-export const toggleBadgeStatus = (id: string): Promise<AdminBadge> => {
-  return apiPut<AdminBadge>(`/admin/badges/${id}/toggle-status`, undefined, {
     requireAuth: true,
     isAdmin: true, // Use admin token
   });
