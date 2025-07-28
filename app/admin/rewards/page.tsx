@@ -31,10 +31,19 @@ export default function AdminRewardsPage() {
     const fetchStats = async () => {
       try {
         setLoading(true);
+        console.log("📈 Starting to fetch rewards stats...");
         const stats = await getRewardsStats();
+        console.log("✅ Rewards stats API response:", stats);
+        console.log("💰 Total amount:", stats?.totalAmount || 0);
+        console.log("🏃 Total participants:", stats?.total || 0);
         setRewardsStats(stats);
       } catch (error) {
-        console.error("Error fetching rewards stats:", error);
+        console.error("❌ Error fetching rewards stats:", error);
+        console.error("🔧 Error details:", {
+          message: error instanceof Error ? error.message : "Unknown error",
+          status: (error as any)?.status || "Unknown status",
+          data: (error as any)?.data || null,
+        });
         toast.error("Failed to load rewards statistics");
       } finally {
         setLoading(false);
@@ -72,12 +81,12 @@ export default function AdminRewardsPage() {
             desktop: "Total Miles",
           },
           value: {
-            mobile: `${Math.floor(rewardsStats.totalMiles / 1000)}k`,
-            desktop: rewardsStats.totalMiles.toLocaleString(),
+            mobile: `${Math.floor((rewardsStats.totalMiles || 0) / 1000)}k`,
+            desktop: (rewardsStats.totalMiles || 0).toLocaleString(),
           },
           subtitle: {
-            mobile: `Avg: ${rewardsStats.averageMiles}mi`,
-            desktop: `Avg: ${rewardsStats.averageMiles} miles/user`,
+            mobile: `Avg: ${rewardsStats.averageMiles || 0}mi`,
+            desktop: `Avg: ${rewardsStats.averageMiles || 0} miles/user`,
           },
           color: "text-blue-600",
           bgColor: "bg-blue-100 dark:bg-blue-900/20",
@@ -89,12 +98,12 @@ export default function AdminRewardsPage() {
             desktop: "Total Rewards",
           },
           value: {
-            mobile: `$${Math.floor(rewardsStats.totalAmount)}`,
-            desktop: `$${rewardsStats.totalAmount.toLocaleString()}`,
+            mobile: `$${Math.floor(rewardsStats.totalAmount || 0)}`,
+            desktop: `$${(rewardsStats.totalAmount || 0).toLocaleString()}`,
           },
           subtitle: {
-            mobile: `Avg: $${rewardsStats.averageAmount}`,
-            desktop: `Avg: $${rewardsStats.averageAmount}/user`,
+            mobile: `Avg: $${rewardsStats.averageAmount || 0}`,
+            desktop: `Avg: $${rewardsStats.averageAmount || 0}/user`,
           },
           color: "text-green-600",
           bgColor: "bg-green-100 dark:bg-green-900/20",
@@ -106,12 +115,16 @@ export default function AdminRewardsPage() {
             desktop: "Carbon Saved",
           },
           value: {
-            mobile: `${Math.floor(rewardsStats.totalCarbonSaved / 1000)}k`,
-            desktop: rewardsStats.totalCarbonSaved.toLocaleString(),
+            mobile: `${Math.floor(
+              (rewardsStats.totalCarbonSaved || 0) / 1000
+            )}k`,
+            desktop: (rewardsStats.totalCarbonSaved || 0).toLocaleString(),
           },
           subtitle: {
-            mobile: `Avg: ${rewardsStats.averageCarbonSaved.toFixed(1)}kg`,
-            desktop: `Avg: ${rewardsStats.averageCarbonSaved.toFixed(
+            mobile: `Avg: ${(rewardsStats.averageCarbonSaved || 0).toFixed(
+              1
+            )}kg`,
+            desktop: `Avg: ${(rewardsStats.averageCarbonSaved || 0).toFixed(
               1
             )} kg/user`,
           },
@@ -125,12 +138,16 @@ export default function AdminRewardsPage() {
             desktop: "Most Active Day",
           },
           value: {
-            mobile: `${rewardsStats.mostActiveDayCount}`,
-            desktop: `${rewardsStats.mostActiveDayCount} rewards`,
+            mobile: `${rewardsStats.mostActiveDayCount || 0}`,
+            desktop: `${rewardsStats.mostActiveDayCount || 0} rewards`,
           },
           subtitle: {
-            mobile: formatDate(rewardsStats.mostActiveDay),
-            desktop: formatDate(rewardsStats.mostActiveDay),
+            mobile: rewardsStats.mostActiveDay
+              ? formatDate(rewardsStats.mostActiveDay)
+              : "N/A",
+            desktop: rewardsStats.mostActiveDay
+              ? formatDate(rewardsStats.mostActiveDay)
+              : "N/A",
           },
           color: "text-orange-600",
           bgColor: "bg-orange-100 dark:bg-orange-900/20",
@@ -182,11 +199,19 @@ export default function AdminRewardsPage() {
   const handleDistributeRewards = async () => {
     setIsDistributing(true);
     try {
+      console.log("💰 Starting to distribute rewards...");
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 2000));
+      console.log("✅ Rewards distributed successfully!");
       toast.success("Rewards distributed successfully!");
       // Update round status here
-    } catch {
+    } catch (error) {
+      console.error("❌ Error distributing rewards:", error);
+      console.error("🔧 Error details:", {
+        message: error instanceof Error ? error.message : "Unknown error",
+        status: (error as any)?.status || "Unknown status",
+        data: (error as any)?.data || null,
+      });
       toast.error("Failed to distribute rewards");
     } finally {
       setIsDistributing(false);
@@ -267,7 +292,7 @@ export default function AdminRewardsPage() {
                   Upload
                 </span>
                 <span className="font-medium text-foreground">
-                  {rewardsStats.byType.upload}
+                  {rewardsStats?.byType?.upload || 0}
                 </span>
               </div>
               <div className="flex justify-between items-center">
@@ -276,7 +301,7 @@ export default function AdminRewardsPage() {
                   Badge
                 </span>
                 <span className="font-medium text-foreground">
-                  {rewardsStats.byType.badge}
+                  {rewardsStats?.byType?.badge || 0}
                 </span>
               </div>
               <div className="flex justify-between items-center">
@@ -285,7 +310,7 @@ export default function AdminRewardsPage() {
                   Challenge
                 </span>
                 <span className="font-medium text-foreground">
-                  {rewardsStats.byType.challenge}
+                  {rewardsStats?.byType?.challenge || 0}
                 </span>
               </div>
             </div>
@@ -301,19 +326,19 @@ export default function AdminRewardsPage() {
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Pending</span>
                 <span className="font-medium text-yellow-600">
-                  {rewardsStats.byStatus.pending}
+                  {rewardsStats?.byStatus?.pending || 0}
                 </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Completed</span>
                 <span className="font-medium text-green-600">
-                  {rewardsStats.byStatus.completed}
+                  {rewardsStats?.byStatus?.completed || 0}
                 </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Failed</span>
                 <span className="font-medium text-red-600">
-                  {rewardsStats.byStatus.failed}
+                  {rewardsStats?.byStatus?.failed || 0}
                 </span>
               </div>
             </div>
@@ -329,19 +354,19 @@ export default function AdminRewardsPage() {
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Not Sent</span>
                 <span className="font-medium text-orange-600">
-                  {rewardsStats.byBlockchainStatus.not_sent}
+                  {rewardsStats?.byBlockchainStatus?.not_sent || 0}
                 </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Confirmed</span>
                 <span className="font-medium text-green-600">
-                  {rewardsStats.byBlockchainStatus.confirmed}
+                  {rewardsStats?.byBlockchainStatus?.confirmed || 0}
                 </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Failed</span>
                 <span className="font-medium text-red-600">
-                  {rewardsStats.byBlockchainStatus.failed}
+                  {rewardsStats?.byBlockchainStatus?.failed || 0}
                 </span>
               </div>
             </div>

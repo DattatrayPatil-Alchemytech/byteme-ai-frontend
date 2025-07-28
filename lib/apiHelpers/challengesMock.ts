@@ -8,14 +8,14 @@ import {
 
 // Mock Challenges Data
 export interface Challenge {
-  id: number;
+  id: string; // Changed to string for UUID
   name: string;
   description: string;
   type: ChallengeType;
   difficulty: ChallengeDifficulty;
   visibility: ChallengeVisibility;
-  imageUrl: string;
-  bannerUrl: string;
+  imageUrl: string | null;
+  bannerUrl: string | null;
   objectives: {
     mileage?: number;
     uploadCount?: number;
@@ -23,12 +23,12 @@ export interface Challenge {
     socialShares?: number;
     carbonSaved?: number;
     vehicleCount?: number;
-  };
+  } | null;
   rewards: {
     b3trTokens: number;
     points: number;
     experience: number;
-  };
+  } | null;
   leaderboardRewards: {
     first: {
       b3trTokens: number;
@@ -42,29 +42,43 @@ export interface Challenge {
       b3trTokens: number;
       points: number;
     };
-  };
+  } | null;
   startDate: string;
   endDate: string;
   maxParticipants: number;
   currentParticipants: number;
+  completedParticipants: number;
   requirements: {
     minLevel: number;
     minMileage: number;
-  };
+  } | null;
   metadata: {
     category: ChallengeCategory;
     tags: string[];
     estimatedTime: string;
     featured: boolean;
-  };
-  notes: string;
+  } | null;
+  notes?: string;
   status: ChallengeStatus;
+  // Additional fields from API response
+  isActive: boolean;
+  isUpcoming: boolean;
+  isCompleted: boolean;
+  isPublished: boolean;
+  canBeEdited: boolean;
+  isFull: boolean;
+  daysRemaining: number;
+  progressPercentage: number;
+  completionRate: number;
+  formattedDuration: string;
+  difficultyColor: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 export const mockChallenges: Challenge[] = [
   {
-    id: 1,
+    id: "1",
     name: "Weekend Warrior",
     description: "Drive 500 km over the weekend and earn bonus rewards!",
     type: "mileage",
@@ -101,6 +115,7 @@ export const mockChallenges: Challenge[] = [
     endDate: "2024-01-22",
     maxParticipants: 100,
     currentParticipants: 78,
+    completedParticipants: 0,
     requirements: {
       minLevel: 5,
       minMileage: 1000,
@@ -113,10 +128,22 @@ export const mockChallenges: Challenge[] = [
     },
     notes: "Created for weekend engagement",
     status: "active",
+    isActive: true,
+    isUpcoming: false,
+    isCompleted: false,
+    isPublished: true,
+    canBeEdited: true,
+    isFull: false,
+    daysRemaining: 7,
+    progressPercentage: 78,
+    completionRate: 0,
+    formattedDuration: "1 week",
+    difficultyColor: "medium",
     createdAt: "2024-01-10",
+    updatedAt: "2024-01-10",
   },
   {
-    id: 2,
+    id: "2",
     name: "Upload Master",
     description: "Upload 50 photos this month and become an Upload Master!",
     type: "upload",
@@ -152,6 +179,7 @@ export const mockChallenges: Challenge[] = [
     endDate: "2024-01-31",
     maxParticipants: 200,
     currentParticipants: 156,
+    completedParticipants: 0,
     requirements: {
       minLevel: 3,
       minMileage: 500,
@@ -164,10 +192,22 @@ export const mockChallenges: Challenge[] = [
     },
     notes: "Monthly upload challenge for content creators",
     status: "active",
+    isActive: true,
+    isUpcoming: false,
+    isCompleted: false,
+    isPublished: true,
+    canBeEdited: true,
+    isFull: false,
+    daysRemaining: 30,
+    progressPercentage: 78,
+    completionRate: 0,
+    formattedDuration: "1 month",
+    difficultyColor: "hard",
     createdAt: "2023-12-25",
+    updatedAt: "2023-12-25",
   },
   {
-    id: 3,
+    id: "3",
     name: "Daily Streaker",
     description: "Maintain a 30-day upload streak and win exclusive rewards!",
     type: "streak",
@@ -204,6 +244,7 @@ export const mockChallenges: Challenge[] = [
     endDate: "2024-03-01",
     maxParticipants: 50,
     currentParticipants: 32,
+    completedParticipants: 0,
     requirements: {
       minLevel: 10,
       minMileage: 2000,
@@ -216,10 +257,22 @@ export const mockChallenges: Challenge[] = [
     },
     notes: "Premium challenge for dedicated users",
     status: "active",
+    isActive: true,
+    isUpcoming: false,
+    isCompleted: false,
+    isPublished: true,
+    canBeEdited: true,
+    isFull: false,
+    daysRemaining: 29,
+    progressPercentage: 64,
+    completionRate: 0,
+    formattedDuration: "30 days",
+    difficultyColor: "hard",
     createdAt: "2024-01-20",
+    updatedAt: "2024-01-20",
   },
   {
-    id: 4,
+    id: "4",
     name: "Social Butterfly",
     description: "Share your achievements on social media 20 times!",
     type: "upload",
@@ -255,6 +308,7 @@ export const mockChallenges: Challenge[] = [
     endDate: "2024-12-31",
     maxParticipants: 1000,
     currentParticipants: 245,
+    completedParticipants: 0,
     requirements: {
       minLevel: 1,
       minMileage: 0,
@@ -267,10 +321,22 @@ export const mockChallenges: Challenge[] = [
     },
     notes: "Year-long social engagement challenge",
     status: "active",
+    isActive: true,
+    isUpcoming: false,
+    isCompleted: false,
+    isPublished: true,
+    canBeEdited: true,
+    isFull: false,
+    daysRemaining: 364,
+    progressPercentage: 24.5,
+    completionRate: 0,
+    formattedDuration: "ongoing",
+    difficultyColor: "easy",
     createdAt: "2023-12-15",
+    updatedAt: "2023-12-15",
   },
   {
-    id: 5,
+    id: "5",
     name: "Green Commuter",
     description: "Complete 1000 km of eco-friendly commuting this quarter!",
     type: "mileage",
@@ -306,6 +372,7 @@ export const mockChallenges: Challenge[] = [
     endDate: "2024-03-31",
     maxParticipants: 150,
     currentParticipants: 89,
+    completedParticipants: 0,
     requirements: {
       minLevel: 5,
       minMileage: 1500,
@@ -318,10 +385,22 @@ export const mockChallenges: Challenge[] = [
     },
     notes: "Quarterly eco-commuting challenge",
     status: "active",
+    isActive: true,
+    isUpcoming: false,
+    isCompleted: false,
+    isPublished: true,
+    canBeEdited: true,
+    isFull: false,
+    daysRemaining: 90,
+    progressPercentage: 59.3,
+    completionRate: 0,
+    formattedDuration: "3 months",
+    difficultyColor: "medium",
     createdAt: "2023-12-20",
+    updatedAt: "2023-12-20",
   },
   {
-    id: 6,
+    id: "6",
     name: "Night Owl Driver",
     description: "Complete 200 km of night driving and earn bonus tokens!",
     type: "mileage",
@@ -357,6 +436,7 @@ export const mockChallenges: Challenge[] = [
     endDate: "2024-02-29",
     maxParticipants: 80,
     currentParticipants: 12,
+    completedParticipants: 0,
     requirements: {
       minLevel: 3,
       minMileage: 300,
@@ -369,10 +449,22 @@ export const mockChallenges: Challenge[] = [
     },
     notes: "Night driving challenge for adventurous drivers",
     status: "draft",
+    isActive: false,
+    isUpcoming: false,
+    isCompleted: false,
+    isPublished: false,
+    canBeEdited: false,
+    isFull: false,
+    daysRemaining: 14,
+    progressPercentage: 15,
+    completionRate: 0,
+    formattedDuration: "2 weeks",
+    difficultyColor: "easy",
     createdAt: "2024-02-01",
+    updatedAt: "2024-02-01",
   },
   {
-    id: 7,
+    id: "7",
     name: "Carbon Saver Champion",
     description:
       "Save 100kg of CO2 emissions through eco-friendly travel choices!",
@@ -409,6 +501,7 @@ export const mockChallenges: Challenge[] = [
     endDate: "2024-03-31",
     maxParticipants: 200,
     currentParticipants: 145,
+    completedParticipants: 0,
     requirements: {
       minLevel: 3,
       minMileage: 500,
@@ -421,10 +514,22 @@ export const mockChallenges: Challenge[] = [
     },
     notes: "Environmental awareness challenge for carbon reduction",
     status: "active",
+    isActive: true,
+    isUpcoming: false,
+    isCompleted: false,
+    isPublished: true,
+    canBeEdited: true,
+    isFull: false,
+    daysRemaining: 30,
+    progressPercentage: 72.5,
+    completionRate: 0,
+    formattedDuration: "1 month",
+    difficultyColor: "medium",
     createdAt: "2024-02-15",
+    updatedAt: "2024-02-15",
   },
   {
-    id: 8,
+    id: "8",
     name: "Fleet Manager Pro",
     description: "Register and manage 5 different vehicles in your fleet!",
     type: "vehicle-count",
@@ -460,6 +565,7 @@ export const mockChallenges: Challenge[] = [
     endDate: "2024-12-31",
     maxParticipants: 500,
     currentParticipants: 287,
+    completedParticipants: 0,
     requirements: {
       minLevel: 1,
       minMileage: 0,
@@ -472,10 +578,22 @@ export const mockChallenges: Challenge[] = [
     },
     notes: "Vehicle registration and management challenge",
     status: "active",
+    isActive: true,
+    isUpcoming: false,
+    isCompleted: false,
+    isPublished: true,
+    canBeEdited: true,
+    isFull: false,
+    daysRemaining: 364,
+    progressPercentage: 57.4,
+    completionRate: 0,
+    formattedDuration: "ongoing",
+    difficultyColor: "easy",
     createdAt: "2023-12-01",
+    updatedAt: "2023-12-01",
   },
   {
-    id: 9,
+    id: "9",
     name: "Summer Sprint Cancelled",
     description: "This challenge was cancelled due to low participation.",
     type: "mileage",
@@ -511,6 +629,7 @@ export const mockChallenges: Challenge[] = [
     endDate: "2024-08-31",
     maxParticipants: 50,
     currentParticipants: 8,
+    completedParticipants: 0,
     requirements: {
       minLevel: 15,
       minMileage: 5000,
@@ -523,6 +642,18 @@ export const mockChallenges: Challenge[] = [
     },
     notes: "Challenge cancelled due to insufficient registration",
     status: "cancelled",
+    isActive: false,
+    isUpcoming: false,
+    isCompleted: true,
+    isPublished: false,
+    canBeEdited: false,
+    isFull: false,
+    daysRemaining: 0,
+    progressPercentage: 100,
+    completionRate: 0,
+    formattedDuration: "3 months",
+    difficultyColor: "hard",
     createdAt: "2024-05-01",
+    updatedAt: "2024-05-01",
   },
 ];

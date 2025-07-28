@@ -61,10 +61,13 @@ export default function Overview({
     );
   }
 
-  const completionRate = (
-    (rewardsStats.byStatus.completed / rewardsStats.total) *
-    100
-  ).toFixed(1);
+  const completionRate =
+    rewardsStats?.total && rewardsStats.total > 0
+      ? (
+          ((rewardsStats.byStatus?.completed || 0) / rewardsStats.total) *
+          100
+        ).toFixed(1)
+      : "0.0";
 
   return (
     <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-lg">
@@ -92,18 +95,18 @@ export default function Overview({
             </p>
             <p className="text-sm sm:text-lg font-bold text-foreground">
               <span className="block sm:hidden">
-                ${Math.floor(rewardsStats.totalAmount)}
+                ${Math.floor(rewardsStats?.totalAmount || 0)}
               </span>
               <span className="hidden sm:block">
-                ${rewardsStats.totalAmount.toLocaleString()}
+                ${(rewardsStats?.totalAmount || 0).toLocaleString()}
               </span>
             </p>
             <p className="text-xs text-muted-foreground">
               <span className="block sm:hidden">
-                {rewardsStats.total} rewards
+                {rewardsStats?.total || 0} rewards
               </span>
               <span className="hidden sm:block">
-                Total of {rewardsStats.total} rewards
+                Total of {rewardsStats?.total || 0} rewards
               </span>
             </p>
           </div>
@@ -112,7 +115,7 @@ export default function Overview({
               Completed
             </p>
             <p className="text-sm sm:text-lg font-bold text-blue-600">
-              {rewardsStats.byStatus.completed}
+              {rewardsStats?.byStatus?.completed || 0}
             </p>
             <p className="text-xs text-blue-500">
               {completionRate}% success rate
@@ -123,7 +126,7 @@ export default function Overview({
               Pending
             </p>
             <p className="text-sm sm:text-lg font-bold text-yellow-600">
-              {rewardsStats.byStatus.pending}
+              {rewardsStats?.byStatus?.pending || 0}
             </p>
             <p className="text-xs text-yellow-500">Processing</p>
           </div>
@@ -133,14 +136,16 @@ export default function Overview({
             </p>
             <p className="text-sm sm:text-lg font-bold text-emerald-600">
               <span className="block sm:hidden">
-                {rewardsStats.mostActiveDayCount}
+                {rewardsStats?.mostActiveDayCount || 0}
               </span>
               <span className="hidden sm:block">
-                {rewardsStats.mostActiveDayCount} rewards
+                {rewardsStats?.mostActiveDayCount || 0} rewards
               </span>
             </p>
             <p className="text-xs text-emerald-500">
-              {formatDate(rewardsStats.mostActiveDay)}
+              {rewardsStats?.mostActiveDay
+                ? formatDate(rewardsStats.mostActiveDay)
+                : "N/A"}
             </p>
           </div>
         </div>

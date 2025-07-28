@@ -8,6 +8,7 @@ import {
 } from "@/lib/apiHelpers/userDashboard";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import toast from "react-hot-toast";
 
 const mockChallenges = [
   {
@@ -53,13 +54,26 @@ const Leaderboard: React.FC = () => {
 
   useEffect(() => {
     setLoading(true);
+    console.log("🔍 Starting to fetch leaderboard data...");
     getWeeklyLeaderboard()
       .then((res) => {
+        console.log("✅ Leaderboard API response:", res);
+        console.log("📊 Leaderboard entries count:", res?.entries?.length || 0);
+        console.log("👥 Total participants:", res?.totalParticipants || 0);
         setData(res);
       })
       .catch((err) => {
-        console.error("Failed to load leaderboard:", err);
+        console.error("❌ Failed to load leaderboard:", err);
+        console.error("🔧 Error details:", {
+          message: err.message,
+          status: err.status,
+          data: err.data,
+        });
         setData(null);
+        // Show user-friendly error message
+        toast.error(
+          `Failed to load leaderboard: ${err.message || "Unknown error"}`
+        );
       })
       .finally(() => setLoading(false));
   }, []);
@@ -110,7 +124,10 @@ const Leaderboard: React.FC = () => {
             <CardContent>
               <div className="space-y-4">
                 {[...Array(2)].map((_, idx) => (
-                  <div key={idx} className="p-4 bg-card/50 rounded-lg border border-border/20 animate-pulse">
+                  <div
+                    key={idx}
+                    className="p-4 bg-card/50 rounded-lg border border-border/20 animate-pulse"
+                  >
                     <div className="flex items-center space-x-3 mb-3">
                       <div className="w-8 h-8 rounded bg-muted" />
                       <div>
@@ -130,7 +147,7 @@ const Leaderboard: React.FC = () => {
       </div>
     );
   }
-  
+
   if (!data) {
     return (
       <div className="py-8 text-center text-red-500">
@@ -187,8 +204,12 @@ const Leaderboard: React.FC = () => {
               {data.entries.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12">
                   <span className="text-5xl mb-4">📉</span>
-                  <p className="text-lg font-semibold text-muted-foreground dark:text-slate-300 mb-2">No leaderboard data yet</p>
-                  <p className="text-sm text-muted-foreground dark:text-slate-400 text-center">Be the first to participate and climb the leaderboard!</p>
+                  <p className="text-lg font-semibold text-muted-foreground dark:text-slate-300 mb-2">
+                    No leaderboard data yet
+                  </p>
+                  <p className="text-sm text-muted-foreground dark:text-slate-400 text-center">
+                    Be the first to participate and climb the leaderboard!
+                  </p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -215,12 +236,20 @@ const Leaderboard: React.FC = () => {
                           </p>
                           <div className="flex items-center space-x-4 mt-1">
                             <div className="flex items-center space-x-1">
-                              <span className="text-muted-foreground dark:text-slate-400">📊</span>
-                              <span className="text-xs text-muted-foreground dark:text-slate-400">{entry.totalPoints} pts</span>
+                              <span className="text-muted-foreground dark:text-slate-400">
+                                📊
+                              </span>
+                              <span className="text-xs text-muted-foreground dark:text-slate-400">
+                                {entry.totalPoints} pts
+                              </span>
                             </div>
                             <div className="flex items-center space-x-1">
-                              <span className="text-muted-foreground dark:text-slate-400">🌱</span>
-                              <span className="text-xs text-muted-foreground dark:text-slate-400">{entry.totalCarbonSaved} CO₂</span>
+                              <span className="text-muted-foreground dark:text-slate-400">
+                                🌱
+                              </span>
+                              <span className="text-xs text-muted-foreground dark:text-slate-400">
+                                {entry.totalCarbonSaved} CO₂
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -244,15 +273,21 @@ const Leaderboard: React.FC = () => {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 {/* Your Rank Card */}
                 <div className="bg-muted/50 dark:bg-slate-700/50 rounded-xl p-4 text-center min-w-[140px] border border-border/30 dark:border-slate-600/30">
-                  <p className="text-sm text-muted-foreground dark:text-slate-400 mb-2">Your Rank</p>
+                  <p className="text-sm text-muted-foreground dark:text-slate-400 mb-2">
+                    Your Rank
+                  </p>
                   <div className="text-2xl font-bold text-primary dark:text-green-400">
-                    {data.userRank && data.userRank > 0 ? `#${data.userRank}` : '#'}
+                    {data.userRank && data.userRank > 0
+                      ? `#${data.userRank}`
+                      : "#"}
                   </div>
                 </div>
 
                 {/* Total Participants Card */}
                 <div className="bg-muted/50 dark:bg-slate-700/50 rounded-xl p-4 text-center min-w-[140px] border border-border/30 dark:border-slate-600/30">
-                  <p className="text-sm text-muted-foreground dark:text-slate-400 mb-2">Total Participants</p>
+                  <p className="text-sm text-muted-foreground dark:text-slate-400 mb-2">
+                    Total Participants
+                  </p>
                   <div className="text-2xl font-bold text-foreground dark:text-white">
                     {data.totalParticipants || 0}
                   </div>
@@ -321,7 +356,9 @@ const Leaderboard: React.FC = () => {
                     <ul className="text-xs text-muted-foreground dark:text-slate-400 space-y-1">
                       {challenge.requirements.map((req, index) => (
                         <li key={index} className="flex items-center">
-                          <span className="text-green-600 dark:text-green-400 mr-2">•</span>
+                          <span className="text-green-600 dark:text-green-400 mr-2">
+                            •
+                          </span>
                           {req}
                         </li>
                       ))}

@@ -1,5 +1,5 @@
 NEXT_PUBLIC_CONNECTION_CERTIFICATE_CONTENT=Sign this message to authenticate with Drive & Earn
-
+NEXT_PUBLIC_API_BASE_URL=https://byteme-ai.alchemytech.in
 # VeChain Network Configuration
 NEXT_PUBLIC_VECHAIN_NETWORK=vechain_testnet
 NEXT_PUBLIC_VECHAIN_DEPLOYER=0x595c73ec5279a3833BA535753bfd762Da6bBaC1D
