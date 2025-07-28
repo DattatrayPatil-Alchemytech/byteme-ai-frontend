@@ -1,4 +1,4 @@
-// import { apiGet } from "./apiMiddleware"; // Removed unused import
+import { apiGet } from "./apiMiddleware";
 
 // Types for rewards stats
 export interface RewardsStats {
@@ -61,18 +61,17 @@ const mockRewardsStats: RewardsStats = {
  * GET /admin/rewards/stats
  */
 export const getRewardsStats = async (): Promise<RewardsStats> => {
-  return new Promise((resolve) =>
-    setTimeout(() => {
-      resolve(mockRewardsStats);
-    }, 500)
-  );
+  // return new Promise((resolve) =>
+  //   setTimeout(() => {
+  //     resolve(mockRewardsStats);
+  //   }, 500)
+  // );
 
   // Commented out actual API call for future implementation
-  /*
-  return apiGet<RewardsStats>('/admin/rewards/stats', {
+
+  return apiGet<RewardsStats>("/admin/rewards/stats", {
     requireAuth: true,
     isAdmin: true,
-    showToast: false
+    showToast: false,
   });
-  */
 };

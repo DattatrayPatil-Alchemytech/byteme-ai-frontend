@@ -1,46 +1,93 @@
-import { apiGet } from "./apiMiddleware";
-import { Challenge, mockChallenges } from "./challengesMock";
+import { apiGet, apiPost, apiPut, apiDelete } from "./apiMiddleware";
+import { Challenge } from "./challengesMock";
 import { ChallengeListParams } from "../../app/admin/challenges/utils/filterOptions";
 
-// API Response types
+// API Response types - matches actual backend response
 export interface ChallengesListResponse {
   challenges: Challenge[];
   total: number;
-  page: number;
   limit: number;
-  totalPages: number;
+  page: number;
+  totalPages?: number; // Calculated on frontend from total/limit
 }
 
 export interface ChallengeResponse {
-  challenge: Challenge;
-  message?: string;
+  id: string;
+  name: string;
+  description: string;
+  type: string;
+  status: string;
+  difficulty: string;
+  visibility: string;
+  imageUrl?: string | null;
+  bannerUrl?: string | null;
+  objectives?: {
+    mileage?: number;
+    uploadCount?: number;
+    streakDays?: number;
+    socialShares?: number;
+    carbonSaved?: number;
+    vehicleCount?: number;
+  } | null;
+  rewards?: {
+    b3trTokens: number;
+    points: number;
+    experience: number;
+  } | null;
+  leaderboardRewards?: {
+    first: { b3trTokens: number; points: number };
+    second: { b3trTokens: number; points: number };
+    third: { b3trTokens: number; points: number };
+  } | null;
+  startDate: string;
+  endDate: string;
+  maxParticipants: number;
+  currentParticipants: number;
+  completedParticipants: number;
+  requirements?: {
+    minLevel: number;
+    minMileage: number;
+  } | null;
+  metadata?: {
+    category: string;
+    tags: string[];
+    estimatedTime: string;
+    featured: boolean;
+  } | null;
+  isActive: boolean;
+  isUpcoming: boolean;
+  isCompleted: boolean;
+  isPublished: boolean;
+  canBeEdited: boolean;
+  isFull: boolean;
+  daysRemaining: number;
+  progressPercentage: number;
+  completionRate: number;
+  formattedDuration: string;
+  difficultyColor: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateChallengeData {
   name: string;
   description: string;
-  type: Challenge["type"];
-  difficulty: Challenge["difficulty"];
-  visibility: Challenge["visibility"];
-  imageUrl: string;
-  bannerUrl: string;
-  objectives: Challenge["objectives"];
-  rewards: Challenge["rewards"];
-  leaderboardRewards: Challenge["leaderboardRewards"];
+  type: string;
+  imageUrl?: string;
   startDate: string;
   endDate: string;
-  maxParticipants: number;
-  requirements: Challenge["requirements"];
-  metadata: Challenge["metadata"];
-  notes: string;
-  status: Challenge["status"];
+  requirements?: {
+    minLevel: number;
+    minMileage: number;
+  };
+  status?: string;
 }
 
 export type UpdateChallengeData = Partial<CreateChallengeData>;
 
 export interface PublishChallengeResponse {
   message: string;
-  challenge: Challenge;
+  challenge: ChallengeResponse;
 }
 
 // API Functions
@@ -52,20 +99,6 @@ export interface PublishChallengeResponse {
 export const getChallengesList = async (
   params: ChallengeListParams
 ): Promise<ChallengesListResponse> => {
-  return new Promise((resolve) =>
-    setTimeout(() => {
-      resolve({
-        challenges: mockChallenges,
-        total: mockChallenges.length,
-        page: params.page,
-        limit: params.limit,
-        totalPages: Math.ceil(mockChallenges.length / params.limit),
-      });
-    }, 500)
-  );
-
-  // Commented out actual API call for future implementation
-
   const queryParams = new URLSearchParams();
   Object.entries(params).forEach(([key, value]) => {
     if (value !== "" && value !== undefined && value !== null) {
@@ -73,7 +106,7 @@ export const getChallengesList = async (
     }
   });
 
-  return apiGet<ChallengesListResponse>(
+  const response = await apiGet<ChallengesListResponse>(
     `/admin/challenges?${queryParams.toString()}`,
     {
       requireAuth: true,
@@ -81,6 +114,14 @@ export const getChallengesList = async (
       showToast: false,
     }
   );
+
+  // Calculate totalPages from total and limit
+  const calculatedTotalPages = Math.ceil(response.total / response.limit);
+
+  return {
+    ...response,
+    totalPages: calculatedTotalPages,
+  };
 };
 
 /**
@@ -88,24 +129,13 @@ export const getChallengesList = async (
  * GET /admin/challenges/{id}
  */
 export const getChallengeById = async (
-  _id: number
+  id: string
 ): Promise<ChallengeResponse> => {
-  return new Promise((resolve) =>
-    setTimeout(() => {
-      resolve({
-        challenge: mockChallenges[0],
-      });
-    }, 300)
-  );
-
-  // Commented out actual API call for future implementation
-  /*
   return apiGet<ChallengeResponse>(`/admin/challenges/${id}`, {
     requireAuth: true,
     isAdmin: true,
-    showToast: false
+    showToast: false,
   });
-  */
 };
 
 /**
@@ -113,25 +143,13 @@ export const getChallengeById = async (
  * POST /admin/challenges
  */
 export const createChallenge = async (
-  _data: CreateChallengeData
+  data: CreateChallengeData
 ): Promise<ChallengeResponse> => {
-  return new Promise((resolve) =>
-    setTimeout(() => {
-      resolve({
-        challenge: mockChallenges[0],
-        message: "Challenge created successfully",
-      });
-    }, 800)
-  );
-
-  // Commented out actual API call for future implementation
-  /*
-  return apiPost<ChallengeResponse>('/admin/challenges', data, {
+  return apiPost<ChallengeResponse>("/admin/challenges", data, {
     requireAuth: true,
     isAdmin: true,
-    showToast: true
+    showToast: true,
   });
-  */
 };
 
 /**
@@ -139,26 +157,14 @@ export const createChallenge = async (
  * PUT /admin/challenges/{id}
  */
 export const updateChallenge = async (
-  _id: number,
-  _data: UpdateChallengeData
+  id: string,
+  data: UpdateChallengeData
 ): Promise<ChallengeResponse> => {
-  return new Promise((resolve) =>
-    setTimeout(() => {
-      resolve({
-        challenge: mockChallenges[0],
-        message: "Challenge updated successfully",
-      });
-    }, 600)
-  );
-
-  // Commented out actual API call for future implementation
-  /*
   return apiPut<ChallengeResponse>(`/admin/challenges/${id}`, data, {
     requireAuth: true,
     isAdmin: true,
-    showToast: true
+    showToast: true,
   });
-  */
 };
 
 /**
@@ -166,24 +172,13 @@ export const updateChallenge = async (
  * DELETE /admin/challenges/{id}
  */
 export const deleteChallenge = async (
-  _id: number
+  id: string
 ): Promise<{ message: string }> => {
-  return new Promise((resolve) =>
-    setTimeout(() => {
-      resolve({
-        message: "Challenge deleted successfully",
-      });
-    }, 400)
-  );
-
-  // Commented out actual API call for future implementation
-  /*
   return apiDelete<{ message: string }>(`/admin/challenges/${id}`, {
     requireAuth: true,
     isAdmin: true,
-    showToast: true
+    showToast: true,
   });
-  */
 };
 
 /**
@@ -191,25 +186,17 @@ export const deleteChallenge = async (
  * PUT /admin/challenges/{id}/publish
  */
 export const publishChallenge = async (
-  _id: number
+  id: string
 ): Promise<PublishChallengeResponse> => {
-  return new Promise((resolve) =>
-    setTimeout(() => {
-      resolve({
-        message: "Challenge published successfully",
-        challenge: mockChallenges[0],
-      });
-    }, 500)
+  return apiPut<PublishChallengeResponse>(
+    `/admin/challenges/${id}/publish`,
+    {},
+    {
+      requireAuth: true,
+      isAdmin: true,
+      showToast: true,
+    }
   );
-
-  // Commented out actual API call for future implementation
-  /*
-  return apiPut<PublishChallengeResponse>(`/admin/challenges/${id}/publish`, {}, {
-    requireAuth: true,
-    isAdmin: true,
-    showToast: true
-  });
-  */
 };
 
 // Export types for use in components
