@@ -13,6 +13,24 @@ import ParticipantsTable from "@/components/rewards/ParticipantsTable";
 // API helpers
 import { getRewardsStats, RewardsStats } from "../../../lib/apiHelpers/rewards";
 
+// Types
+interface ApiError {
+  status?: unknown;
+  data?: unknown;
+}
+
+const getErrorDetails = (error: unknown) => ({
+  message: error instanceof Error ? error.message : "Unknown error",
+  status:
+    error && typeof error === "object" && "status" in error
+      ? (error as ApiError).status
+      : "Unknown status",
+  data:
+    error && typeof error === "object" && "data" in error
+      ? (error as ApiError).data
+      : null,
+});
+
 // Mock data
 import { mockCurrentRound, generateMoreSubmissions } from "./mockRewardsData";
 
@@ -39,11 +57,7 @@ export default function AdminRewardsPage() {
         setRewardsStats(stats);
       } catch (error) {
         console.error("❌ Error fetching rewards stats:", error);
-        console.error("🔧 Error details:", {
-          message: error instanceof Error ? error.message : "Unknown error",
-          status: (error as any)?.status || "Unknown status",
-          data: (error as any)?.data || null,
-        });
+        console.error("🔧 Error details:", getErrorDetails(error));
         toast.error("Failed to load rewards statistics");
       } finally {
         setLoading(false);
@@ -207,11 +221,7 @@ export default function AdminRewardsPage() {
       // Update round status here
     } catch (error) {
       console.error("❌ Error distributing rewards:", error);
-      console.error("🔧 Error details:", {
-        message: error instanceof Error ? error.message : "Unknown error",
-        status: (error as any)?.status || "Unknown status",
-        data: (error as any)?.data || null,
-      });
+      console.error("🔧 Error details:", getErrorDetails(error));
       toast.error("Failed to distribute rewards");
     } finally {
       setIsDistributing(false);
