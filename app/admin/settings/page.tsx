@@ -19,6 +19,7 @@ export default function AdminSettingsPage() {
   const inspectorUrl = process.env.NEXT_PUBLIC_VECHAIN_INSPECTOR_URL || "";
   const governanceUrl = process.env.NEXT_PUBLIC_VECHAIN_GOVERNANCE || "";
   const appId = process.env.NEXT_PUBLIC_VECHAIN_APP_ID || "";
+  const driveNEarn = "https://drive-n-earn-dashboard.streamlit.app/";
   
   const contracts = {
     "EVDrive V2": process.env.NEXT_PUBLIC_CONTRACT_EVDRIVE_V2 || "",
@@ -52,6 +53,10 @@ export default function AdminSettingsPage() {
 
   const openInspector = () => {
     window.open(inspectorUrl, "_blank");
+  };
+
+  const openDashbaord = () => {
+    window.open(driveNEarn, "_blank");
   };
 
   const handleViewABI = (contractName: string) => {
@@ -177,6 +182,15 @@ export default function AdminSettingsPage() {
               >
                 <Database className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                 VeChain Inspector
+              </Button>
+
+              <Button
+                variant="outline"
+                className="w-full justify-start text-sm h-9 sm:h-10"
+                onClick={openDashbaord}
+              >
+                <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+                Go to Dashbaord Analytics
               </Button>
             </CardContent>
           </Card>
