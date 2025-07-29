@@ -7,7 +7,7 @@ import { adminLogout } from "@/redux/adminSlice";
 
 // API Configuration
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || 'http://byteme-ai-prod.ca-central-1.elasticbeanstalk.com';
+  process.env.NEXT_PUBLIC_API_BASE_URL || 'https://byteme-ai.alchemytech.in';
 
 // HTTP Methods type
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
