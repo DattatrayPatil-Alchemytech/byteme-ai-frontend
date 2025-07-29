@@ -588,29 +588,93 @@ export default function UploadsPage() {
 
       toast.success("Upload successful! Fetching details...");
 
-      // Wait 2 seconds then fetch details
-      setTimeout(async () => {
-        if (response.uploadId) {
-          dispatch(setFetchingDetails(true));
-
+      // Long polling for upload details - try up to 5 times
+      const pollUploadDetails = async (uploadId: string, maxAttempts = 5) => {
+        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
           try {
-            const detailsResponse = await fetchUploadDetails(response.uploadId);
+            console.log(`Fetching upload details - Attempt ${attempt}/${maxAttempts}`);
+            
+            const detailsResponse = await fetchUploadDetails(uploadId);
+            
+            // Check if we got a meaningful response
+            if (detailsResponse.status === "completed" || 
+                detailsResponse.status === "failed" || 
+                detailsResponse.validationStatus === "rejected") {
+              
+              console.log(`Upload details received on attempt ${attempt}:`, detailsResponse.status);
+              dispatch(setUploadDetails(detailsResponse));
 
-            dispatch(setUploadDetails(detailsResponse));
-
-            // Handle different statuses and show appropriate messages
-            if (
-              detailsResponse.status === "completed" &&
-              detailsResponse.isApproved
-            ) {
-              toast.success(
-                "Odometer reading successfully extracted and approved!"
-              );
-            } else if (detailsResponse.status === "failed") {
-              const errorMsg =
-                detailsResponse.validationNotes || "Upload processing failed";
-              // Don't show error toast immediately, wait for OCR
-              dispatch(setFetchError(errorMsg));
+              // Handle different statuses and show appropriate messages
+              if (
+                detailsResponse.status === "completed" &&
+                detailsResponse.isApproved
+              ) {
+                toast.success(
+                  "Odometer reading successfully extracted and approved!"
+                );
+                return; // Success, stop polling
+              } else if (detailsResponse.status === "failed") {
+                const errorMsg =
+                  detailsResponse.validationNotes || "Upload processing failed";
+                // Don't show error toast immediately, wait for OCR
+                dispatch(setFetchError(errorMsg));
+                
+                // If API fails, wait for background OCR to complete and show results
+                if (backgroundOCRPromise) {
+                  toast("API failed. Trying client-side OCR...");
+                  await backgroundOCRPromise;
+                } else {
+                  // If no OCR available, then show the error
+                  toast.error(errorMsg);
+                }
+                return; // Got response, stop polling
+              } else if (detailsResponse.validationStatus === "rejected") {
+                const rejectMsg =
+                  detailsResponse.validationNotes || "Upload was rejected";
+                // Don't show error toast immediately, wait for OCR
+                dispatch(setFetchError(rejectMsg));
+                
+                // If API rejects, wait for background OCR to complete and show results
+                if (backgroundOCRPromise) {
+                  toast("API rejected. Trying client-side OCR...");
+                  await backgroundOCRPromise;
+                } else {
+                  // If no OCR available, then show the error
+                  toast.error(rejectMsg);
+                }
+                return; // Got response, stop polling
+              } else if (detailsResponse.status === "processing") {
+                // Still processing, continue polling
+                console.log("Upload still processing, continuing to poll...");
+                if (attempt < maxAttempts) {
+                  continue;
+                } else {
+                  // Max attempts reached, show processing message
+                  toast.success("Upload is still being processed. Please wait...");
+                  return;
+                }
+              } else {
+                toast.success("Upload details fetched successfully!");
+                return; // Got response, stop polling
+              }
+            } else {
+              // Still processing, continue polling
+              console.log("Upload still processing, continuing to poll...");
+              if (attempt < maxAttempts) {
+                continue;
+              } else {
+                // Max attempts reached, show processing message
+                toast.success("Upload is still being processed. Please wait...");
+                return;
+              }
+            }
+          } catch (error) {
+            console.error(`Error fetching upload details on attempt ${attempt}:`, error);
+            
+            if (attempt === maxAttempts) {
+              // Last attempt failed
+              const errorMessage = error instanceof Error ? error.message : "Failed to fetch details";
+              dispatch(setFetchError(errorMessage));
               
               // If API fails, wait for background OCR to complete and show results
               if (backgroundOCRPromise) {
@@ -618,44 +682,23 @@ export default function UploadsPage() {
                 await backgroundOCRPromise;
               } else {
                 // If no OCR available, then show the error
-                toast.error(errorMsg);
+                handleApiFailure(error, uploadId, true);
               }
-            } else if (detailsResponse.validationStatus === "rejected") {
-              const rejectMsg =
-                detailsResponse.validationNotes || "Upload was rejected";
-              // Don't show error toast immediately, wait for OCR
-              dispatch(setFetchError(rejectMsg));
-              
-              // If API rejects, wait for background OCR to complete and show results
-              if (backgroundOCRPromise) {
-                toast("API rejected. Trying client-side OCR...");
-                await backgroundOCRPromise;
-              } else {
-                // If no OCR available, then show the error
-                toast.error(rejectMsg);
-              }
-            } else if (detailsResponse.status === "processing") {
-              toast.success("Upload is still being processed. Please wait...");
+              return;
             } else {
-              toast.success("Upload details fetched successfully!");
+              // Not the last attempt, continue to next attempt immediately
+              continue;
             }
-          } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : "Failed to fetch details";
-            dispatch(setFetchError(errorMessage));
-            
-            // If API fails, wait for background OCR to complete and show results
-            if (backgroundOCRPromise) {
-              toast("API failed. Trying client-side OCR...");
-              await backgroundOCRPromise;
-            } else {
-              // If no OCR available, then show the error
-            handleApiFailure(error, response.uploadId, true);
-            }
-          } finally {
-            dispatch(setFetchingDetails(false));
           }
         }
-      }, 2000);
+      };
+
+      // Start polling if we have an upload ID
+      if (response.uploadId) {
+        dispatch(setFetchingDetails(true));
+        await pollUploadDetails(response.uploadId);
+        dispatch(setFetchingDetails(false));
+      }
     } catch (error) {
       dispatch(
         setUploadResponse({

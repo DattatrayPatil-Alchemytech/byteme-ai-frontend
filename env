@@ -20,4 +20,4 @@ NEXT_PUBLIC_VECHAIN_EXPLORER_URL=https://explore-testnet.vechain.org/
 NEXT_PUBLIC_VECHAIN_INSPECTOR_URL=https://inspector.vecha.in/
 NEXT_PUBLIC_CONTRACT_X2EARN_APPS=0xcB23Eb1bBD5c07553795b9538b1061D0f4ABA153
 
-NEXT_PUBLIC_API_BASE_URL=http://byteme-ai-prod.ca-central-1.elasticbeanstalk.com
+NEXT_PUBLIC_API_BASE_URL=https://byteme-ai.alchemytech.in
