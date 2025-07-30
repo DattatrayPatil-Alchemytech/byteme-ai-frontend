@@ -9,7 +9,13 @@ import {
   verifyBlockchainTransactions,
 } from "@/lib/apiHelpers/rewards";
 
-export default function DistributeActions() {
+export default function DistributeActions({
+  showDistribute,
+  setTrigger,
+}: {
+  showDistribute: boolean;
+  setTrigger: (trigger: boolean) => void;
+}) {
   const [isDistributing, setIsDistributing] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
 
@@ -18,6 +24,7 @@ export default function DistributeActions() {
       toast.loading("Processing pending rewards...");
       await processPendingRewards();
       toast.success("Rewards distributed successfully!");
+      setTrigger(true);
     } catch (e) {
       toast.error("Failed to distribute rewards");
     } finally {
@@ -30,6 +37,7 @@ export default function DistributeActions() {
     try {
       toast.loading("Syncing with blockchain...");
       await verifyBlockchainTransactions();
+      setTrigger(true);
       toast.success("Blockchain sync successful!");
     } catch (e) {
       toast.error("Blockchain sync failed");
@@ -51,14 +59,14 @@ export default function DistributeActions() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-start gap-4">
           <Button
             onClick={handleDistribute}
-            disabled={isDistributing || isSyncing}
+            disabled={isDistributing || isSyncing || !showDistribute}
             className="gradient-ev-green hover:from-emerald-600 hover:to-green-700 whitespace-nowrap"
           >
             {isDistributing ? "Distributing..." : "Distribute Rewards"}
           </Button>
           <Button
             onClick={handleSyncBlockchain}
-            disabled={isDistributing || isSyncing}
+            disabled={isDistributing || isSyncing || !showDistribute}
             className="gradient-ev-green hover:from-blue-600 hover:to-blue-700 whitespace-nowrap"
           >
             {isSyncing ? "Syncing..." : "Sync with Blockchain"}

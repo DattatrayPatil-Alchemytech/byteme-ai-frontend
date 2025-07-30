@@ -5,10 +5,13 @@ import {
 } from "@/lib/apiHelpers/userDashboard";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import toast from "react-hot-toast";
+import { RootState } from "@/redux/store";
+import { useSelector } from "react-redux";
 
 const LeaderboardRanking: React.FC = () => {
   const [data, setData] = useState<LeaderboardResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const { user } = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
     setLoading(true);
@@ -191,7 +194,12 @@ const LeaderboardRanking: React.FC = () => {
                 Your Rank
               </p>
               <div className="text-2xl font-bold text-primary dark:text-green-400">
-                {data.userRank && data.userRank > 0 ? `#${data.userRank}` : "#"}
+                {data.userRank && data.userRank > 0
+                  ? `#${data.userRank}`
+                  : `#${
+                      data?.entries?.find((entry) => entry.userId === user?.id)
+                        ?.rank
+                    }`}
               </div>
             </div>
 

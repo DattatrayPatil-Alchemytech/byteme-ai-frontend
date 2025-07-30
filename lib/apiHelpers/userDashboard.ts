@@ -124,7 +124,7 @@ export const getDashboardData = (): Promise<DashboardData> => {
 };
 
 export const getWeeklyLeaderboard = async (): Promise<LeaderboardResponse> => {
-  return apiGet<LeaderboardResponse>(`/leaderboard?page=1&limit=5`, {
+  return apiGet<LeaderboardResponse>(`/leaderboard?page=1&limit=20`, {
     requireAuth: true,
     showToast: false,
   });

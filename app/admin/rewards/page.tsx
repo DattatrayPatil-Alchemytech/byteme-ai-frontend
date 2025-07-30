@@ -39,6 +39,8 @@ export default function RewardsPage() {
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [loading, setLoading] = useState(true);
   const [rewardsStats, setRewardsStats] = useState<RewardsStats | null>(null);
+  const [trigger, setTrigger] = useState(true);
+  const [showDistribute, setShowDistribute] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,6 +51,13 @@ export default function RewardsPage() {
           getRewardsStats(),
         ]);
         setRewards(rewardsResponse.rewards);
+        setTrigger(false);
+        const pending = rewardsResponse.rewards.filter(
+          (tx) => tx.status === "pending"
+        );
+        if (pending.length > 0) {
+          setShowDistribute(true);
+        }
         setRewardsStats(statsResponse);
       } catch (error) {
         console.error("Error fetching rewards data:", error);
@@ -57,8 +66,10 @@ export default function RewardsPage() {
       }
     };
 
-    fetchData();
-  }, []);
+    if (trigger) {
+      fetchData();
+    }
+  }, [trigger]);
 
   const getStatusColor = (color: string) => {
     switch (color) {
@@ -192,7 +203,10 @@ export default function RewardsPage() {
             Manage and track rewards distribution and blockchain transactions
           </p>
         </div>
-        <DistributeActions />
+        <DistributeActions
+          showDistribute={showDistribute}
+          setTrigger={setTrigger}
+        />
       </div>
 
       {/* Stats Overview */}
