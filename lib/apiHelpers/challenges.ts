@@ -199,5 +199,64 @@ export const publishChallenge = async (
   );
 };
 
+export interface UserChallenge {
+  name: string;
+  description: string;
+  targetValue: number;
+  rewardAmount?: number;
+  type: string;
+  startDate: string;
+  endDate: string;
+  currentParticipants: number;
+  maxParticipants: number;
+  requirements?: { minLevel: number; minMileage: number };
+  rewards?: {
+    points: number;
+    experience: number;
+  };
+  joined?: boolean;
+  id?: string;
+}
+
+export interface UserChallengesResponse {
+  userChallenges: { challenge: UserChallenge }[];
+}
+
+/**
+ * Get user's joined challenges
+ * GET /user/challenges
+ */
+export const getUserChallenges = async (): Promise<UserChallengesResponse> => {
+  return apiGet<UserChallengesResponse>("/user/challenges", {
+    requireAuth: true,
+  });
+};
+
+/**
+ * Get available challenges to join
+ * GET /challenges/available
+ */
+export const getAvailableChallenges = async (): Promise<{
+  challenges: UserChallenge[];
+}> => {
+  return apiGet<{ challenges: UserChallenge[] }>("/challenges/available", {
+    requireAuth: true,
+  });
+};
+
+/**
+ * Join an active challenge
+ * POST /challenges/join-active
+ */
+export const joinActiveChallenge = async (
+  challengeId: string
+): Promise<{ success: boolean; message: string }> => {
+  return apiPost<{ success: boolean; message: string }>(
+    "/challenges/join-active",
+    { challengeId },
+    { requireAuth: true }
+  );
+};
+
 // Export types for use in components
 export type { Challenge };

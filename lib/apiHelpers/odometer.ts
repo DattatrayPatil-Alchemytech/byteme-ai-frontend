@@ -4,7 +4,7 @@ import { VehicleDetails } from "@/redux/odometerSlice";
 // Types for API responses
 export interface UploadOdometerResponse {
   uploadId: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
+  status: "pending" | "processing" | "completed" | "failed";
   processingTime: number;
 }
 
@@ -38,8 +38,8 @@ export interface UploadDetailsResponse {
   openaiAnalysis: string | null;
   vehicleDetected: string | null;
   aiValidationResult: string | null;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
-  validationStatus: 'pending' | 'approved' | 'rejected';
+  status: "pending" | "processing" | "completed" | "failed" | "success";
+  validationStatus: "pending" | "approved" | "rejected";
   validationNotes: string | null;
   isApproved: boolean;
   finalMileage: number | null;
@@ -64,24 +64,24 @@ export const uploadOdometerImage = async (
 ): Promise<UploadOdometerResponse> => {
   // Create FormData for multipart upload according to Swagger spec
   const formData = new FormData();
-  formData.append('image', imageFile);
+  formData.append("image", imageFile);
   if (isAuthenticated) {
     if (vehicleDetails.vehicleId !== undefined) {
-      formData.append('vehicleId', vehicleDetails.vehicleId);
+      formData.append("vehicleId", vehicleDetails.vehicleId);
     }
   } else {
     if (vehicleDetails.numberPlate !== undefined) {
-      formData.append('vehicleId', vehicleDetails.numberPlate);
+      formData.append("vehicleId", vehicleDetails.numberPlate);
       // Create notes object with vehicle type and name
       const notes = {
         type: vehicleDetails.vehicleType,
-        name: vehicleDetails.vehicleName
+        name: vehicleDetails.vehicleName,
       };
-      formData.append('notes', JSON.stringify(notes));
+      formData.append("notes", JSON.stringify(notes));
     }
   }
 
-  return apiPost<UploadOdometerResponse>('/odometer/upload', formData, {
+  return apiPost<UploadOdometerResponse>("/odometer/upload", formData, {
     requireAuth: false,
     showToast: false,
   });
@@ -92,6 +92,16 @@ export const fetchUploadDetails = async (
   uploadId: string
 ): Promise<UploadDetailsResponse> => {
   return apiGet<UploadDetailsResponse>(`/odometer/uploads/${uploadId}`, {
+    requireAuth: false,
+    showToast: false,
+  });
+};
+
+// Fetch upload details by uploadId
+export const linktoUpload = async (
+  uploadId: string
+): Promise<UploadDetailsResponse> => {
+  return apiPost<UploadDetailsResponse>(`/odometer/uploads/${uploadId}/link`, {
     requireAuth: false,
     showToast: false,
   });
@@ -113,4 +123,4 @@ export const uploadVehicleDetails = async (
 };
 
 // Export types for use in components
-export type { VehicleDetails }; 
+export type { VehicleDetails };

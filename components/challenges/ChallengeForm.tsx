@@ -29,6 +29,7 @@ export interface ChallengeFormData {
     minMileage: number;
   };
   status?: string;
+  bannerUrl?: string;
 }
 
 export default function ChallengeForm({
@@ -75,7 +76,10 @@ export default function ChallengeForm({
     }
   }, [initialData]);
 
-  const handleInputChange = (field: keyof ChallengeFormData, value: any) => {
+  const handleInputChange = (
+    field: keyof ChallengeFormData,
+    value: string | number | boolean
+  ) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -96,7 +100,7 @@ export default function ChallengeForm({
     e.preventDefault();
 
     // Clean up data before sending
-    const apiData: any = {
+    const apiData: ChallengeFormData = {
       name: formData.name,
       description: formData.description,
       type: formData.type,
@@ -104,6 +108,7 @@ export default function ChallengeForm({
       endDate: formData.endDate,
       requirements: formData.requirements,
       status: formData.status || "draft",
+      bannerUrl: formData.imageUrl,
     };
 
     // Only include imageUrl if it has a value

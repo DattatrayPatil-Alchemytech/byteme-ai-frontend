@@ -1,4 +1,4 @@
-import { apiGet } from "./apiMiddleware";
+import { apiGet, apiPost } from "./apiMiddleware";
 
 // Types for rewards stats
 export interface RewardsStats {
@@ -28,50 +28,80 @@ export interface RewardsStats {
   mostActiveDayCount: number;
 }
 
-// Mock data for rewards stats
-const mockRewardsStats: RewardsStats = {
-  total: 150,
-  totalAmount: 1500.5,
-  totalMiles: 15000.5,
-  totalCarbonSaved: 2500.5,
-  byType: {
-    upload: 100,
-    badge: 30,
-    challenge: 20,
-  },
-  byStatus: {
-    pending: 50,
-    completed: 100,
-    failed: 5,
-  },
-  byBlockchainStatus: {
-    not_sent: 50,
-    confirmed: 100,
-    failed: 5,
-  },
-  averageAmount: 10,
-  averageMiles: 100,
-  averageCarbonSaved: 16.67,
-  mostActiveDay: "2024-01-15",
-  mostActiveDayCount: 8,
-};
+interface RewardBlockchainData {
+  txHash: {
+    txid: string;
+    totalDistributed: string;
+    batchCount: number;
+    totalUsers: number;
+  };
+  sentAt: string;
+}
+
+export interface Reward {
+  status: string;
+  blockchainStatus: string;
+  amount: string;
+  milesDriven: string;
+  carbonSaved: string;
+  cycleId: string | null;
+  blockchainData: RewardBlockchainData;
+  processedAt: string;
+  confirmedAt: string;
+  typeIcon: string;
+  statusColor: string;
+  blockchainStatusColor: string;
+}
+
+interface RewardsResponse {
+  rewards: Reward[];
+}
 
 /**
  * Get rewards statistics
  * GET /admin/rewards/stats
  */
 export const getRewardsStats = async (): Promise<RewardsStats> => {
-  // return new Promise((resolve) =>
-  //   setTimeout(() => {
-  //     resolve(mockRewardsStats);
-  //   }, 500)
-  // );
-
-  // Commented out actual API call for future implementation
-
   return apiGet<RewardsStats>("/admin/rewards/stats", {
     requireAuth: true,
     isAdmin: true,
-    showToast: false,
   });
+};
+
+/**
+ * GET /admin/rewards
+ */
+export const getRewards = async (): Promise<RewardsResponse> => {
+  return apiGet<RewardsResponse>("/admin/rewards", {
+    isAdmin: true,
+    requireAuth: true,
+  });
+};
+
+/**
+ * POST /admin/rewards/process/pending-rewards
+ */
+export const processPendingRewards = async () => {
+  return apiPost(
+    "/admin/rewards/process/pending-rewards",
+    {},
+    {
+      isAdmin: true,
+      requireAuth: true,
+    }
+  );
+};
+
+/**
+ * POST /admin/rewards/verify/blockchain-transactions
+ */
+export const verifyBlockchainTransactions = async () => {
+  return apiPost(
+    "/admin/rewards/verify/blockchain-transactions",
+    {},
+    {
+      isAdmin: true,
+      requireAuth: true,
+    }
+  );
 };
