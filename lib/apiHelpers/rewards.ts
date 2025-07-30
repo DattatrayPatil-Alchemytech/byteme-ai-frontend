@@ -82,26 +82,18 @@ export const getRewards = async (): Promise<RewardsResponse> => {
  * POST /admin/rewards/process/pending-rewards
  */
 export const processPendingRewards = async () => {
-  return apiPost(
-    "/admin/rewards/process/pending-rewards",
-    {},
-    {
-      isAdmin: true,
-      requireAuth: true,
-    }
-  );
+  return apiGet("/admin/rewards/process/pending-rewards", {
+    isAdmin: true,
+    requireAuth: true,
+  });
 };
 
 /**
  * POST /admin/rewards/verify/blockchain-transactions
  */
 export const verifyBlockchainTransactions = async () => {
-  return apiPost(
-    "/admin/rewards/verify/blockchain-transactions",
-    {},
-    {
-      isAdmin: true,
-      requireAuth: true,
-    }
-  );
+  return apiGet("/admin/rewards/verify/blockchain-transactions", {
+    isAdmin: true,
+    requireAuth: true,
+  });
 };
