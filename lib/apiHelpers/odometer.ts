@@ -70,17 +70,18 @@ export const uploadOdometerImage = async (
     if (vehicleDetails.vehicleId !== undefined) {
       formData.append("vehicleId", vehicleDetails.vehicleId);
     }
-  } else {
-    if (vehicleDetails.numberPlate !== undefined) {
-      formData.append("vehicleId", vehicleDetails.numberPlate);
-      // Create notes object with vehicle type and name
-      const notes = {
-        type: vehicleDetails.vehicleType,
-        name: vehicleDetails.vehicleName,
-      };
-      formData.append("notes", JSON.stringify(notes));
-    }
-  }
+  } 
+  // else {
+  //   if (vehicleDetails.numberPlate !== undefined) {
+  //     formData.append("vehicleId", vehicleDetails.numberPlate);
+  //     // Create notes object with vehicle type and name
+  //     const notes = {
+  //       type: vehicleDetails.vehicleType,
+  //       name: vehicleDetails.vehicleName,
+  //     };
+  //     formData.append("notes", JSON.stringify(notes));
+  //   }
+  // }
 
   return apiPost<UploadOdometerResponse>("/odometer/upload", formData, {
     requireAuth: isAuthenticated,
