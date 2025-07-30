@@ -597,7 +597,7 @@ export default function UploadsPage() {
     if (retryCount > 1) {
       try {
         await new Promise((resolve) => setTimeout(resolve, delay));
-        detailsResponse = await fetchUploadDetails(uploadId);
+        detailsResponse = await fetchUploadDetails(uploadId, isAuthenticated);
         if (
           detailsResponse?.status === "completed" &&
           detailsResponse?.isApproved
@@ -680,7 +680,9 @@ export default function UploadsPage() {
           detailsResponse?.isApproved
         ) {
           dispatch(setUploadDetails(detailsResponse));
-          await linktoUpload(uploadId);
+          if (!isAuthenticated) {
+            await linktoUpload(uploadId);
+          }
           return;
         } else if (detailsResponse?.status === "failed") {
           const errorMsg = "Upload processing failed";
@@ -1082,7 +1084,7 @@ export default function UploadsPage() {
               <h2 className="text-2xl font-bold">Odometer Reading Extracted</h2>
 
               <div className="text-4xl font-bold text-green-600">
-                {uploadDetails.extractedMileage?.toLocaleString() ||
+                {uploadDetails?.totalDistanceAllTime?.toLocaleString() ||
                   uploadDetails.finalMileage?.toLocaleString() ||
                   "0"}{" "}
                 KM
@@ -1093,14 +1095,14 @@ export default function UploadsPage() {
                   <span className="text-muted-foreground">Confidence: </span>
                   <span
                     className={`font-medium ${
-                      (uploadDetails.ocrConfidenceScore || 0) > 70
+                      (uploadDetails.ocrConfidenceScore || 0) * 100 > 70
                         ? "text-green-600"
-                        : (uploadDetails.ocrConfidenceScore || 0) > 40
+                        : (uploadDetails.ocrConfidenceScore || 0) * 100 > 40
                         ? "text-yellow-600"
                         : "text-red-600"
                     }`}
                   >
-                    {uploadDetails.ocrConfidenceScore || 0}%
+                    {(uploadDetails.ocrConfidenceScore || 0) * 100}%
                   </span>
                 </div>
                 <div>
@@ -1115,14 +1117,14 @@ export default function UploadsPage() {
                 </div>
               )}
 
-              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+              {/* <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                 <h4 className="font-semibold mb-2">API Response Details</h4>
                 <pre className="text-xs text-gray-600 overflow-auto">
                   {JSON.stringify(uploadDetails, null, 2)}
                 </pre>
-              </div>
+              </div> */}
 
-              <div className="flex gap-4">
+              <div className="flex gap-4 justify-center">
                 <Button onClick={handleReset} variant="outline">
                   <RotateCcw className="w-4 h-4 mr-2" />
                   Upload New Image
@@ -1151,6 +1153,7 @@ export default function UploadsPage() {
         {/* Client-side OCR Success - Show when OCR succeeds (API may have failed) */}
         {clientSideOCRResult &&
           !isProcessingOCR &&
+          !isFetchingDetails &&
           uploadDetails?.status !== "completed" && (
             <div className="text-center space-y-4">
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100">

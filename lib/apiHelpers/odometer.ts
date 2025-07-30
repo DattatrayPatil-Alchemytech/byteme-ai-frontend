@@ -50,6 +50,7 @@ export interface UploadDetailsResponse {
   ocrProcessingTimeMs: number | null;
   aiProcessingTimeMs: number | null;
   fileSizeBytes: number;
+  totalDistanceAllTime?: number | null;
   imageDimensions: string;
   createdAt: string;
   updatedAt: string;
@@ -82,17 +83,18 @@ export const uploadOdometerImage = async (
   }
 
   return apiPost<UploadOdometerResponse>("/odometer/upload", formData, {
-    requireAuth: false,
+    requireAuth: isAuthenticated,
     showToast: false,
   });
 };
 
 // Fetch upload details by uploadId
 export const fetchUploadDetails = async (
-  uploadId: string
+  uploadId: string,
+  isAuthenticated?: boolean
 ): Promise<UploadDetailsResponse> => {
   return apiGet<UploadDetailsResponse>(`/odometer/uploads/${uploadId}`, {
-    requireAuth: false,
+    requireAuth: isAuthenticated,
     showToast: false,
   });
 };
