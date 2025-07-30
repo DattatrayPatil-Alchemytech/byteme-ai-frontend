@@ -25,7 +25,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   );
   const dispatch = useDispatch();
   const router = useRouter();
-  const pathname = usePathname();
+  const pathname = usePathname() || "";
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [isAuthDone, setIsAuthDone] = useState(false);
   const { disconnect } = useWallet();
@@ -61,7 +61,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     if (isCheckingAuth) {
       checkAndRefreshAuth();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accessToken]);
 
   // Route protection logic

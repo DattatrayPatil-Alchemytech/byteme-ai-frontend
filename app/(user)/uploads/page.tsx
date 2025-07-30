@@ -36,6 +36,7 @@ import {
 import {
   uploadOdometerImage,
   fetchUploadDetails,
+  linktoUpload,
 } from "@/lib/apiHelpers/odometer";
 import { getUserVehicles, addVehicle } from "@/lib/apiHelpers/profile";
 import toast from "react-hot-toast";
@@ -66,8 +67,8 @@ interface TesseractInstance {
 
 // Load Tesseract.js dynamically on client side
 const loadTesseract = async () => {
-  if (typeof window !== 'undefined') {
-    const Tesseract = await import('tesseract.js');
+  if (typeof window !== "undefined") {
+    const Tesseract = await import("tesseract.js");
     return Tesseract.default;
   }
   return null;
@@ -75,13 +76,13 @@ const loadTesseract = async () => {
 
 // Vehicle type mapping for OCR
 const vehicleTypeMapping = {
-  'two-wheeler-bike': '2wheeler',
-  'two-wheeler-scooter': '2wheeler',
-  'three-wheeler': '3wheeler',
-  'four-wheeler': '4wheeler',
+  "two-wheeler-bike": "2wheeler",
+  "two-wheeler-scooter": "2wheeler",
+  "three-wheeler": "3wheeler",
+  "four-wheeler": "4wheeler",
 } as const;
 
-type VehicleType = '2wheeler' | '3wheeler' | '4wheeler';
+type VehicleType = "2wheeler" | "3wheeler" | "4wheeler";
 
 interface KmMatch {
   value: number;
@@ -108,9 +109,9 @@ const vehicleTypes = [
 
 // Advanced image preprocessing for better OCR accuracy
 const preprocessImageForOCR = (
-  canvas: HTMLCanvasElement, 
-  ctx: CanvasRenderingContext2D, 
-  imageData: ImageData, 
+  canvas: HTMLCanvasElement,
+  ctx: CanvasRenderingContext2D,
+  imageData: ImageData,
   vehicleType: VehicleType
 ): string => {
   const data = imageData.data;
@@ -122,21 +123,21 @@ const preprocessImageForOCR = (
     const r = data[i];
     const g = data[i + 1];
     const b = data[i + 2];
-    
+
     // Weighted grayscale conversion
     const gray = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
-    
+
     // Apply different thresholding based on vehicle type
     let threshold = 128;
-    if (vehicleType === '2wheeler') threshold = 110; // More sensitive for smaller displays
-    if (vehicleType === '3wheeler') threshold = 120;
-    
+    if (vehicleType === "2wheeler") threshold = 110; // More sensitive for smaller displays
+    if (vehicleType === "3wheeler") threshold = 120;
+
     const binary = gray > threshold ? 255 : 0;
-    
-    data[i] = binary;     // R
-    data[i + 1] = binary; // G  
+
+    data[i] = binary; // R
+    data[i + 1] = binary; // G
     data[i + 2] = binary; // B
-    data[i + 3] = 255;    // A
+    data[i + 3] = 255; // A
   }
 
   ctx.putImageData(imageData, 0, 0);
@@ -144,15 +145,16 @@ const preprocessImageForOCR = (
   // Step 2: Apply morphological operations to clean up noise
   const cleanedImageData = ctx.getImageData(0, 0, width, height);
   const cleanedData = cleanedImageData.data;
-  
+
   // Simple erosion to remove noise
   for (let y = 1; y < height - 1; y++) {
     for (let x = 1; x < width - 1; x++) {
       const idx = (y * width + x) * 4;
-      
-      if (data[idx] === 0) { // If current pixel is black
+
+      if (data[idx] === 0) {
+        // If current pixel is black
         let blackNeighbors = 0;
-        
+
         // Check 3x3 neighborhood
         for (let dy = -1; dy <= 1; dy++) {
           for (let dx = -1; dx <= 1; dx++) {
@@ -160,7 +162,7 @@ const preprocessImageForOCR = (
             if (data[nIdx] === 0) blackNeighbors++;
           }
         }
-        
+
         // Keep black pixel only if it has enough black neighbors
         if (blackNeighbors < 3) {
           cleanedData[idx] = cleanedData[idx + 1] = cleanedData[idx + 2] = 255;
@@ -170,77 +172,86 @@ const preprocessImageForOCR = (
   }
 
   ctx.putImageData(cleanedImageData, 0, 0);
-  return canvas.toDataURL('image/png');
+  return canvas.toDataURL("image/png");
 };
 
 // Enhanced kilometer extraction with better patterns
-const extractKilometersAdvanced = (ocrText: string, vehicleType: VehicleType): KmMatch | null => {
-  console.log('OCR Raw Text:', ocrText);
-  
+const extractKilometersAdvanced = (
+  ocrText: string,
+  vehicleType: VehicleType
+): KmMatch | null => {
+  console.log("OCR Raw Text:", ocrText);
+
   // Clean the OCR text
   const cleanText = ocrText
-    .replace(/[|]/g, '1') // Common OCR mistake: | instead of 1
-    .replace(/[O]/g, '0') // O instead of 0
-    .replace(/[S]/g, '5') // S instead of 5
-    .replace(/[l]/g, '1') // l instead of 1
-    .replace(/\s+/g, ' ') // Multiple spaces to single space
+    .replace(/[|]/g, "1") // Common OCR mistake: | instead of 1
+    .replace(/[O]/g, "0") // O instead of 0
+    .replace(/[S]/g, "5") // S instead of 5
+    .replace(/[l]/g, "1") // l instead of 1
+    .replace(/\s+/g, " ") // Multiple spaces to single space
     .trim();
 
-  console.log('Cleaned Text:', cleanText);
+  console.log("Cleaned Text:", cleanText);
 
   // Vehicle-specific patterns - more comprehensive
   const patterns: VehiclePatterns = {
-    '2wheeler': [
+    "2wheeler": [
       // Standard patterns for 2-wheelers
       /(?:total|odo|odometer|km|kilometers?)[\s:]*(\d{3,6}(?:[,.]?\d{1,3})?)/gi,
       /(\d{4,6}(?:[,.]?\d{1,3})?)\s*(?:km|kilometers?|kms?|k)/gi,
       // Digital display patterns
       /(\d{5,6})\s*(?:\.|,)?\s*\d{1}\s*(?:km|k)?/gi,
       // Just numbers that look like odometer readings
-      /\b(\d{4,6})\b/g
+      /\b(\d{4,6})\b/g,
     ],
-    '3wheeler': [
+    "3wheeler": [
       /(?:total|odo|odometer)[\s:]*(\d{4,6}(?:[,.]?\d{1,3})?)/gi,
       /(\d{4,6}(?:[,.]?\d{1,3})?)\s*(?:km|kilometers?|kms?)/gi,
-      /\b(\d{5,6})\b/g
+      /\b(\d{5,6})\b/g,
     ],
-    '4wheeler': [
+    "4wheeler": [
       /(?:total|odometer|odo)[\s:]*(\d{4,7}(?:[,.]?\d{1,3})?)/gi,
       /(\d{5,7}(?:[,.]?\d{1,3})?)\s*(?:km|kilometers?|kms?)/gi,
-      /\b(\d{5,7})\b/g
-    ]
+      /\b(\d{5,7})\b/g,
+    ],
   };
 
-  const vehiclePatterns = patterns[vehicleType] || patterns['4wheeler'];
+  const vehiclePatterns = patterns[vehicleType] || patterns["4wheeler"];
   const matches: KmMatch[] = [];
 
   vehiclePatterns.forEach((pattern, patternIndex) => {
     let match;
     const regex = new RegExp(pattern.source, pattern.flags);
-    
+
     while ((match = regex.exec(cleanText)) !== null) {
-      const rawValue = match[1].replace(/[,\s]/g, '');
+      const rawValue = match[1].replace(/[,\s]/g, "");
       const numValue = parseInt(rawValue, 10);
-      
+
       // Vehicle-specific validation ranges
       const ranges: VehicleRanges = {
-        '2wheeler': { min: 100, max: 150000 },    // 100 km to 150,000 km
-        '3wheeler': { min: 500, max: 500000 },    // 500 km to 500,000 km  
-        '4wheeler': { min: 1000, max: 999999 }    // 1,000 km to 999,999 km
+        "2wheeler": { min: 100, max: 150000 }, // 100 km to 150,000 km
+        "3wheeler": { min: 500, max: 500000 }, // 500 km to 500,000 km
+        "4wheeler": { min: 1000, max: 999999 }, // 1,000 km to 999,999 km
       };
-      
-      const range = ranges[vehicleType] || ranges['4wheeler'];
-      
+
+      const range = ranges[vehicleType] || ranges["4wheeler"];
+
       if (!isNaN(numValue) && numValue >= range.min && numValue <= range.max) {
-        const confidence = calculateAdvancedConfidence(match[0], cleanText, vehicleType, patternIndex, numValue);
-        
+        const confidence = calculateAdvancedConfidence(
+          match[0],
+          cleanText,
+          vehicleType,
+          patternIndex,
+          numValue
+        );
+
         matches.push({
           value: numValue,
           originalText: match[0],
           confidence: confidence,
-          patternUsed: patternIndex
+          patternUsed: patternIndex,
         });
-        
+
         console.log(`Found match: ${numValue} (confidence: ${confidence}%)`);
       }
     }
@@ -248,16 +259,16 @@ const extractKilometersAdvanced = (ocrText: string, vehicleType: VehicleType): K
 
   // Sort by confidence and return best match
   const bestMatch = matches.sort((a, b) => b.confidence - a.confidence)[0];
-  console.log('Best match:', bestMatch);
-  
+  console.log("Best match:", bestMatch);
+
   return bestMatch || null;
 };
 
 const calculateAdvancedConfidence = (
-  matchText: string, 
-  fullText: string, 
-  vehicleType: VehicleType, 
-  patternIndex: number, 
+  matchText: string,
+  fullText: string,
+  vehicleType: VehicleType,
+  patternIndex: number,
   numValue: number
 ): number => {
   let confidence = 40; // Base confidence
@@ -265,24 +276,28 @@ const calculateAdvancedConfidence = (
   // Boost for specific keywords
   if (/total|odo|odometer/i.test(matchText)) confidence += 25;
   if (/km|kilometers?/i.test(matchText)) confidence += 20;
-  
+
   // Boost for reasonable number length
   const numStr = numValue.toString();
-  if (vehicleType === '2wheeler' && numStr.length >= 4 && numStr.length <= 5) confidence += 15;
-  if (vehicleType === '3wheeler' && numStr.length >= 4 && numStr.length <= 6) confidence += 15;
-  if (vehicleType === '4wheeler' && numStr.length >= 5 && numStr.length <= 6) confidence += 15;
-  
+  if (vehicleType === "2wheeler" && numStr.length >= 4 && numStr.length <= 5)
+    confidence += 15;
+  if (vehicleType === "3wheeler" && numStr.length >= 4 && numStr.length <= 6)
+    confidence += 15;
+  if (vehicleType === "4wheeler" && numStr.length >= 5 && numStr.length <= 6)
+    confidence += 15;
+
   // Boost for pattern specificity (earlier patterns are more specific)
   confidence += (3 - patternIndex) * 5;
-  
+
   // Penalty for very high numbers that seem unrealistic
   if (numValue > 500000) confidence -= 20;
-  if (numValue > 200000 && vehicleType === '2wheeler') confidence -= 30;
-  
+  if (numValue > 200000 && vehicleType === "2wheeler") confidence -= 30;
+
   // Boost if number appears in context
   const contextWords = fullText.toLowerCase();
-  if (contextWords.includes('distance') || contextWords.includes('traveled')) confidence += 10;
-  
+  if (contextWords.includes("distance") || contextWords.includes("traveled"))
+    confidence += 10;
+
   return Math.min(Math.max(confidence, 10), 95); // Keep between 10-95%
 };
 
@@ -327,12 +342,12 @@ export default function UploadsPage() {
   useEffect(() => {
     // Reset all state to initial values - this should clear everything
     dispatch(resetOdometer());
-    
+
     // Clear file input if it exists
     if (inputRef.current) {
-      inputRef.current.value = '';
+      inputRef.current.value = "";
     }
-    
+
     // Reset the API call flag when component mounts
     hasCalledVehiclesAPI.current = false;
   }, [dispatch]);
@@ -340,27 +355,33 @@ export default function UploadsPage() {
   // Call getVehicles API if user is authenticated - run after reset
   useEffect(() => {
     let isMounted = true;
-    
+
     const fetchVehicles = async () => {
       // Check if user is authenticated, component is still mounted, and API hasn't been called yet
       if (isMounted && isAuthenticated && !hasCalledVehiclesAPI.current) {
         hasCalledVehiclesAPI.current = true; // Mark as called to prevent duplicate calls
-        
+
         try {
           dispatch(setVehiclesLoading(true));
           dispatch(setVehiclesError(null));
-          
+
           const vehicles = await getUserVehicles();
-          
+
           // Check if component is still mounted before updating state
           if (isMounted) {
             dispatch(setVehicles(vehicles));
           }
         } catch (error) {
           if (isMounted) {
-            console.error('Error fetching vehicles:', error);
-            dispatch(setVehiclesError(error instanceof Error ? error.message : 'Failed to fetch vehicles'));
-            toast.error('Failed to load vehicles');
+            console.error("Error fetching vehicles:", error);
+            dispatch(
+              setVehiclesError(
+                error instanceof Error
+                  ? error.message
+                  : "Failed to fetch vehicles"
+              )
+            );
+            toast.error("Failed to load vehicles");
           }
         } finally {
           if (isMounted) {
@@ -376,19 +397,25 @@ export default function UploadsPage() {
     return () => {
       isMounted = false;
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
 
-
   // Helper function to handle API failures
-  const handleApiFailure = (error: unknown, uploadId?: string, isFetchError = false) => {
-    const errorMessage = error instanceof Error 
-      ? error.message 
-      : isFetchError ? "Failed to fetch details" : "Upload failed";
-    
+  const handleApiFailure = (
+    error: unknown,
+    uploadId?: string,
+    isFetchError = false
+  ) => {
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : isFetchError
+        ? "Failed to fetch details"
+        : "Upload failed";
+
     // Set failed upload details in Redux
     dispatch(setFailedUploadDetails({ uploadId, errorMessage }));
-    
+
     // Show toast notification
     toast.error(errorMessage);
   };
@@ -454,14 +481,18 @@ export default function UploadsPage() {
   // Client-side OCR processing function
   const processImageWithOCR = async () => {
     if (!uploadedImage || !tesseract) {
-      dispatch(setOCRError('Tesseract not loaded yet. Please wait a moment and try again.'));
+      dispatch(
+        setOCRError(
+          "Tesseract not loaded yet. Please wait a moment and try again."
+        )
+      );
       return;
     }
-    
+
     dispatch(setProcessingOCR(true));
     dispatch(setOCRError(null));
-    dispatch(setOCRProcessingStep('Preprocessing image...'));
-    
+    dispatch(setOCRProcessingStep("Preprocessing image..."));
+
     try {
       // Step 1: Preprocess image
       const processedImage = await new Promise<string>((resolve) => {
@@ -469,76 +500,124 @@ export default function UploadsPage() {
         img.onload = () => {
           const canvas = canvasRef.current;
           if (!canvas) return;
-          
-          const ctx = canvas.getContext('2d');
+
+          const ctx = canvas.getContext("2d");
           if (!ctx) return;
-          
+
           // Set canvas size
           canvas.width = img.width;
           canvas.height = img.height;
-          
+
           // Draw original image
           ctx.drawImage(img, 0, 0);
-          
+
           // Get image data and preprocess
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const vehicleType = vehicleTypeMapping[vehicleDetails.vehicleType] || '4wheeler';
-          const processedDataURL = preprocessImageForOCR(canvas, ctx, imageData, vehicleType);
-          
+          const vehicleType =
+            vehicleTypeMapping[vehicleDetails.vehicleType] || "4wheeler";
+          const processedDataURL = preprocessImageForOCR(
+            canvas,
+            ctx,
+            imageData,
+            vehicleType
+          );
+
           resolve(processedDataURL);
         };
         img.src = uploadedImage;
       });
 
       // Step 2: Perform OCR with optimized settings
-      dispatch(setOCRProcessingStep('Performing OCR...'));
-      
-      const { data: { text } } = await tesseract.recognize(
-        processedImage,
-        'eng',
-        {
-          logger: (m: TesseractLogger) => {
-            if (m.status === 'recognizing text' && m.progress !== undefined) {
-              dispatch(setOCRProcessingStep(`OCR Progress: ${Math.round(m.progress * 100)}%`));
-            }
-          },
-          tessedit_pageseg_mode: tesseract.PSM.SPARSE_TEXT,
-          tessedit_char_whitelist: '0123456789.,KMkmTotalODODistancekilometers ',
-          preserve_interword_spaces: '1'
-        }
-      );
-      
-      dispatch(setOCRProcessingStep('Extracting kilometers...'));
-      
+      dispatch(setOCRProcessingStep("Performing OCR..."));
+
+      const {
+        data: { text },
+      } = await tesseract.recognize(processedImage, "eng", {
+        logger: (m: TesseractLogger) => {
+          if (m.status === "recognizing text" && m.progress !== undefined) {
+            dispatch(
+              setOCRProcessingStep(
+                `OCR Progress: ${Math.round(m.progress * 100)}%`
+              )
+            );
+          }
+        },
+        tessedit_pageseg_mode: tesseract.PSM.SPARSE_TEXT,
+        tessedit_char_whitelist: "0123456789.,KMkmTotalODODistancekilometers ",
+        preserve_interword_spaces: "1",
+      });
+
+      dispatch(setOCRProcessingStep("Extracting kilometers..."));
+
       // Step 3: Extract kilometers
-      const vehicleType = vehicleTypeMapping[vehicleDetails.vehicleType] || '4wheeler';
+      const vehicleType =
+        vehicleTypeMapping[vehicleDetails.vehicleType] || "4wheeler";
       const kmData = extractKilometersAdvanced(text, vehicleType);
-      
+
       if (kmData && kmData.confidence > 30) {
-        dispatch(setClientSideOCRResult({
-          kilometers: kmData.value,
-          confidence: kmData.confidence,
-          originalText: kmData.originalText,
-          patternUsed: kmData.patternUsed
-        }));
-        dispatch(setOCRProcessingStep('Complete!'));
+        dispatch(
+          setClientSideOCRResult({
+            kilometers: kmData.value,
+            confidence: kmData.confidence,
+            originalText: kmData.originalText,
+            patternUsed: kmData.patternUsed,
+          })
+        );
+        dispatch(setOCRProcessingStep("Complete!"));
         // Don't show toast here since it's running in background
       } else {
         const errorMsg = `Could not reliably extract kilometers from the odometer. 
-                         ${kmData ? `Best guess: ${kmData.value} km (${kmData.confidence}% confidence)` : ''}
+                         ${
+                           kmData
+                             ? `Best guess: ${kmData.value} km (${kmData.confidence}% confidence)`
+                             : ""
+                         }
                          Please ensure the image shows the odometer clearly with good lighting.`;
         dispatch(setOCRError(errorMsg));
         // Don't show toast here since it's running in background
       }
-      
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
-      dispatch(setOCRError('Failed to process image: ' + errorMessage));
+      const errorMessage =
+        err instanceof Error ? err.message : "Unknown error occurred";
+      dispatch(setOCRError("Failed to process image: " + errorMessage));
       // Don't show toast here since it's running in background
-      console.error('OCR Error:', err);
+      console.error("OCR Error:", err);
     } finally {
       dispatch(setProcessingOCR(false));
-      dispatch(setOCRProcessingStep(''));
+      dispatch(setOCRProcessingStep(""));
+    }
+  };
+
+  const retryWithDelay = async (
+    uploadId: string,
+    retryCount: number = 5,
+    delay: number = 5000
+  ) => {
+    let detailsResponse;
+    if (retryCount > 1) {
+      try {
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        detailsResponse = await fetchUploadDetails(uploadId);
+        if (
+          detailsResponse?.status === "completed" &&
+          detailsResponse?.isApproved
+        ) {
+          toast.success(
+            "Odometer reading successfully extracted and approved!"
+          );
+          return detailsResponse;
+        } else {
+          return retryWithDelay(uploadId, retryCount - 1, delay);
+        }
+      } catch (error) {
+        console.error(
+          `Error fetching upload details on attempt ${retryCount}:`,
+          error
+        );
+        retryWithDelay(uploadId, retryCount - 1, delay);
+      }
+    } else {
+      return detailsResponse;
     }
   };
 
@@ -576,7 +655,11 @@ export default function UploadsPage() {
 
     try {
       // Upload image and get upload ID
-      const response = await uploadOdometerImage(uploadedFile, vehicleDetails, isAuthenticated);
+      const response = await uploadOdometerImage(
+        uploadedFile,
+        vehicleDetails,
+        isAuthenticated
+      );
 
       dispatch(
         setUploadResponse({
@@ -590,106 +673,44 @@ export default function UploadsPage() {
 
       // Long polling for upload details - try up to 5 times
       const pollUploadDetails = async (uploadId: string, maxAttempts = 5) => {
-        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-          try {
-            console.log(`Fetching upload details - Attempt ${attempt}/${maxAttempts}`);
-            
-            const detailsResponse = await fetchUploadDetails(uploadId);
-            
-            // Check if we got a meaningful response
-            if (detailsResponse.status === "completed" || 
-                detailsResponse.status === "failed" || 
-                detailsResponse.validationStatus === "rejected") {
-              
-              console.log(`Upload details received on attempt ${attempt}:`, detailsResponse.status);
-              dispatch(setUploadDetails(detailsResponse));
+        const detailsResponse = await retryWithDelay(uploadId);
 
-              // Handle different statuses and show appropriate messages
-              if (
-                detailsResponse.status === "completed" &&
-                detailsResponse.isApproved
-              ) {
-                toast.success(
-                  "Odometer reading successfully extracted and approved!"
-                );
-                return; // Success, stop polling
-              } else if (detailsResponse.status === "failed") {
-                const errorMsg =
-                  detailsResponse.validationNotes || "Upload processing failed";
-                // Don't show error toast immediately, wait for OCR
-                dispatch(setFetchError(errorMsg));
-                
-                // If API fails, wait for background OCR to complete and show results
-                if (backgroundOCRPromise) {
-                  toast("API failed. Trying client-side OCR...");
-                  await backgroundOCRPromise;
-                } else {
-                  // If no OCR available, then show the error
-                  toast.error(errorMsg);
-                }
-                return; // Got response, stop polling
-              } else if (detailsResponse.validationStatus === "rejected") {
-                const rejectMsg =
-                  detailsResponse.validationNotes || "Upload was rejected";
-                // Don't show error toast immediately, wait for OCR
-                dispatch(setFetchError(rejectMsg));
-                
-                // If API rejects, wait for background OCR to complete and show results
-                if (backgroundOCRPromise) {
-                  toast("API rejected. Trying client-side OCR...");
-                  await backgroundOCRPromise;
-                } else {
-                  // If no OCR available, then show the error
-                  toast.error(rejectMsg);
-                }
-                return; // Got response, stop polling
-              } else if (detailsResponse.status === "processing") {
-                // Still processing, continue polling
-                console.log("Upload still processing, continuing to poll...");
-                if (attempt < maxAttempts) {
-                  continue;
-                } else {
-                  // Max attempts reached, show processing message
-                  toast.success("Upload is still being processed. Please wait...");
-                  return;
-                }
-              } else {
-                toast.success("Upload details fetched successfully!");
-                return; // Got response, stop polling
-              }
-            } else {
-              // Still processing, continue polling
-              console.log("Upload still processing, continuing to poll...");
-              if (attempt < maxAttempts) {
-                continue;
-              } else {
-                // Max attempts reached, show processing message
-                toast.success("Upload is still being processed. Please wait...");
-                return;
-              }
-            }
-          } catch (error) {
-            console.error(`Error fetching upload details on attempt ${attempt}:`, error);
-            
-            if (attempt === maxAttempts) {
-              // Last attempt failed
-              const errorMessage = error instanceof Error ? error.message : "Failed to fetch details";
-              dispatch(setFetchError(errorMessage));
-              
-              // If API fails, wait for background OCR to complete and show results
-              if (backgroundOCRPromise) {
-                toast("API failed. Trying client-side OCR...");
-                await backgroundOCRPromise;
-              } else {
-                // If no OCR available, then show the error
-                handleApiFailure(error, uploadId, true);
-              }
-              return;
-            } else {
-              // Not the last attempt, continue to next attempt immediately
-              continue;
-            }
+        if (
+          detailsResponse?.status === "completed" &&
+          detailsResponse?.isApproved
+        ) {
+          dispatch(setUploadDetails(detailsResponse));
+          await linktoUpload(uploadId);
+          return;
+        } else if (detailsResponse?.status === "failed") {
+          const errorMsg = "Upload processing failed";
+          // Don't show error toast immediately, wait for OCR
+          dispatch(setFetchError(errorMsg));
+
+          // If API fails, wait for background OCR to complete and show results
+          if (backgroundOCRPromise) {
+            toast("API failed. Trying client-side OCR...");
+            await backgroundOCRPromise;
+          } else {
+            // If no OCR available, then show the error
+            toast.error(errorMsg);
           }
+          return; // Got response, stop polling
+        } else if (detailsResponse?.validationStatus === "rejected") {
+          const rejectMsg =
+            detailsResponse?.validationNotes || "Upload was rejected";
+          // Don't show error toast immediately, wait for OCR
+          dispatch(setFetchError(rejectMsg));
+
+          // If API rejects, wait for background OCR to complete and show results
+          if (backgroundOCRPromise) {
+            toast("API rejected. Trying client-side OCR...");
+            await backgroundOCRPromise;
+          } else {
+            // If no OCR available, then show the error
+            toast.error(rejectMsg);
+          }
+          return; // Got response, stop polling
         }
       };
 
@@ -707,14 +728,14 @@ export default function UploadsPage() {
           processingTime: 0,
         })
       );
-      
+
       // If API fails, wait for background OCR to complete and show results
       if (backgroundOCRPromise) {
         toast("API failed. Trying client-side OCR...");
         await backgroundOCRPromise;
       } else {
         // If no OCR available, then show the error
-      handleApiFailure(error);
+        handleApiFailure(error);
       }
     } finally {
       dispatch(setUploading(false));
@@ -740,30 +761,34 @@ export default function UploadsPage() {
 
   // Handle navigation to dashboard
   const handleJoinChallenge = () => {
-    router.push('/dashboard');
+    router.push("/dashboard");
   };
 
   // Handle adding a new vehicle
-  const handleAddVehicle = async (vehicleData: { model: string; vehicleType: string; plateNumber: string }) => {
+  const handleAddVehicle = async (vehicleData: {
+    model: string;
+    vehicleType: string;
+    plateNumber: string;
+  }) => {
     setAddVehicleLoading(true);
     try {
       await addVehicle(vehicleData);
-      toast.success('Vehicle added successfully!');
+      toast.success("Vehicle added successfully!");
       setAddVehicleModalOpen(false);
-      
+
       // Reset the API call flag to allow refetching vehicles
       hasCalledVehiclesAPI.current = false;
-      
+
       // Refetch vehicles
       dispatch(setVehiclesLoading(true));
       dispatch(setVehiclesError(null));
-      
+
       const vehicles = await getUserVehicles();
       dispatch(setVehicles(vehicles));
       dispatch(setVehiclesLoading(false));
-      
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to add vehicle';
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to add vehicle";
       toast.error(errorMessage);
       throw error; // Re-throw to let the modal handle it
     } finally {
@@ -771,7 +796,7 @@ export default function UploadsPage() {
     }
   };
 
-    return (
+  return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       {/* Upload Section */}
       <div className="border border-border rounded-xl p-6 bg-card">
@@ -779,11 +804,11 @@ export default function UploadsPage() {
         {!isUploading && !uploadResponse && !uploadDetails && (
           <>
             <div className="flex items-center gap-2 mb-4">
-            <Camera className="w-6 h-6 text-muted-foreground" />
+              <Camera className="w-6 h-6 text-muted-foreground" />
               <span className="font-bold text-lg text-foreground">
                 Upload Odometer Photo
               </span>
-          </div>
+            </div>
             <p className="text-muted-foreground mb-4 text-sm">
               Take a clear photo of your vehicle&apos;s odometer to verify your
               mileage
@@ -791,10 +816,10 @@ export default function UploadsPage() {
             {/* Image Upload Area */}
             <div
               className="border-2 border-dashed border-gray-300 rounded-lg p-8 flex flex-col items-center justify-center text-center cursor-pointer transition hover:border-green-400 mb-6"
-            onClick={handleClick}
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-          >
+              onClick={handleClick}
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+            >
               {uploadedImage ? (
                 <div className="space-y-4">
                   <div className="relative">
@@ -814,17 +839,17 @@ export default function UploadsPage() {
                 </div>
               ) : (
                 <>
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted">
-              <Upload className="w-8 h-8 text-muted-foreground" />
-            </div>
-            <div className="space-y-1 mt-2">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted">
+                    <Upload className="w-8 h-8 text-muted-foreground" />
+                  </div>
+                  <div className="space-y-1 mt-2">
                     <p className="text-sm text-muted-foreground">
                       Click to upload or drag and drop your odometer photo
                     </p>
                     <p className="text-sm text-muted-foreground">
                       Supported formats: JPG, PNG, HEIC (Max 10MB)
                     </p>
-        </div>
+                  </div>
                   <Button
                     size="lg"
                     className="gradient-ev-green text-white mt-4"
@@ -842,7 +867,7 @@ export default function UploadsPage() {
                 accept="image/*"
               />
             </div>
-            
+
             {/* Vehicle Details Form */}
             {uploadedImage && (
               <div className="space-y-4">
@@ -854,25 +879,28 @@ export default function UploadsPage() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Select Vehicle
                     </label>
-                    
+
                     {/* Loading skeleton */}
                     {vehiclesLoading && (
                       <div className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 animate-pulse">
                         <div className="h-4 bg-gray-200 rounded w-3/4"></div>
                       </div>
                     )}
-                    
+
                     {/* Vehicle select field */}
                     {!vehiclesLoading && vehicles && vehicles.length > 0 && (
                       <select
                         value={vehicleDetails.vehicleId || ""}
                         onChange={(e) => {
-                          const selectedVehicle = vehicles.find(v => v.id === e.target.value);
+                          const selectedVehicle = vehicles.find(
+                            (v) => v.id === e.target.value
+                          );
                           if (selectedVehicle) {
-                            
-                            dispatch(setVehicleDetails({
-                              vehicleId: selectedVehicle.id,
-                            }));
+                            dispatch(
+                              setVehicleDetails({
+                                vehicleId: selectedVehicle.id,
+                              })
+                            );
                           }
                         }}
                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -885,21 +913,24 @@ export default function UploadsPage() {
                         ))}
                       </select>
                     )}
-                    
+
                     {/* Add vehicle button when no vehicles */}
-                    {!vehiclesLoading && (!vehicles || vehicles.length === 0) && (
-                      <div className="text-center p-4 border border-dashed border-gray-300 rounded-lg">
-                        <p className="text-gray-500 mb-3">No vehicles found</p>
-                        <Button 
-                          variant="outline" 
-                          className="gradient-ev-green text-white"
-                          onClick={() => setAddVehicleModalOpen(true)}
-                        >
-                          Add Vehicle
-                        </Button>
-                      </div>
-                    )}
-                    
+                    {!vehiclesLoading &&
+                      (!vehicles || vehicles.length === 0) && (
+                        <div className="text-center p-4 border border-dashed border-gray-300 rounded-lg">
+                          <p className="text-gray-500 mb-3">
+                            No vehicles found
+                          </p>
+                          <Button
+                            variant="outline"
+                            className="gradient-ev-green text-white"
+                            onClick={() => setAddVehicleModalOpen(true)}
+                          >
+                            Add Vehicle
+                          </Button>
+                        </div>
+                      )}
+
                     {/* Error state */}
                     {vehiclesError && (
                       <div className="text-red-600 text-sm mt-2">
@@ -917,7 +948,10 @@ export default function UploadsPage() {
                       <select
                         value={vehicleDetails.vehicleType}
                         onChange={(e) =>
-                          handleVehicleDetailsChange("vehicleType", e.target.value)
+                          handleVehicleDetailsChange(
+                            "vehicleType",
+                            e.target.value
+                          )
                         }
                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
@@ -940,7 +974,10 @@ export default function UploadsPage() {
                         type="text"
                         value={vehicleDetails.numberPlate}
                         onChange={(e) =>
-                          handleVehicleDetailsChange("numberPlate", e.target.value)
+                          handleVehicleDetailsChange(
+                            "numberPlate",
+                            e.target.value
+                          )
                         }
                         placeholder="Enter vehicle number plate"
                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -956,7 +993,10 @@ export default function UploadsPage() {
                         type="text"
                         value={vehicleDetails.vehicleName}
                         onChange={(e) =>
-                          handleVehicleDetailsChange("vehicleName", e.target.value)
+                          handleVehicleDetailsChange(
+                            "vehicleName",
+                            e.target.value
+                          )
                         }
                         placeholder="Enter vehicle name/model"
                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -973,7 +1013,10 @@ export default function UploadsPage() {
                     isFetchingDetails ||
                     isProcessingOCR ||
                     !uploadedImage ||
-                    (isAuthenticated ? !vehicleDetails.vehicleId : (!vehicleDetails.numberPlate.trim() || !vehicleDetails.vehicleName.trim()))
+                    (isAuthenticated
+                      ? !vehicleDetails.vehicleId
+                      : !vehicleDetails.numberPlate.trim() ||
+                        !vehicleDetails.vehicleName.trim())
                   }
                   className="w-full gradient-ev-green text-white"
                   size="lg"
@@ -981,7 +1024,11 @@ export default function UploadsPage() {
                   {isUploading || isFetchingDetails || isProcessingOCR ? (
                     <>
                       <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      {isUploading ? "Uploading..." : isFetchingDetails ? "Fetching Details..." : ocrProcessingStep || "Processing..."}
+                      {isUploading
+                        ? "Uploading..."
+                        : isFetchingDetails
+                        ? "Fetching Details..."
+                        : ocrProcessingStep || "Processing..."}
                     </>
                   ) : (
                     <>
@@ -990,8 +1037,6 @@ export default function UploadsPage() {
                     </>
                   )}
                 </Button>
-
-
               </div>
             )}
           </>
@@ -999,27 +1044,32 @@ export default function UploadsPage() {
 
         {/* Single Processing Status - Show when any processing is happening (API or OCR) */}
         {(isUploading || isFetchingDetails || isProcessingOCR) && (
-            <div className="text-center space-y-4">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100">
-                <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
-              </div>
+          <div className="text-center space-y-4">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100">
+              <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
+            </div>
             <h2 className="text-2xl font-bold">
-              {isUploading ? "Uploading..." : 
-               isFetchingDetails ? "Fetching Details..." : 
-               "Processing with Client-side OCR"}
+              {isUploading
+                ? "Uploading..."
+                : isFetchingDetails
+                ? "Fetching Details..."
+                : "Processing with Client-side OCR"}
             </h2>
-              <p className="text-muted-foreground">
-              {isUploading ? "Uploading image to server..." :
-               isFetchingDetails ? "Fetching processing results..." :
-               ocrProcessingStep || "Processing image with client-side OCR..."}
-              </p>
+            <p className="text-muted-foreground">
+              {isUploading
+                ? "Uploading image to server..."
+                : isFetchingDetails
+                ? "Fetching processing results..."
+                : ocrProcessingStep ||
+                  "Processing image with client-side OCR..."}
+            </p>
             {uploadResponse && uploadResponse.uploadId && (
               <div className="text-sm text-muted-foreground">
                 Upload ID: {uploadResponse.uploadId}
               </div>
             )}
-            </div>
-          )}
+          </div>
+        )}
 
         {/* Success Results - Show when API succeeds */}
         {uploadDetails &&
@@ -1027,8 +1077,8 @@ export default function UploadsPage() {
           uploadDetails.status === "completed" && (
             <div className="text-center space-y-4">
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100">
-            <CheckCircle className="w-6 h-6 text-green-600" />
-          </div>
+                <CheckCircle className="w-6 h-6 text-green-600" />
+              </div>
               <h2 className="text-2xl font-bold">Odometer Reading Extracted</h2>
 
               <div className="text-4xl font-bold text-green-600">
@@ -1036,11 +1086,11 @@ export default function UploadsPage() {
                   uploadDetails.finalMileage?.toLocaleString() ||
                   "0"}{" "}
                 KM
-        </div>
-            
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="text-muted-foreground">Confidence: </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-muted-foreground">Confidence: </span>
                   <span
                     className={`font-medium ${
                       (uploadDetails.ocrConfidenceScore || 0) > 70
@@ -1051,14 +1101,14 @@ export default function UploadsPage() {
                     }`}
                   >
                     {uploadDetails.ocrConfidenceScore || 0}%
-                </span>
-              </div>
-              <div>
+                  </span>
+                </div>
+                <div>
                   <span className="text-muted-foreground">Vehicle: </span>
                   <span className="font-medium">{uploadDetails.vehicleId}</span>
+                </div>
               </div>
-            </div>
-            
+
               {uploadDetails.carbonSaved && (
                 <div className="text-sm text-green-600">
                   Carbon Saved: {uploadDetails.carbonSaved} kg CO2
@@ -1077,14 +1127,17 @@ export default function UploadsPage() {
                   <RotateCcw className="w-4 h-4 mr-2" />
                   Upload New Image
                 </Button>
-          </div>
+              </div>
               <div className="flex justify-center">
                 {!isAuthenticated && (
-                  <WalletConnect title="Connect Wallet and Claim Rewards" className="gradient-ev-green text-white" />
+                  <WalletConnect
+                    title="Connect Wallet and Claim Rewards"
+                    className="gradient-ev-green text-white"
+                  />
                 )}
                 {isAuthenticated && (
-                  <Button 
-                    className="gradient-ev-green text-white" 
+                  <Button
+                    className="gradient-ev-green text-white"
                     variant="outline"
                     onClick={handleJoinChallenge}
                   >
@@ -1092,83 +1145,95 @@ export default function UploadsPage() {
                   </Button>
                 )}
               </div>
-        </div>
+            </div>
           )}
 
         {/* Client-side OCR Success - Show when OCR succeeds (API may have failed) */}
-        {clientSideOCRResult && !isProcessingOCR && (
-          <div className="text-center space-y-4">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100">
-              <CheckCircle className="w-6 h-6 text-blue-600" />
-            </div>
-            <h2 className="text-2xl font-bold text-blue-600">
-              Odometer Reading Extracted
-            </h2>
-            <div className="text-4xl font-bold text-blue-600">
-              {clientSideOCRResult.kilometers.toLocaleString()} KM
-            </div>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="text-muted-foreground">Confidence: </span>
-                <span
-                  className={`font-medium ${
-                    clientSideOCRResult.confidence > 70
-                      ? "text-green-600"
-                      : clientSideOCRResult.confidence > 40
-                      ? "text-yellow-600"
-                      : "text-red-600"
-                  }`}
-                >
-                  {clientSideOCRResult.confidence}%
-                </span>
+        {clientSideOCRResult &&
+          !isProcessingOCR &&
+          uploadDetails?.status !== "completed" && (
+            <div className="text-center space-y-4">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100">
+                <CheckCircle className="w-6 h-6 text-blue-600" />
               </div>
-              <div>
-                <span className="text-muted-foreground">Detected: </span>
-                <span className="font-medium">&quot;{clientSideOCRResult.originalText}&quot;</span>
+              <h2 className="text-2xl font-bold text-blue-600">
+                Odometer Reading Extracted
+              </h2>
+              <div className="text-4xl font-bold text-blue-600">
+                {clientSideOCRResult.kilometers.toLocaleString()} KM
+              </div>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-muted-foreground">Confidence: </span>
+                  <span
+                    className={`font-medium ${
+                      clientSideOCRResult.confidence > 70
+                        ? "text-green-600"
+                        : clientSideOCRResult.confidence > 40
+                        ? "text-yellow-600"
+                        : "text-red-600"
+                    }`}
+                  >
+                    {clientSideOCRResult.confidence}%
+                  </span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Detected: </span>
+                  <span className="font-medium">
+                    &quot;{clientSideOCRResult.originalText}&quot;
+                  </span>
+                </div>
+              </div>
+              <div className="flex justify-center">
+                <Button onClick={handleReset} variant="outline">
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  Upload New Image
+                </Button>
+              </div>
+              <div className="flex justify-center">
+                {!isAuthenticated && (
+                  <WalletConnect
+                    title="Connect Wallet and Claim Rewards"
+                    className="gradient-ev-green text-white"
+                  />
+                )}
+                {isAuthenticated && (
+                  <Button
+                    className="gradient-ev-green text-white"
+                    variant="outline"
+                    onClick={handleJoinChallenge}
+                  >
+                    Join Challenge From Leaderboard
+                  </Button>
+                )}
               </div>
             </div>
-            <div className="flex justify-center">
-              <Button onClick={handleReset} variant="outline">
-                <RotateCcw className="w-4 h-4 mr-2" />
-                Upload New Image
-              </Button>
-            </div>
-            <div className="flex justify-center">
-              {!isAuthenticated && (
-                <WalletConnect title="Connect Wallet and Claim Rewards" className="gradient-ev-green text-white" />
-              )}
-              {isAuthenticated && (
-                 <Button 
-                   className="gradient-ev-green text-white" 
-                   variant="outline"
-                   onClick={handleJoinChallenge}
-                 >
-                   Join Challenge From Leaderboard
-                 </Button>
-               )}
-            </div>
-          </div>
-        )}
+          )}
 
         {/* Single Error Message - Show when all processing is complete and both API and OCR failed */}
-        {!isUploading && !isFetchingDetails && !isProcessingOCR && 
-         uploadDetails && 
-         (uploadDetails.status === "failed" || uploadDetails.validationStatus === "rejected") &&
-         !clientSideOCRResult && (
+        {!isUploading &&
+          !isFetchingDetails &&
+          !isProcessingOCR &&
+          uploadDetails &&
+          (uploadDetails.status === "failed" ||
+            uploadDetails.validationStatus === "rejected") &&
+          !clientSideOCRResult && (
             <div className="text-center space-y-4">
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-100">
                 <AlertCircle className="w-6 h-6 text-red-600" />
               </div>
               <h2 className="text-2xl font-bold text-red-600">
-              Processing Failed
+                Processing Failed
               </h2>
-            <p className="text-red-600 text-sm whitespace-pre-line">
-              {ocrError || uploadDetails.validationNotes || "Failed to process the image. Please ensure the image shows the odometer clearly with good lighting."}
+              <p className="text-red-600 text-sm whitespace-pre-line">
+                {ocrError ||
+                  uploadDetails.validationNotes ||
+                  "Failed to process the image. Please ensure the image shows the odometer clearly with good lighting."}
               </p>
               <div className="flex justify-center">
                 <Button onClick={handleReset} variant="outline">
                   <RotateCcw className="w-4 h-4 mr-2" />
-                Upload New Image
+                  Upload New Image
                 </Button>
               </div>
             </div>
@@ -1198,7 +1263,7 @@ export default function UploadsPage() {
           </li>
         </ul>
       </div>
-      
+
       {/* Hidden canvas for image preprocessing */}
       <canvas ref={canvasRef} className="hidden" />
 

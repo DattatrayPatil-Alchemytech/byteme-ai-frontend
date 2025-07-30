@@ -56,13 +56,13 @@ export default function AdminLayout({
   const getActiveTab = () => {
     if (pathname === "/admin" || pathname === "/admin/dashboard")
       return "overview";
-    if (pathname.startsWith("/admin/users")) return "users";
-    if (pathname.startsWith("/admin/orders")) return "orders";
-    if (pathname.startsWith("/admin/products")) return "products";
-    if (pathname.startsWith("/admin/badges")) return "badges";
-    if (pathname.startsWith("/admin/challenges")) return "challenges";
-    if (pathname.startsWith("/admin/rewards")) return "rewards";
-    if (pathname.startsWith("/admin/settings")) return "settings";
+    if (pathname?.startsWith("/admin/users")) return "users";
+    if (pathname?.startsWith("/admin/orders")) return "orders";
+    if (pathname?.startsWith("/admin/products")) return "products";
+    if (pathname?.startsWith("/admin/badges")) return "badges";
+    if (pathname?.startsWith("/admin/challenges")) return "challenges";
+    if (pathname?.startsWith("/admin/rewards")) return "rewards";
+    if (pathname?.startsWith("/admin/settings")) return "settings";
     return "";
   };
 

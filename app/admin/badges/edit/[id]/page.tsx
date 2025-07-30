@@ -1,32 +1,37 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select } from '@/components/ui/select';
-import { getBadgeDetails, updateBadge, type AdminBadge, type UpdateBadgeRequest } from '@/lib/apiHelpers/adminBadges';
-import { toast } from 'react-hot-toast';
-import { ArrowLeft } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select } from "@/components/ui/select";
+import {
+  getBadgeDetails,
+  updateBadge,
+  type AdminBadge,
+  type UpdateBadgeRequest,
+} from "@/lib/apiHelpers/adminBadges";
+import { toast } from "react-hot-toast";
+import { ArrowLeft } from "lucide-react";
 
 export default function EditBadgePage() {
   const router = useRouter();
   const params = useParams();
-  const badgeId = params.id as string;
-  
+  const badgeId = params?.id as string;
+
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [badge, setBadge] = useState<AdminBadge | null>(null);
   const [formData, setFormData] = useState<UpdateBadgeRequest>({
-    name: '',
-    description: '',
-    type: '',
-    rarity: '',
-    imageUrl: '',
-    iconUrl: '',
+    name: "",
+    description: "",
+    type: "",
+    rarity: "",
+    imageUrl: "",
+    iconUrl: "",
     conditions: {},
     rewards: {
       b3trTokens: 0,
@@ -35,14 +40,14 @@ export default function EditBadgePage() {
     },
     pointsValue: 0,
     metadata: {
-      category: '',
+      category: "",
       tags: [],
       difficulty: 1,
-      estimatedTime: '',
+      estimatedTime: "",
     },
   });
 
-  const [newTag, setNewTag] = useState('');
+  const [newTag, setNewTag] = useState("");
 
   // Fetch badge details
   const fetchBadgeDetails = async () => {
@@ -50,11 +55,12 @@ export default function EditBadgePage() {
       setIsLoading(true);
       const badgeData = await getBadgeDetails(badgeId);
       setBadge(badgeData);
-      
+
       // Parse metadata if it's a string
-      const metadata = typeof badgeData.metadata === 'string' 
-        ? JSON.parse(badgeData.metadata) 
-        : badgeData.metadata;
+      const metadata =
+        typeof badgeData.metadata === "string"
+          ? JSON.parse(badgeData.metadata)
+          : badgeData.metadata;
 
       // Populate form data
       setFormData({
@@ -70,9 +76,9 @@ export default function EditBadgePage() {
         metadata: metadata,
       });
     } catch (error) {
-      console.error('Error fetching badge details:', error);
-      toast.error('Failed to fetch badge details');
-      router.push('/admin/badges');
+      console.error("Error fetching badge details:", error);
+      toast.error("Failed to fetch badge details");
+      router.push("/admin/badges");
     } finally {
       setIsLoading(false);
     }
@@ -80,38 +86,43 @@ export default function EditBadgePage() {
 
   // Handle form input changes
   const handleInputChange = (field: string, value: string | number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   // Handle nested object changes
-  const handleNestedChange = (parent: keyof UpdateBadgeRequest, field: string, value: string | number) => {
-    setFormData(prev => {
+  const handleNestedChange = (
+    parent: keyof UpdateBadgeRequest,
+    field: string,
+    value: string | number
+  ) => {
+    setFormData((prev) => {
       const parentValue = prev[parent] as Record<string, unknown>;
       return {
         ...prev,
         [parent]: {
           ...parentValue,
-          [field]: value
-        }
+          [field]: value,
+        },
       };
     });
   };
 
   // Handle array changes (tags)
-  const handleTagsChange = (action: 'add' | 'remove', tag?: string) => {
-    setFormData(prev => {
+  const handleTagsChange = (action: "add" | "remove", tag?: string) => {
+    setFormData((prev) => {
       const currentTags = (prev.metadata?.tags as string[]) || [];
       return {
         ...prev,
         metadata: {
           ...prev.metadata,
-          tags: action === 'add' && tag
-            ? [...currentTags, tag]
-            : currentTags.filter(t => t !== tag)
-        }
+          tags:
+            action === "add" && tag
+              ? [...currentTags, tag]
+              : currentTags.filter((t) => t !== tag),
+        },
       };
     });
   };
@@ -119,21 +130,26 @@ export default function EditBadgePage() {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validation
-    if (!formData.name || !formData.description || !formData.type || !formData.rarity) {
-      toast.error('Please fill in all required fields');
+    if (
+      !formData.name ||
+      !formData.description ||
+      !formData.type ||
+      !formData.rarity
+    ) {
+      toast.error("Please fill in all required fields");
       return;
     }
 
     try {
       setIsSaving(true);
       await updateBadge(badgeId, formData);
-      toast.success('Badge updated successfully');
-      router.push('/admin/badges');
+      toast.success("Badge updated successfully");
+      router.push("/admin/badges");
     } catch (error) {
-      console.error('Error updating badge:', error);
-      toast.error('Failed to update badge');
+      console.error("Error updating badge:", error);
+      toast.error("Failed to update badge");
     } finally {
       setIsSaving(false);
     }
@@ -143,14 +159,14 @@ export default function EditBadgePage() {
   const handleAddTag = () => {
     const currentTags = (formData.metadata?.tags as string[]) || [];
     if (newTag.trim() && !currentTags.includes(newTag.trim())) {
-      handleTagsChange('add', newTag.trim());
-      setNewTag('');
+      handleTagsChange("add", newTag.trim());
+      setNewTag("");
     }
   };
 
   // Remove tag
   const handleRemoveTag = (tag: string) => {
-    handleTagsChange('remove', tag);
+    handleTagsChange("remove", tag);
   };
 
   // Initial data fetch
@@ -158,7 +174,7 @@ export default function EditBadgePage() {
     if (badgeId) {
       fetchBadgeDetails();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [badgeId]);
 
   if (isLoading) {
@@ -173,8 +189,10 @@ export default function EditBadgePage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-foreground mb-4">Badge Not Found</h2>
-          <Button onClick={() => router.push('/admin/badges')}>
+          <h2 className="text-2xl font-bold text-foreground mb-4">
+            Badge Not Found
+          </h2>
+          <Button onClick={() => router.push("/admin/badges")}>
             Back to Badges
           </Button>
         </div>
@@ -190,7 +208,7 @@ export default function EditBadgePage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => router.push('/admin/badges')}
+            onClick={() => router.push("/admin/badges")}
             className="flex items-center space-x-2"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -202,10 +220,7 @@ export default function EditBadgePage() {
             </p>
           </div>
         </div>
-        <Button
-          variant="outline"
-          onClick={() => router.push('/admin/badges')}
-        >
+        <Button variant="outline" onClick={() => router.push("/admin/badges")}>
           Cancel
         </Button>
       </div>
@@ -222,7 +237,7 @@ export default function EditBadgePage() {
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
+                onChange={(e) => handleInputChange("name", e.target.value)}
                 placeholder="Enter badge name"
                 required
               />
@@ -232,7 +247,9 @@ export default function EditBadgePage() {
               <Textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) => handleInputChange('description', e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("description", e.target.value)
+                }
                 placeholder="Enter badge description"
                 required
               />
@@ -240,9 +257,9 @@ export default function EditBadgePage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="type">Type *</Label>
-                <Select 
-                  value={formData.type} 
-                  onChange={(e) => handleInputChange('type', e.target.value)}
+                <Select
+                  value={formData.type}
+                  onChange={(e) => handleInputChange("type", e.target.value)}
                   required
                 >
                   <option value="">Select type</option>
@@ -254,9 +271,9 @@ export default function EditBadgePage() {
               </div>
               <div>
                 <Label htmlFor="rarity">Rarity *</Label>
-                <Select 
-                  value={formData.rarity} 
-                  onChange={(e) => handleInputChange('rarity', e.target.value)}
+                <Select
+                  value={formData.rarity}
+                  onChange={(e) => handleInputChange("rarity", e.target.value)}
                   required
                 >
                   <option value="">Select rarity</option>
@@ -273,7 +290,7 @@ export default function EditBadgePage() {
               <Textarea
                 id="notes"
                 value={formData.notes}
-                onChange={(e) => handleInputChange('notes', e.target.value)}
+                onChange={(e) => handleInputChange("notes", e.target.value)}
                 placeholder="Optional notes about the badge"
               />
             </div>
@@ -292,7 +309,7 @@ export default function EditBadgePage() {
                 id="imageUrl"
                 type="url"
                 value={formData.imageUrl}
-                onChange={(e) => handleInputChange('imageUrl', e.target.value)}
+                onChange={(e) => handleInputChange("imageUrl", e.target.value)}
                 placeholder="https://example.com/badge-image.png"
                 required
               />
@@ -303,7 +320,7 @@ export default function EditBadgePage() {
                 id="iconUrl"
                 type="url"
                 value={formData.iconUrl}
-                onChange={(e) => handleInputChange('iconUrl', e.target.value)}
+                onChange={(e) => handleInputChange("iconUrl", e.target.value)}
                 placeholder="https://example.com/badge-icon.png"
                 required
               />
@@ -323,16 +340,28 @@ export default function EditBadgePage() {
                 <Input
                   id="mileage"
                   type="number"
-                  value={(formData.conditions?.mileage as number) || ''}
-                  onChange={(e) => handleNestedChange('conditions', 'mileage', parseInt(e.target.value) || 0)}
+                  value={(formData.conditions?.mileage as number) || ""}
+                  onChange={(e) =>
+                    handleNestedChange(
+                      "conditions",
+                      "mileage",
+                      parseInt(e.target.value) || 0
+                    )
+                  }
                   placeholder="1000"
                 />
               </div>
               <div>
                 <Label htmlFor="timeFrame">Time Frame</Label>
-                <Select 
-                  value={(formData.conditions?.timeFrame as string) || ''} 
-                  onChange={(e) => handleNestedChange('conditions', 'timeFrame', e.target.value)}
+                <Select
+                  value={(formData.conditions?.timeFrame as string) || ""}
+                  onChange={(e) =>
+                    handleNestedChange(
+                      "conditions",
+                      "timeFrame",
+                      e.target.value
+                    )
+                  }
                 >
                   <option value="">Select time frame</option>
                   <option value="all_time">All Time</option>
@@ -358,7 +387,13 @@ export default function EditBadgePage() {
                   id="b3trTokens"
                   type="number"
                   value={(formData.rewards?.b3trTokens as number) || 0}
-                  onChange={(e) => handleNestedChange('rewards', 'b3trTokens', parseInt(e.target.value) || 0)}
+                  onChange={(e) =>
+                    handleNestedChange(
+                      "rewards",
+                      "b3trTokens",
+                      parseInt(e.target.value) || 0
+                    )
+                  }
                   placeholder="10"
                 />
               </div>
@@ -368,7 +403,13 @@ export default function EditBadgePage() {
                   id="points"
                   type="number"
                   value={(formData.rewards?.points as number) || 0}
-                  onChange={(e) => handleNestedChange('rewards', 'points', parseInt(e.target.value) || 0)}
+                  onChange={(e) =>
+                    handleNestedChange(
+                      "rewards",
+                      "points",
+                      parseInt(e.target.value) || 0
+                    )
+                  }
                   placeholder="100"
                 />
               </div>
@@ -378,7 +419,13 @@ export default function EditBadgePage() {
                   id="experience"
                   type="number"
                   value={(formData.rewards?.experience as number) || 0}
-                  onChange={(e) => handleNestedChange('rewards', 'experience', parseInt(e.target.value) || 0)}
+                  onChange={(e) =>
+                    handleNestedChange(
+                      "rewards",
+                      "experience",
+                      parseInt(e.target.value) || 0
+                    )
+                  }
                   placeholder="50"
                 />
               </div>
@@ -389,7 +436,12 @@ export default function EditBadgePage() {
                 id="pointsValue"
                 type="number"
                 value={formData.pointsValue}
-                onChange={(e) => handleInputChange('pointsValue', parseInt(e.target.value) || 0)}
+                onChange={(e) =>
+                  handleInputChange(
+                    "pointsValue",
+                    parseInt(e.target.value) || 0
+                  )
+                }
                 placeholder="100"
               />
             </div>
@@ -407,16 +459,26 @@ export default function EditBadgePage() {
                 <Label htmlFor="category">Category</Label>
                 <Input
                   id="category"
-                  value={(formData.metadata?.category as string) || ''}
-                  onChange={(e) => handleNestedChange('metadata', 'category', e.target.value)}
+                  value={(formData.metadata?.category as string) || ""}
+                  onChange={(e) =>
+                    handleNestedChange("metadata", "category", e.target.value)
+                  }
                   placeholder="milestone"
                 />
               </div>
               <div>
                 <Label htmlFor="difficulty">Difficulty (1-5)</Label>
-                <Select 
-                  value={((formData.metadata?.difficulty as number) || 1).toString()} 
-                  onChange={(e) => handleNestedChange('metadata', 'difficulty', parseInt(e.target.value))}
+                <Select
+                  value={(
+                    (formData.metadata?.difficulty as number) || 1
+                  ).toString()}
+                  onChange={(e) =>
+                    handleNestedChange(
+                      "metadata",
+                      "difficulty",
+                      parseInt(e.target.value)
+                    )
+                  }
                 >
                   <option value="">Select difficulty</option>
                   <option value="1">1 - Very Easy</option>
@@ -431,8 +493,14 @@ export default function EditBadgePage() {
               <Label htmlFor="estimatedTime">Estimated Time</Label>
               <Input
                 id="estimatedTime"
-                value={(formData.metadata?.estimatedTime as string) || ''}
-                onChange={(e) => handleNestedChange('metadata', 'estimatedTime', e.target.value)}
+                value={(formData.metadata?.estimatedTime as string) || ""}
+                onChange={(e) =>
+                  handleNestedChange(
+                    "metadata",
+                    "estimatedTime",
+                    e.target.value
+                  )
+                }
                 placeholder="2 weeks"
               />
             </div>
@@ -444,28 +512,32 @@ export default function EditBadgePage() {
                   value={newTag}
                   onChange={(e) => setNewTag(e.target.value)}
                   placeholder="Add a tag"
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
+                  onKeyPress={(e) =>
+                    e.key === "Enter" && (e.preventDefault(), handleAddTag())
+                  }
                 />
                 <Button type="button" onClick={handleAddTag} variant="outline">
                   Add
                 </Button>
               </div>
               <div className="flex flex-wrap gap-2">
-                {(formData.metadata?.tags as string[])?.map((tag: string, index: number) => (
-                  <div
-                    key={index}
-                    className="flex items-center space-x-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded-md"
-                  >
-                    <span className="text-sm">{tag}</span>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveTag(tag)}
-                      className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200"
+                {(formData.metadata?.tags as string[])?.map(
+                  (tag: string, index: number) => (
+                    <div
+                      key={index}
+                      className="flex items-center space-x-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded-md"
                     >
-                      ×
-                    </button>
-                  </div>
-                ))}
+                      <span className="text-sm">{tag}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveTag(tag)}
+                        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  )
+                )}
               </div>
             </div>
           </CardContent>
@@ -476,7 +548,7 @@ export default function EditBadgePage() {
           <Button
             type="button"
             variant="outline"
-            onClick={() => router.push('/admin/badges')}
+            onClick={() => router.push("/admin/badges")}
           >
             Cancel
           </Button>
@@ -491,11 +563,11 @@ export default function EditBadgePage() {
                 <span>Saving...</span>
               </div>
             ) : (
-              'Save Changes'
+              "Save Changes"
             )}
           </Button>
         </div>
       </form>
     </div>
   );
-} 
+}

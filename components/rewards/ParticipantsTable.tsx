@@ -18,12 +18,12 @@ export interface RoundSubmission {
 }
 
 interface ParticipantsTableProps {
-  allSubmissions: RoundSubmission[];
   currentSubmissions: RoundSubmission[];
   startIndex: number;
   endIndex: number;
   currentPage: number;
   totalPages: number;
+  totalCount: number;
   setCurrentPage: (page: number) => void;
   handleViewUserDetails: (userId: number) => void;
   getRankColor: (rank: number) => string;
@@ -32,12 +32,12 @@ interface ParticipantsTableProps {
 }
 
 export default function ParticipantsTable({
-  allSubmissions,
   currentSubmissions,
   startIndex,
   endIndex,
   currentPage,
   totalPages,
+  totalCount,
   setCurrentPage,
   handleViewUserDetails,
   getRankColor,
@@ -53,8 +53,8 @@ export default function ParticipantsTable({
             Round Participants
           </span>
           <span className="text-sm text-muted-foreground">
-            Showing {startIndex + 1}-{Math.min(endIndex, allSubmissions.length)}{" "}
-            of {allSubmissions.length}
+            Showing {startIndex + 1}-{Math.min(endIndex, totalCount)} of{" "}
+            {totalCount}
           </span>
         </CardTitle>
       </CardHeader>
@@ -247,13 +247,11 @@ export default function ParticipantsTable({
           {/* Results Info */}
           <div className="text-sm text-muted-foreground text-center sm:text-left">
             <span className="block sm:hidden">
-              {startIndex + 1}-{Math.min(endIndex, allSubmissions.length)} of{" "}
-              {allSubmissions.length}
+              {startIndex + 1}-{Math.min(endIndex, totalCount)} of {totalCount}
             </span>
             <span className="hidden sm:block">
-              Showing {startIndex + 1}-
-              {Math.min(endIndex, allSubmissions.length)} of{" "}
-              {allSubmissions.length} participants
+              Showing {startIndex + 1}-{Math.min(endIndex, totalCount)} of{" "}
+              {totalCount} participants
             </span>
           </div>
 
